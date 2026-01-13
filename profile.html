@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <link rel="manifest" href="/NVTA/manifest.json">
+<meta name="theme-color" content="#0f172a">
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>প্রোফাইল</title>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+<style>
+:root {
+    --primary-color: #4a6bff;
+    --secondary-color: #f5f7ff;
+    --text-color: #333;
+    --white: #fff;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --notification-color: #ff6b6b;
+    --dark-bg: #1a1a1a;
+    --dark-text: #f0f0f0;
+    --dark-secondary: #2d2d2d;
+    --dark-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI','Kalpurush','Siyam Rupali',sans-serif;
+}
+body{
+    color:#333;
+    font-size:14px; 
+    background-color: white;
+    padding-top: 50px;
+    padding-bottom: 70px;
+    transition: background-color 0.3s, color 0.3s;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body.dark-mode {
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
+}
+
+/* Background Animation */
+.bg-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.bg-bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #27ae60 0%, #4a6bff 100%);
+    animation: float 15s infinite ease-in-out;
+    opacity: 0.2;
+}
+
+body.dark-mode .bg-bubble {
+    background: linear-gradient(135deg, #2ecc71 0%, #3498db 100%);
+    opacity: 0.15;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) translateX(0);
+    }
+    25% {
+        transform: translateY(-20px) translateX(10px);
+    }
+    50% {
+        transform: translateY(-40px) translateX(-10px);
+    }
+    75% {
+        transform: translateY(-20px) translateX(-5px);
+    }
+}
+
+/* Header Styles */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    border-bottom: 1px solid #2ecc71;
+    height: 50px;
+}
+
+body.dark-mode header {
+    background-color: var(--dark-secondary);
+    box-shadow: var(--dark-shadow);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 50%;
+    overflow: hidden;
+}
+
+.logo {
+    height: 40px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.app-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--primary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 18px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+    padding: 5px;
+    width: 15px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+body.dark-mode .icon-btn {
+    color: var(--dark-text);
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: var(--notification-color);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.notification-badge.pulse {
+    animation: pulse 0.5s 2;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle .fa-sun,
+.theme-toggle .fa-moon {
+    transition: opacity 0.3s;
+}
+
+body.dark-mode .theme-toggle .fa-sun {
+    display: block;
+    opacity: 1;
+}
+
+body.dark-mode .theme-toggle .fa-moon {
+    display: none;
+    opacity: 0;
+}
+
+body:not(.dark-mode) .theme-toggle .fa-sun {
+    display: none;
+    opacity: 0;
+}
+
+body:not(.dark-mode) .theme-toggle .fa-moon {
+    display: block;
+    opacity: 1;
+}
+
+/* Navigation Bar Styles */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--white);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0;
+    z-index: 100;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    border-top: 1px solid #2ecc71;
+    height: 60px;
+}
+
+body.dark-mode .bottom-nav {
+    background-color: var(--dark-secondary);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 12px;
+    transition: all 0.3s;
+    padding: 8px 12px;
+    position: relative;
+    flex: 1;
+    max-width: 33.33%;
+}
+
+body.dark-mode .nav-btn {
+    color: var(--dark-text);
+}
+
+.nav-btn i {
+    font-size: 20px;
+    margin-bottom: 4px;
+    transition: color 0.3s;
+}
+
+.nav-btn:hover i {
+    color: var(--primary-color);
+}
+
+.nav-btn.active i {
+    color: var(--primary-color);
+}
+
+.nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    width: 6px;
+    height: 6px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+}
+
+/* Main Content Styles */
+.container{
+    max-width:1200px;
+    margin:auto;
+    opacity: 1;
+    padding: 15px;
+    transition: opacity 0.3s;
+}
+
+.container.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* প্রোফাইল স্টাইল - নতুন যুক্ত */
+.profile-header {
+    padding: 25px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    background: linear-gradient(135deg, #FFA726 0%, #FF9800 100%);
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    min-height: 180px;
+}
+
+body.dark-mode .profile-header {
+    background: linear-gradient(135deg, #FF8A00 0%, #FF5722 100%);
+}
+
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+    z-index: 1;
+}
+
+.profile-header > * {
+    position: relative;
+    z-index: 2;
+}
+
+.profile-photo-container {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.profile-info-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 0;
+}
+
+.member-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: left;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    line-height: 1.2;
+}
+
+body.dark-mode .member-name {
+    color: #ffffff;
+}
+
+.member-id {
+    font-size: 18px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    text-align: left;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 8px 16px;
+    border-radius: 10px;
+    display: inline-block;
+    backdrop-filter: blur(5px);
+    max-width: fit-content;
+}
+
+body.dark-mode .member-id {
+    background: rgba(0, 0, 0, 0.2);
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.member-status {
+    display: inline-block;
+    padding: 8px 20px;
+    background-color: #27ae60;
+    color: white;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+    max-width: fit-content;
+}
+
+/* তথ্য সেকশন */
+.info-section {
+    margin-bottom: 30px;
+}
+
+.section-title{
+    font-size:18px;
+    color:#2c3e9e;
+    margin-top: 30px;
+    margin-bottom:12px;
+    border-bottom:1px solid #2c3e9e;
+    padding-bottom:6px;
+}
+
+body.dark-mode .section-title {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.info-row {
+    display: flex;
+    border-bottom: 1px solid #eee;
+    padding: 12px 0;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    width: 200px;
+    font-weight: 600;
+    color: #555;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+body.dark-mode .info-label {
+    color: #aaa;
+}
+
+.info-value {
+    color: #333;
+    font-size: 14px;
+    flex: 1;
+}
+
+body.dark-mode .info-value {
+    color: var(--dark-text);
+}
+
+/* ঠিকানা সেকশন */
+.address-section {
+    margin-bottom: 30px;
+}
+
+.address-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+.address-card {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: var(--white);
+}
+
+body.dark-mode .address-card {
+    background-color: var(--dark-secondary);
+    border-color: #444;
+}
+
+.address-title {
+    color: #2c3e9e;
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e1e5f1;
+    font-weight: 700;
+}
+
+body.dark-mode .address-title {
+    color: var(--primary-color);
+    border-bottom-color: #444;
+}
+
+/* নমিনি সেকশন */
+.nominee-section {
+    margin-bottom: 10px;
+}
+
+.nominee-card {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: var(--white);
+}
+
+body.dark-mode .nominee-card {
+    background-color: var(--dark-secondary);
+    border-color: #444;
+}
+
+.nominee-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.nominee-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #2c3e9e;
+    flex-shrink: 0;
+}
+
+.nominee-basic-info {
+    flex: 1;
+}
+
+.nominee-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+body.dark-mode .nominee-name {
+    color: var(--dark-text);
+}
+
+.nominee-relation {
+    font-size: 14px;
+    color: #666;
+}
+
+body.dark-mode .nominee-relation {
+    color: #aaa;
+}
+
+.nominee-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+/* লগআউট বাটন সেকশন */
+.logout-section {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.logout-btn {
+    padding: 12px 40px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Loading State */
+.loading-overlay {
+    position: fixed;
+    top: 50px; /* Header height */
+    left: 0;
+    width: 100%;
+    height: calc(100% - 110px); /* Full height minus header and footer */
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 90;
+    transition: background-color 0.3s;
+}
+
+body.dark-mode .loading-overlay {
+    background: rgba(26, 26, 26, 0.9);
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #27ae60;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+body.dark-mode .loading-spinner {
+    border: 4px solid #2d2d2d;
+    border-top: 4px solid #2ecc71;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: #333;
+    font-size: 18px;
+    font-family: 'Kalpurush', 'Siyam Rupali', sans-serif;
+    transition: color 0.3s;
+}
+
+body.dark-mode .loading-text {
+    color: #f0f0f0;
+}
+
+/* Content Loading State */
+.content-loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Progressive Loading Animation */
+.profile-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container{
+        padding:10px;
+    }
+    body{
+        font-size:13px;
+    }
+    .section-title{
+        font-size:16px;
+    }
+    
+    /* প্রোফাইল রেস্পন্সিভ */
+    .profile-header {
+        padding: 20px;
+        gap: 20px;
+        min-height: auto;
+    }
+    
+    .profile-photo {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .member-name {
+        font-size: 24px;
+    }
+    
+    .member-id {
+        font-size: 16px;
+        padding: 6px 12px;
+    }
+    
+    .member-status {
+        font-size: 14px;
+        padding: 6px 16px;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .address-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .nominee-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .info-label {
+        width: 100%;
+    }
+    
+    .nominee-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .nominee-photo {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .logout-btn {
+        width: 100%;
+        padding: 12px;
+    }
+    
+    .address-card, .nominee-card {
+        padding: 15px;
+    }
+    
+    /* Header Responsive */
+    .logo {
+        height: 40px;
+    }
+    
+    .app-title {
+        font-size: 14px;
+    }
+    
+    .header-controls {
+        gap: 10px;
+    }
+    
+    .icon-btn {
+        font-size: 16px;
+    }
+    
+    .notification-badge {
+        width: 16px;
+        height: 16px;
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-header {
+        padding: 15px;
+        border-radius: 15px;
+        gap: 15px;
+    }
+    
+    .profile-photo {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .member-name {
+        font-size: 20px;
+    }
+    
+    .member-id {
+        font-size: 14px;
+        padding: 5px 10px;
+    }
+    
+    .member-status {
+        font-size: 13px;
+        padding: 5px 12px;
+    }
+    
+    .loading-spinner {
+        width: 35px;
+        height: 35px;
+        border-width: 3px;
+    }
+
+    .loading-text {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 360px) {
+    .profile-header {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .profile-photo {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .member-name {
+        font-size: 18px;
+    }
+    
+    .member-id {
+        font-size: 13px;
+    }
+}
+
+@media (min-width: 768px) {
+    .logo {
+        height: 35px;
+    }
+    
+    .app-title {
+        font-size: 18px;
+    }
+    
+    .icon-btn {
+        font-size: 20px;
+    }
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+<!-- Background Animation -->
+<div class="bg-animation" id="bg-animation"></div>
+
+<!-- Header -->
+<header>
+    <div class="logo-container">
+        <a href="index.html">
+            <img src="https://blogger.googleusercontent.com/img/a/AVvXsEivqTIaHdAT5pCu40npVAhBQUB7v15cU-vog8HUrrsluvCpu3Q4kRsQ2XiX2pnPi441r1CIxxxgLe9HPVq8lVPQKg22UyoVEQZdm_JRehypwRK8WWfDQY45SCFonpHDeLrTr0u2Qhk1RnVew6cLpcWrUN9FfLdv6f_sG9KwJi1EpHbRs5DGk4ZlRIqL" alt="App Logo" class="logo" id="header-logo">
+        </a>
+        <div class="app-title" id="header-title"></div>
+    </div>
+    
+    <div class="header-controls">
+        <button class="icon-btn theme-toggle" id="theme-toggle">
+            <i class="fas fa-sun"></i>
+            <i class="fas fa-moon"></i>
+        </button>
+        <button class="icon-btn" id="notification-btn" onclick="window.location.href='notifications.html'">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" id="notification-badge">0</span>
+        </button>
+    </div>
+</header>
+
+<!-- Loading Overlay with Spinner -->
+<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">অপেক্ষা করুন</div>
+</div>
+
+<div class="container" id="mainContainer">
+    <!-- প্রোফাইল হেডার -->
+    <div class="profile-header">
+        <div class="profile-photo-container">
+            <img src="https://blogger.googleusercontent.com/img/a/AVvXsEj9OiIr3VFRvlTYNtRPHMzwWBEZNsxDHWq3f54sMWtyx8WyV64h0zN5cBt7NNvsxdeK5mwSFmB5EX6hA-41oW-lL2ubn_kjkdvSzPYeFX2C5On8GsYAOPB809sL4gWMzwVL-sQG8Sd-02CQlUzaJvR4yrufK7KOQHUMvYgXHXdlJvsKnoyCXoNVThiV" alt="প্রোফাইল ছবি" class="profile-photo" id="profilePhoto">
+        </div>
+        
+        <div class="profile-info-column">
+            <h1 class="member-name profile-skeleton" id="memberName" style="height: 32px; width: 200px;"></h1>
+            <div class="member-id profile-skeleton" id="memberId" style="height: 30px; width: 150px;"></div>
+            <span class="member-status" id="memberStatus">সক্রিয় সদস্য</span>
+        </div>
+    </div>
+    
+    <!-- ব্যক্তিগত তথ্য সেকশন -->
+    <div class="info-section">
+        <h2 class="section-title">ব্যক্তিগত তথ্য</h2>
+        <div class="info-grid">
+            <!-- প্রথম কলাম -->
+            <div>
+                <div class="info-row">
+                    <div class="info-label">পিতার নাম</div>
+                    <div class="info-value profile-skeleton" id="fatherName" style="height: 20px; width: 150px;"></div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">মাতার নাম</div>
+                    <div class="info-value profile-skeleton" id="motherName" style="height: 20px; width: 150px;"></div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">জন্ম তারিখ</div>
+                    <div class="info-value profile-skeleton" id="birthDate" style="height: 20px; width: 120px;"></div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">ধর্ম</div>
+                    <div class="info-value profile-skeleton" id="religion" style="height: 20px; width: 100px;"></div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">পেশা</div>
+                    <div class="info-value profile-skeleton" id="profession" style="height: 20px; width: 150px;"></div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">জাতীয় পরিচয়পত্র</div>
+                    <div class="info-value profile-skeleton" id="nid" style="height: 20px; width: 180px;"></div>
+                </div>
+            </div>
+            
+            <!-- দ্বিতীয় কলাম -->
+            <div>
+                <div class="info-row">
+                    <div class="info-label">জাতীয়তা</div>
+                    <div class="info-value profile-skeleton" id="nationality" style="height: 20px; width: 100px;"></div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">বৈবাহিক অবস্থা</div>
+                    <div class="info-value profile-skeleton" id="maritalStatus" style="height: 20px; width: 120px;"></div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">রক্তের গ্রুপ</div>
+                    <div class="info-value profile-skeleton" id="bloodGroup" style="height: 20px; width: 80px;"></div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">শিক্ষাগত যোগ্যতা</div>
+                    <div class="info-value profile-skeleton" id="education" style="height: 20px; width: 150px;"></div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">মোবাইল নম্বর</div>
+                    <div class="info-value profile-skeleton" id="mobile" style="height: 20px; width: 150px;"></div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">নিবন্ধন তারিখ</div>
+                    <div class="info-value profile-skeleton" id="registrationDate" style="height: 20px; width: 150px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ঠিকানা সেকশন -->
+    <div class="address-section">
+        <h2 class="section-title">ঠিকানা তথ্য</h2>
+        <div class="address-grid">
+            <div class="address-card">
+                <h3 class="address-title">স্থায়ী ঠিকানা</h3>
+                <div class="info-row">
+                    <div class="info-label">গ্রাম/মহল্লা</div>
+                    <div class="info-value profile-skeleton" id="permanentVillage" style="height: 20px; width: 150px;"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">ডাকঘর</div>
+                    <div class="info-value profile-skeleton" id="permanentPostOffice" style="height: 20px; width: 150px;"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">উপজেলা</div>
+                    <div class="info-value profile-skeleton" id="permanentUpazila" style="height: 20px; width: 120px;"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">জেলা</div>
+                    <div class="info-value profile-skeleton" id="permanentDistrict" style="height: 20px; width: 120px;"></div>
+                </div>
+            </div>
+            
+            <div class="address-card">
+                <h3 class="address-title">বর্তমান ঠিকানা</h3>
+                <div class="info-row">
+                    <div class="info-label">গ্রাম/মহল্লা</div>
+                    <div class="info-value profile-skeleton" id="currentVillage" style="height: 20px; width: 150px;"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">ডাকঘর</div>
+                    <div class="info-value profile-skeleton" id="currentPostOffice" style="height: 20px; width: 150px;"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">উপজেলা</div>
+                    <div class="info-value profile-skeleton" id="currentUpazila" style="height: 20px; width: 120px;"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">জেলা</div>
+                    <div class="info-value profile-skeleton" id="currentDistrict" style="height: 20px; width: 120px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- নমিনি সেকশন -->
+    <div class="nominee-section">
+        <h2 class="section-title">নমিনি তথ্য</h2>
+        <div class="nominee-card">
+            <div class="nominee-header">
+                <img src="https://blogger.googleusercontent.com/img/a/AVvXsEj9OiIr3VFRvlTYNtRPHMzwWBEZNsxDHWq3f54sMWtyx8WyV64h0zN5cBt7NNvsxdeK5mwSFmB5EX6hA-41oW-lL2ubn_kjkdvSzPYeFX2C5On8GsYAOPB809sL4gWMzwVL-sQG8Sd-02CQlUzaJvR4yrufK7KOQHUMvYgXHXdlJvsKnoyCXoNVThiV" alt="নমিনির ছবি" class="nominee-photo" id="nomineePhoto">
+                <div class="nominee-basic-info">
+                    <div class="nominee-name profile-skeleton" id="nomineeName" style="height: 24px; width: 180px;"></div>
+                    <div class="nominee-relation profile-skeleton" id="nomineeRelation" style="height: 20px; width: 120px;"></div>
+                </div>
+            </div>
+            
+            <div class="nominee-grid">
+                <div class="info-row">
+                    <div class="info-label">জাতীয় পরিচয়পত্র</div>
+                    <div class="info-value profile-skeleton" id="nomineeNid" style="height: 20px; width: 180px;"></div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">জন্ম তারিখ</div>
+                    <div class="info-value profile-skeleton" id="nomineeBirthDate" style="height: 20px; width: 120px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- লগআউট বাটন সেকশন -->
+    <div class="logout-section">
+        <button class="logout-btn" id="logoutBtn">লগআউট</button>
+    </div>
+</div>
+
+<!-- Navigation Bar -->
+<nav class="bottom-nav">
+    <a href="payment.html" class="nav-btn" id="deposit-btn">
+        <i class="fas fa-money-bill-wave"></i>
+        <span>জমা দিন</span>
+    </a>
+    <a href="index.html" class="nav-btn" id="home-btn">
+        <i class="fas fa-home"></i>
+        <span>হোম</span>
+    </a>
+    <a href="profile.html" class="nav-btn active" id="profile-btn">
+        <i class="fas fa-user"></i>
+        <span>প্রোফাইল</span>
+    </a>
+</nav>
+
+<script>
+// Firebase config
+const firebaseConfig = {
+    apiKey: "AIzaSyBnUqarL-c8oEA52EPBCUdoz67kzvsDnM0",
+    authDomain: "nvta-f70ed.firebaseapp.com",
+    projectId: "nvta-f70ed",
+    storageBucket: "nvta-f70ed.firebasestorage.app",
+    messagingSenderId: "832906232424",
+    appId: "1:832906232424:web:df35b6c489c9c9c03ef1dd"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+// ✅ Cache important elements
+const loadingOverlay = document.getElementById('loadingOverlay');
+const mainContainer = document.getElementById('mainContainer');
+
+// Profile elements
+const profilePhoto = document.getElementById('profilePhoto');
+const memberId = document.getElementById('memberId');
+const memberName = document.getElementById('memberName');
+const memberStatus = document.getElementById('memberStatus');
+const fatherName = document.getElementById('fatherName');
+const motherName = document.getElementById('motherName');
+const birthDate = document.getElementById('birthDate');
+const religion = document.getElementById('religion');
+const profession = document.getElementById('profession');
+const nid = document.getElementById('nid');
+const nationality = document.getElementById('nationality');
+const maritalStatus = document.getElementById('maritalStatus');
+const bloodGroup = document.getElementById('bloodGroup');
+const education = document.getElementById('education');
+const mobile = document.getElementById('mobile');
+const registrationDate = document.getElementById('registrationDate');
+const permanentVillage = document.getElementById('permanentVillage');
+const permanentPostOffice = document.getElementById('permanentPostOffice');
+const permanentUpazila = document.getElementById('permanentUpazila');
+const permanentDistrict = document.getElementById('permanentDistrict');
+const currentVillage = document.getElementById('currentVillage');
+const currentPostOffice = document.getElementById('currentPostOffice');
+const currentUpazila = document.getElementById('currentUpazila');
+const currentDistrict = document.getElementById('currentDistrict');
+const nomineePhoto = document.getElementById('nomineePhoto');
+const nomineeName = document.getElementById('nomineeName');
+const nomineeRelation = document.getElementById('nomineeRelation');
+const nomineeNid = document.getElementById('nomineeNid');
+const nomineeBirthDate = document.getElementById('nomineeBirthDate');
+const logoutBtn = document.getElementById('logoutBtn');
+
+// Header and Navigation Elements
+const headerLogo = document.getElementById('header-logo');
+const headerTitle = document.getElementById('header-title');
+const themeToggle = document.getElementById('theme-toggle');
+const notificationBadge = document.getElementById('notification-badge');
+const body = document.body;
+const navBtns = document.querySelectorAll('.nav-btn');
+const bgAnimation = document.getElementById('bg-animation');
+
+// App state
+let currentUser = null;
+let userDataCache = null;
+
+// ✅ Show loading (only on content area)
+function showLoading() {
+    loadingOverlay.style.display = 'flex';
+    mainContainer.classList.add('loading');
+}
+
+// ✅ Hide loading
+function hideLoading() {
+    loadingOverlay.style.display = 'none';
+    mainContainer.classList.remove('loading');
+}
+
+// Remove skeleton loading effect
+function removeSkeleton(element) {
+    if (element && element.classList.contains('profile-skeleton')) {
+        element.classList.remove('profile-skeleton');
+        element.style.background = 'none';
+        element.style.height = 'auto';
+        element.style.width = 'auto';
+    }
+}
+
+// Create background animation
+function createBackgroundAnimation() {
+    const bubbleCount = 15;
+    
+    for (let i = 0; i < bubbleCount; i++) {
+        const bubble = document.createElement('div');
+        bubble.classList.add('bg-bubble');
+        
+        // Random size between 20px and 100px
+        const size = Math.random() * 80 + 20;
+        bubble.style.width = `${size}px`;
+        bubble.style.height = `${size}px`;
+        
+        // Random position
+        bubble.style.left = `${Math.random() * 100}%`;
+        bubble.style.top = `${Math.random() * 100}%`;
+        
+        // Random animation delay and duration
+        const delay = Math.random() * 5;
+        const duration = Math.random() * 10 + 10;
+        bubble.style.animationDelay = `${delay}s`;
+        bubble.style.animationDuration = `${duration}s`;
+        
+        bgAnimation.appendChild(bubble);
+    }
+}
+
+// Setup theme toggle functionality
+function setupThemeToggle() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+    }
+    
+    themeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        const isDark = body.classList.contains('dark-mode');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        
+        // Update loading overlay theme
+        if (isDark) {
+            loadingOverlay.classList.add('dark-mode');
+        } else {
+            loadingOverlay.classList.remove('dark-mode');
+        }
+    });
+}
+
+// Setup navigation buttons
+function setupNavigation() {
+    // Get current page filename
+    const currentPage = window.location.pathname.split('/').pop().toLowerCase();
+    
+    // Remove active class from all buttons first
+    navBtns.forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Set active class based on current page
+    switch(currentPage) {
+        case 'index.html':
+        case '':
+        case '/':
+            // Home page
+            document.getElementById('home-btn').classList.add('active');
+            break;
+        case 'payment.html':
+            // Payment page
+            document.getElementById('deposit-btn').classList.add('active');
+            break;
+        case 'profile.html':
+            // Profile page
+            document.getElementById('profile-btn').classList.add('active');
+            break;
+        default:
+            // Default to home if page not recognized
+            document.getElementById('home-btn').classList.add('active');
+    }
+}
+
+// Load header from Firestore
+function loadHeaderFromFirestore() {
+    const headerRef = db.collection('settings').doc('general');
+    
+    headerRef.get().then((doc) => {
+        if (doc.exists) {
+            const data = doc.data();
+            
+            if (data.headerLogoUrl) {
+                headerLogo.src = data.headerLogoUrl;
+                headerLogo.style.display = 'block';
+                headerLogo.onerror = () => {
+                    headerLogo.src = 'https://via.placeholder.com/150x50?text=Logo+Not+Found';
+                };
+            }
+            
+            if (data.siteTitle) {
+                headerTitle.textContent = data.siteTitle;
+            }
+        }
+    }).catch((error) => {
+        console.error("Error loading header:", error);
+        headerLogo.src = 'https://via.placeholder.com/150x50?text=Error+Loading+Logo';
+    });
+}
+
+// Setup real-time notification listener
+function setupNotificationListener(userId) {
+    const notificationsRef = db.collection('notifications')
+        .where('userId', '==', userId)
+        .where('read', '==', false);
+        
+    notificationsRef.onSnapshot((snapshot) => {
+        const unreadCount = snapshot.size;
+        updateNotificationBadge(unreadCount);
+    }, (error) => {
+        console.error("Notification listener error:", error);
+    });
+}
+
+// Update notification badge with animation
+function updateNotificationBadge(count) {
+    const num = parseInt(count) || 0;
+    
+    if (num > 0) {
+        notificationBadge.textContent = num;
+        notificationBadge.style.display = 'flex';
+        
+        if (num > parseInt(notificationBadge.dataset.prevCount || 0)) {
+            notificationBadge.classList.add('pulse');
+            setTimeout(() => {
+                notificationBadge.classList.remove('pulse');
+            }, 1000);
+        }
+    } else {
+        notificationBadge.style.display = 'none';
+    }
+    
+    notificationBadge.dataset.prevCount = num;
+}
+
+// ✅ FAST AUTH CHECK with localStorage cache
+async function checkAuthAndRedirect() {
+    return new Promise((resolve, reject) => {
+        // First check localStorage cache
+        const cachedUser = localStorage.getItem('cachedUser');
+        if (cachedUser) {
+            try {
+                const user = JSON.parse(cachedUser);
+                resolve(user);
+                return;
+            } catch (e) {
+                // Cache is invalid, proceed with Firebase check
+            }
+        }
+        
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // Cache the user data
+                localStorage.setItem('cachedUser', JSON.stringify({
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName
+                }));
+                resolve(user);
+            } else {
+                window.location.replace('login.html');
+                reject(new Error("User not authenticated"));
+            }
+        }, (error) => {
+            window.location.replace('login.html');
+            reject(error);
+        });
+    });
+}
+
+// ১. Firestore থেকে ডেটা লোড করার ফাংশন (Optimized)
+async function loadProfileDataFromFirestore(userId) {
+    try {
+        // Try to load from cache first
+        const cachedData = localStorage.getItem(`profileData_${userId}`);
+        if (cachedData) {
+            const userData = JSON.parse(cachedData);
+            updateProfileUI(userData);
+            hideLoading(); // Hide loading immediately for cached data
+        }
+        
+        const userRef = db.collection('Registration')
+            .where('userId', '==', userId);
+        
+        // Set up real-time listener
+        userRef.onSnapshot((querySnapshot) => {
+            if (!querySnapshot.empty) {
+                querySnapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    userDataCache = userData;
+                    
+                    // Cache the data
+                    localStorage.setItem(`profileData_${userId}`, JSON.stringify(userData));
+                    
+                    updateProfileUI(userData);
+                    hideLoading();
+                });
+            } else {
+                console.log('কোনো ব্যবহারকারী তথ্য পাওয়া যায়নি');
+                window.location.href = 'login.html';
+            }
+        }, (error) => {
+            console.error('রিয়েলটাইম ডেটা লোডে ত্রুটি:', error);
+            hideLoading();
+        });
+        
+    } catch (error) {
+        console.error('প্রোফাইল ডেটা লোডে ত্রুটি:', error);
+        hideLoading();
+    }
+}
+
+// ২. UI আপডেট করার ফাংশন (Optimized)
+function updateProfileUI(userData) {
+    try {
+        // Remove skeleton effects
+        removeSkeleton(memberId);
+        removeSkeleton(memberName);
+        removeSkeleton(fatherName);
+        removeSkeleton(motherName);
+        removeSkeleton(birthDate);
+        removeSkeleton(religion);
+        removeSkeleton(profession);
+        removeSkeleton(nid);
+        removeSkeleton(nationality);
+        removeSkeleton(maritalStatus);
+        removeSkeleton(bloodGroup);
+        removeSkeleton(education);
+        removeSkeleton(mobile);
+        removeSkeleton(registrationDate);
+        removeSkeleton(permanentVillage);
+        removeSkeleton(permanentPostOffice);
+        removeSkeleton(permanentUpazila);
+        removeSkeleton(permanentDistrict);
+        removeSkeleton(currentVillage);
+        removeSkeleton(currentPostOffice);
+        removeSkeleton(currentUpazila);
+        removeSkeleton(currentDistrict);
+        removeSkeleton(nomineeName);
+        removeSkeleton(nomineeRelation);
+        removeSkeleton(nomineeNid);
+        removeSkeleton(nomineeBirthDate);
+        
+        // প্রোফাইল হেডার আপডেট
+        memberId.textContent = `সদস্য আইডি: ${userData.memberId || ''}`;
+        memberName.textContent = userData.name || '';
+        memberStatus.textContent = userData.status === 'active' ? 'সক্রিয় সদস্য' : 'নিষ্ক্রিয় সদস্য';
+        
+        // Preload profile photo
+        const profileImg = new Image();
+        if (userData.memberPhotoLink) {
+            profileImg.src = userData.memberPhotoLink;
+            profileImg.onload = () => {
+                profilePhoto.src = userData.memberPhotoLink;
+            };
+            profileImg.onerror = () => {
+                profilePhoto.src = 'https://blogger.googleusercontent.com/img/a/AVvXsEj9OiIr3VFRvlTYNtRPHMzwWBEZNsxDHWq3f54sMWtyx8WyV64h0zN5cBt7NNvsxdeK5mwSFmB5EX6hA-41oW-lL2ubn_kjkdvSzPYeFX2C5On8GsYAOPB809sL4gWMzwVL-sQG8Sd-02CQlUzaJvR4yrufK7KOQHUMvYgXHXdlJvsKnoyCXoNVThiV';
+            };
+        } else {
+            profilePhoto.src = 'https://blogger.googleusercontent.com/img/a/AVvXsEj9OiIr3VFRvlTYNtRPHMzwWBEZNsxDHWq3f54sMWtyx8WyV64h0zN5cBt7NNvsxdeK5mwSFmB5EX6hA-41oW-lL2ubn_kjkdvSzPYeFX2C5On8GsYAOPB809sL4gWMzwVL-sQG8Sd-02CQlUzaJvR4yrufK7KOQHUMvYgXHXdlJvsKnoyCXoNVThiV';
+        }
+        
+        // ব্যক্তিগত তথ্য আপডেট
+        fatherName.textContent = userData.fatherName || '';
+        motherName.textContent = userData.motherName || '';
+        birthDate.textContent = userData.birthDate || '';
+        religion.textContent = userData.religion || '';
+        profession.textContent = userData.profession || '';
+        nid.textContent = userData.nid || '';
+        nationality.textContent = userData.nationality || '';
+        maritalStatus.textContent = userData.maritalStatus || '';
+        bloodGroup.textContent = userData.bloodGroup || '';
+        education.textContent = userData.education || '';
+        mobile.textContent = userData.mobile || '';
+        
+        // নিবন্ধন তারিখ
+        if (userData.registrationDate) {
+            const date = new Date(userData.registrationDate);
+            const formattedDate = date.toLocaleDateString('bn-BD', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            registrationDate.textContent = formattedDate;
+        } else {
+            registrationDate.textContent = '';
+        }
+        
+        // ঠিকানা তথ্য আপডেট
+        if (userData.permanentAddress) {
+            permanentVillage.textContent = userData.permanentAddress.village || '';
+            permanentPostOffice.textContent = userData.permanentAddress.postOffice || '';
+            permanentUpazila.textContent = userData.permanentAddress.upazila || '';
+            permanentDistrict.textContent = userData.permanentAddress.district || '';
+        } else {
+            permanentVillage.textContent = '';
+            permanentPostOffice.textContent = '';
+            permanentUpazila.textContent = '';
+            permanentDistrict.textContent = '';
+        }
+        
+        if (userData.currentAddress) {
+            currentVillage.textContent = userData.currentAddress.village || '';
+            currentPostOffice.textContent = userData.currentAddress.postOffice || '';
+            currentUpazila.textContent = userData.currentAddress.upazila || '';
+            currentDistrict.textContent = userData.currentAddress.district || '';
+        } else {
+            currentVillage.textContent = '';
+            currentPostOffice.textContent = '';
+            currentUpazila.textContent = '';
+            currentDistrict.textContent = '';
+        }
+        
+        // নমিনি তথ্য আপডেট
+        nomineeName.textContent = userData.nomineeName || '';
+        nomineeRelation.textContent = userData.nomineeRelation || '';
+        nomineeNid.textContent = userData.nomineeNid || '';
+        nomineeBirthDate.textContent = userData.nomineeBirthDate || '';
+        
+        // Preload nominee photo
+        const nomineeImg = new Image();
+        if (userData.nomineePhotoLink) {
+            nomineeImg.src = userData.nomineePhotoLink;
+            nomineeImg.onload = () => {
+                nomineePhoto.src = userData.nomineePhotoLink;
+            };
+            nomineeImg.onerror = () => {
+                nomineePhoto.src = 'https://blogger.googleusercontent.com/img/a/AVvXsEj9OiIr3VFRvlTYNtRPHMzwWBEZNsxDHWq3f54sMWtyx8WyV64h0zN5cBt7NNvsxdeK5mwSFmB5EX6hA-41oW-lL2ubn_kjkdvSzPYeFX2C5On8GsYAOPB809sL4gWMzwVL-sQG8Sd-02CQlUzaJvR4yrufK7KOQHUMvYgXHXdlJvsKnoyCXoNVThiV';
+            };
+        } else {
+            nomineePhoto.src = 'https://blogger.googleusercontent.com/img/a/AVvXsEj9OiIr3VFRvlTYNtRPHMzwWBEZNsxDHWq3f54sMWtyx8WyV64h0zN5cBt7NNvsxdeK5mwSFmB5EX6hA-41oW-lL2ubn_kjkdvSzPYeFX2C5On8GsYAOPB809sL4gWMzwVL-sQG8Sd-02CQlUzaJvR4yrufK7KOQHUMvYgXHXdlJvsKnoyCXoNVThiV';
+        }
+        
+        // নমিনি সেকশন সবসময় দেখাবে
+        document.querySelector('.nominee-section').style.display = 'block';
+        
+        // Hide empty rows
+        setTimeout(() => {
+            document.querySelectorAll('.info-row').forEach(row => {
+                const valueElement = row.querySelector('.info-value');
+                if (valueElement) {
+                    const value = valueElement.textContent.trim();
+                    const label = row.querySelector('.info-label').textContent.trim();
+                    
+                    // Always show registration date and member ID
+                    if (label === 'নিবন্ধন তারিখ' || value.includes('সদস্য আইডি')) {
+                        row.style.display = 'flex';
+                    } else if (value === '') {
+                        row.style.display = 'none';
+                    } else {
+                        row.style.display = 'flex';
+                    }
+                }
+            });
+        }, 50);
+        
+    } catch (error) {
+        console.error('UI আপডেটে ত্রুটি:', error);
+    }
+}
+
+// ৩. লগআউট ফাংশন
+logoutBtn.addEventListener('click', async function() {
+    try {
+        // Clear all cache
+        localStorage.removeItem('cachedUser');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('memberId');
+        localStorage.removeItem('rememberMe');
+        localStorage.removeItem('mobileNumber');
+        
+        // Clear profile cache
+        if (currentUser) {
+            localStorage.removeItem(`profileData_${currentUser.uid}`);
+        }
+        
+        await auth.signOut();
+        window.location.href = 'login.html';
+        
+    } catch (error) {
+        console.error('লগআউটে ত্রুটি:', error);
+        window.location.href = 'login.html';
+    }
+});
+
+// Initialize header components
+function initHeaderComponents() {
+    createBackgroundAnimation();
+    setupThemeToggle();
+    setupNavigation();
+    loadHeaderFromFirestore();
+}
+
+// ✅ Optimized: Main initialization function
+async function initApp() {
+    showLoading();
+    initHeaderComponents();
+    
+    // Apply theme to loading overlay immediately
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        loadingOverlay.classList.add('dark-mode');
+    }
+    
+    try {
+        const user = await checkAuthAndRedirect();
+        currentUser = user;
+        
+        // Setup notification listener
+        setupNotificationListener(user.uid);
+        
+        // Load profile data
+        loadProfileDataFromFirestore(user.uid);
+        
+        // Set timeout to hide loading if data takes too long
+        setTimeout(() => {
+            hideLoading();
+        }, 5000); // Max 5 seconds loading time
+        
+    } catch (error) {
+        console.error("Error in app initialization:", error);
+        hideLoading();
+    }
+}
+
+// ✅ Set up a real-time auth state listener
+auth.onAuthStateChanged(function(user) {
+    if (!user) {
+        window.location.replace('login.html');
+    }
+});
+
+// ✅ Prevent access through browser back button after logout
+window.onpageshow = function(event) {
+    if (event.persisted) {
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                window.location.replace('login.html');
+            }
+        });
+    }
+};
+
+// ✅ Initialize the app when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('প্রোফাইল পেজ লোড হয়েছে');
+    
+    // Initialize app
+    initApp();
+});
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/NVTA/sw.js');
+}
+</script>
+</body>
+</html>

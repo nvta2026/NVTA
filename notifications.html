@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <link rel="manifest" href="/NVTA/manifest.json">
+<meta name="theme-color" content="#0f172a">
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>নোটিফিকেশন</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #f5f7ff;
+            --text-color: #333;
+            --white: #fff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --notification-color: #ff6b6b;
+            --dark-bg: #1a1a1a;
+            --dark-text: #f0f0f0;
+            --dark-secondary: #2d2d2d;
+            --dark-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --success-color: #4CAF50;
+            --warning-color: #FFC107;
+            --delete-color: #ff4757;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Kalpurush', 'Siyam Rupali', sans-serif;
+        }
+        
+        body {
+            background-color: white;
+            color: var(--text-color);
+            font-size: 14px;
+            transition: background-color 0.3s, color 0.3s;
+            padding-top: 50px;
+            padding-bottom: 70px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+        
+        /* Background Animation */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #27ae60 0%, #4a6bff 100%);
+            animation: float 15s infinite ease-in-out;
+            opacity: 0.2;
+        }
+        
+        body.dark-mode .bg-bubble {
+            background: linear-gradient(135deg, #2ecc71 0%, #3498db 100%);
+            opacity: 0.15;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            25% {
+                transform: translateY(-20px) translateX(10px);
+            }
+            50% {
+                transform: translateY(-40px) translateX(-10px);
+            }
+            75% {
+                transform: translateY(-20px) translateX(-5px);
+            }
+        }
+        
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            border-bottom: 1px solid #2ecc71;
+            height: 50px;
+        }
+        
+        body.dark-mode header {
+            background-color: var(--dark-secondary);
+            box-shadow: var(--dark-shadow);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 50%;
+            overflow: hidden;
+        }
+        
+        .logo {
+            height: 40px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        
+        .app-title {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--primary-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            padding: 5px;
+            width: 15px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        body.dark-mode .icon-btn {
+            color: var(--dark-text);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--notification-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .notification-badge.pulse {
+            animation: pulse 0.5s 2;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .theme-toggle .fa-sun,
+        .theme-toggle .fa-moon {
+            transition: opacity 0.3s;
+        }
+        
+        body.dark-mode .theme-toggle .fa-sun {
+            display: block;
+            opacity: 1;
+        }
+        
+        body.dark-mode .theme-toggle .fa-moon {
+            display: none;
+            opacity: 0;
+        }
+        
+        body:not(.dark-mode) .theme-toggle .fa-sun {
+            display: none;
+            opacity: 0;
+        }
+        
+        body:not(.dark-mode) .theme-toggle .fa-moon {
+            display: block;
+            opacity: 1;
+        }
+        
+        /* Navigation Bar Styles */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--white);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 100;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            border-top: 1px solid #2ecc71;
+            height: 60px;
+        }
+        
+        body.dark-mode .bottom-nav {
+            background-color: var(--dark-secondary);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 12px;
+            transition: all 0.3s;
+            padding: 8px 12px;
+            position: relative;
+            flex: 1;
+            max-width: 33.33%;
+        }
+        
+        body.dark-mode .nav-btn {
+            color: var(--dark-text);
+        }
+        
+        .nav-btn i {
+            font-size: 20px;
+            margin-bottom: 4px;
+            transition: color 0.3s;
+        }
+        
+        .nav-btn:hover i {
+            color: var(--primary-color);
+        }
+        
+        .nav-btn.active i {
+            color: var(--primary-color);
+        }
+        
+        .nav-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            width: 6px;
+            height: 6px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+        }
+        
+        /* Main Content Styles */
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            opacity: 1;
+            padding: 15px;
+            transition: opacity 0.3s;
+        }
+        
+        .container.loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        /* Loading State */
+        .loading-overlay {
+            position: fixed;
+            top: 50px; /* Header height */
+            left: 0;
+            width: 100%;
+            height: calc(100% - 110px); /* Full height minus header and footer */
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 90;
+            transition: background-color 0.3s;
+        }
+        
+        body.dark-mode .loading-overlay {
+            background: rgba(26, 26, 26, 0.9);
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #27ae60;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        body.dark-mode .loading-spinner {
+            border: 4px solid #2d2d2d;
+            border-top: 4px solid #2ecc71;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #333;
+            font-size: 18px;
+            font-family: 'Kalpurush', 'Siyam Rupali', sans-serif;
+            transition: color 0.3s;
+        }
+        
+        body.dark-mode .loading-text {
+            color: #f0f0f0;
+        }
+        
+        /* Notifications Page Specific Styles */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .notifications-container {
+            background-color: var(--white);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        body.dark-mode .notifications-container {
+            background-color: var(--dark-secondary);
+        }
+        
+        .notification-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .notification {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            transition: transform 0.3s ease;
+            background-color: var(--white);
+            cursor: pointer;
+        }
+        
+        body.dark-mode .notification {
+            border-bottom: 1px solid #444;
+            background-color: var(--dark-secondary);
+        }
+        
+        .notification.unread {
+            background-color: #f0f7ff;
+            border-left: 4px solid #4285f4;
+        }
+        
+        body.dark-mode .notification.unread {
+            background-color: #1a2b4a;
+        }
+        
+        .notification.read {
+            padding-left: 19px;
+        }
+        
+        .notification:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .notification-message {
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        body.dark-mode .notification-message {
+            color: #bbb;
+        }
+        
+        .notification-time {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        body.dark-mode .notification-time {
+            color: #999;
+        }
+        
+        .delete-notification {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background-color: var(--delete-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: width 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .mark-all-read {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%; /* Full width */
+            text-align: center; /* Center text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .mark-all-read:hover {
+            background-color: #3367d6;
+        }
+        
+        #no-notifications {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+        
+        body.dark-mode #no-notifications {
+            color: #aaa;
+        }
+        
+        .loading-notification {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+        
+        body.dark-mode .loading-notification {
+            color: #999;
+        }
+        
+        .error-notification {
+            text-align: center;
+            padding: 30px;
+            color: #d32f2f;
+        }
+        
+        /* Notification image styling */
+        .notification-image {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 5px;
+            height: auto;
+        }
+        
+        .notification-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .notification-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--success-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            max-width: 90%;
+            text-align: center;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        .toast.error {
+            background-color: var(--notification-color);
+        }
+        
+        .toast.warning {
+            background-color: var(--warning-color);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                font-size: 13px;
+            }
+            
+            .logo {
+                height: 40px;
+            }
+            
+            .app-title {
+                font-size: 14px;
+            }
+            
+            .header-controls {
+                gap: 10px;
+            }
+            
+            .icon-btn {
+                font-size: 16px;
+            }
+            
+            .notification-badge {
+                width: 16px;
+                height: 16px;
+                font-size: 9px;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .loading-spinner {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .loading-text {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .loading-spinner {
+                width: 35px;
+                height: 35px;
+                border-width: 3px;
+            }
+            
+            .loading-text {
+                font-size: 14px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .logo {
+                height: 35px;
+            }
+            
+            .app-title {
+                font-size: 18px;
+            }
+            
+            .icon-btn {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<!-- Background Animation -->
+<div class="bg-animation" id="bg-animation"></div>
+
+<!-- Header -->
+<header>
+    <div class="logo-container">
+        <a href="index.html">
+            <img src="https://blogger.googleusercontent.com/img/a/AVvXsEivqTIaHdAT5pCu40npVAhBQUB7v15cU-vog8HUrrsluvCpu3Q4kRsQ2XiX2pnPi441r1CIxxxgLe9HPVq8lVPQKg22UyoVEQZdm_JRehypwRK8WWfDQY45SCFonpHDeLrTr0u2Qhk1RnVew6cLpcWrUN9FfLdv6f_sG9KwJi1EpHbRs5DGk4ZlRIqL" alt="App Logo" class="logo" id="header-logo">
+        </a>
+        <div class="app-title" id="header-title"></div>
+    </div>
+    
+    <div class="header-controls">
+        <button class="icon-btn theme-toggle" id="theme-toggle">
+            <i class="fas fa-sun"></i>
+            <i class="fas fa-moon"></i>
+        </button>
+        <button class="icon-btn" id="notification-btn" onclick="window.location.href='notifications.html'">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" id="notification-badge">0</span>
+        </button>
+    </div>
+</header>
+
+<!-- Loading Overlay with Spinner -->
+<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">অপেক্ষা করুন</div>
+</div>
+
+<div class="container" id="mainContainer">
+    <div class="header-section">
+        <div class="user-info">
+            <!-- User ID display removed as requested -->
+        </div>
+        <button id="mark-all-read" class="mark-all-read" style="display: none;">
+            <i class="fas fa-check"></i> সব পড়া হিসেবে চিহ্নিত করুন
+        </button>
+    </div>
+
+    <div class="notifications-container" id="notifications-container">
+        <div class="loading-notification">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>নোটিফিকেশন লোড হচ্ছে...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation Bar -->
+<nav class="bottom-nav">
+    <a href="payment.html" class="nav-btn" id="deposit-btn">
+        <i class="fas fa-money-bill-wave"></i>
+        <span>জমা দিন</span>
+    </a>
+    <a href="index.html" class="nav-btn" id="home-btn">
+        <i class="fas fa-home"></i>
+        <span>হোম</span>
+    </a>
+    <a href="profile.html" class="nav-btn" id="profile-btn">
+        <i class="fas fa-user"></i>
+        <span>প্রোফাইল</span>
+    </a>
+</nav>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-messaging-compat.js"></script>
+
+<script>
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBnUqarL-c8oEA52EPBCUdoz67kzvsDnM0",
+        authDomain: "nvta-f70ed.firebaseapp.com",
+        projectId: "nvta-f70ed",
+        storageBucket: "nvta-f70ed.firebasestorage.app",
+        messagingSenderId: "832906232424",
+        appId: "1:832906232424:web:df35b6c489c9c9c03ef1dd"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const FieldValue = firebase.firestore.FieldValue;
+    const messaging = firebase.messaging();
+
+    // DOM elements
+    const notificationsContainer = document.getElementById('notifications-container');
+    const markAllReadBtn = document.getElementById('mark-all-read');
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    const headerLogo = document.getElementById('header-logo');
+    const headerTitle = document.getElementById('header-title');
+    const notificationBadge = document.getElementById('notification-badge');
+    const toast = document.getElementById('toast');
+    const bgAnimation = document.getElementById('bg-animation');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const mainContainer = document.getElementById('mainContainer');
+    const navBtns = document.querySelectorAll('.nav-btn');
+
+    // App state
+    let currentUser = null;
+    let notifications = [];
+    let unsubscribe = null;
+    let fcmToken = null;
+
+    // ✅ Show loading (only on content area)
+    function showLoading() {
+        loadingOverlay.style.display = 'flex';
+        mainContainer.classList.add('loading');
+    }
+
+    // ✅ Hide loading
+    function hideLoading() {
+        loadingOverlay.style.display = 'none';
+        mainContainer.classList.remove('loading');
+        mainContainer.style.opacity = '1';
+    }
+
+    // Create background animation
+    function createBackgroundAnimation() {
+        const bubbleCount = 15;
+        
+        for (let i = 0; i < bubbleCount; i++) {
+            const bubble = document.createElement('div');
+            bubble.classList.add('bg-bubble');
+            
+            // Random size between 20px and 100px
+            const size = Math.random() * 80 + 20;
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            
+            // Random position
+            bubble.style.left = `${Math.random() * 100}%`;
+            bubble.style.top = `${Math.random() * 100}%`;
+            
+            // Random animation delay and duration
+            const delay = Math.random() * 5;
+            const duration = Math.random() * 10 + 10;
+            bubble.style.animationDelay = `${delay}s`;
+            bubble.style.animationDuration = `${duration}s`;
+            
+            bgAnimation.appendChild(bubble);
+        }
+    }
+
+    // Setup navigation buttons
+    function setupNavigation() {
+        // Get current page filename
+        const currentPage = window.location.pathname.split('/').pop().toLowerCase();
+        
+        // Remove active class from all buttons first
+        navBtns.forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Set active class based on current page
+        switch(currentPage) {
+            case 'index.html':
+            case '':
+            case '/':
+                // Home page
+                document.getElementById('home-btn').classList.add('active');
+                break;
+            case 'payment.html':
+                // Payment page
+                document.getElementById('deposit-btn').classList.add('active');
+                break;
+            case 'profile.html':
+                // Profile page
+                document.getElementById('profile-btn').classList.add('active');
+                break;
+            case 'notifications.html':
+                // Notifications page - none active as per Home Page
+                break;
+            default:
+                // Default to home if page not recognized
+                document.getElementById('home-btn').classList.add('active');
+        }
+    }
+
+    // Setup theme toggle functionality
+    function setupThemeToggle() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            loadingOverlay.classList.add('dark-mode');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            
+            // Update loading overlay theme
+            if (isDark) {
+                loadingOverlay.classList.add('dark-mode');
+            } else {
+                loadingOverlay.classList.remove('dark-mode');
+            }
+        });
+    }
+
+    // Setup notification listener
+    function setupNotificationListener(userId) {
+        const notificationsRef = db.collection('notifications')
+            .where('userId', '==', userId)
+            .where('read', '==', false);
+            
+        notificationsRef.onSnapshot((snapshot) => {
+            const unreadCount = snapshot.size;
+            updateNotificationBadge(unreadCount);
+        }, (error) => {
+            console.error("Notification listener error:", error);
+        });
+    }
+
+    // Update notification badge with animation
+    function updateNotificationBadge(count) {
+        const num = parseInt(count) || 0;
+        
+        if (num > 0) {
+            notificationBadge.textContent = num;
+            notificationBadge.style.display = 'flex';
+            
+            if (num > parseInt(notificationBadge.dataset.prevCount || 0)) {
+                notificationBadge.classList.add('pulse');
+                setTimeout(() => {
+                    notificationBadge.classList.remove('pulse');
+                }, 1000);
+            }
+        } else {
+            notificationBadge.style.display = 'none';
+        }
+        
+        notificationBadge.dataset.prevCount = num;
+    }
+
+    // Load header from Firestore
+    function loadHeaderFromFirestore() {
+        const headerRef = db.collection('settings').doc('general');
+        
+        headerRef.get().then((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                
+                if (data.headerLogoUrl) {
+                    headerLogo.src = data.headerLogoUrl;
+                    headerLogo.style.display = 'block';
+                    headerLogo.onerror = () => {
+                        headerLogo.src = 'https://via.placeholder.com/150x50?text=Logo+Not+Found';
+                    };
+                }
+                
+                if (data.siteTitle) {
+                    headerTitle.textContent = data.siteTitle;
+                }
+            }
+        }).catch((error) => {
+            console.error("Error loading header:", error);
+            headerLogo.src = 'https://via.placeholder.com/150x50?text=Error+Loading+Logo';
+        });
+    }
+
+    // Show toast message
+    function showToast(message, isSuccess = true) {
+        toast.textContent = message;
+        toast.className = isSuccess ? 'toast show' : 'toast show error';
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+    // Show notifications
+    function showNotifications(notifications) {
+        if (notifications.length === 0) {
+            notificationsContainer.innerHTML = `
+                <div id="no-notifications">
+                    <i class="far fa-bell" style="font-size: 40px;"></i>
+                    <p>কোনো নোটিফিকেশন নেই</p>
+                </div>
+            `;
+            markAllReadBtn.style.display = 'none';
+            return;
+        }
+
+        let html = '';
+        notifications.forEach(notif => {
+            const timeAgo = formatTimeAgo(notif.createdAt?.toDate());
+            html += `
+                <div class="notification-wrapper">
+                    <div class="notification ${notif.read ? 'read' : 'unread'}" data-id="${notif.id}" data-url="${notif.url || ''}" data-type="${notif.type || ''}">
+                        <div class="notification-title">${notif.title}</div>
+                        <div class="notification-message">${notif.message}</div>
+                        ${notif.imageUrl ? `<img src="${notif.imageUrl}" alt="Notification image" class="notification-image">` : ''}
+                        <div class="notification-time">
+                            <i class="far fa-clock"></i> ${timeAgo}
+                        </div>
+                    </div>
+                    <div class="delete-notification" data-id="${notif.id}">
+                        <i class="fas fa-trash"></i>
+                    </div>
+                </div>
+            `;
+        });
+        notificationsContainer.innerHTML = html;
+
+        // Add click event for notifications to navigate
+        document.querySelectorAll('.notification').forEach(el => {
+            el.addEventListener('click', (e) => {
+                // Only navigate if not swiping (delete button not visible)
+                const deleteBtn = el.parentElement.querySelector('.delete-notification');
+                if (deleteBtn && parseInt(deleteBtn.style.width) === 0) {
+                    handleNotificationClick(el.dataset.id, el.dataset.type, el.dataset.url);
+                }
+            });
+        });
+
+        // Add click event for delete buttons
+        document.querySelectorAll('.delete-notification').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteNotification(el.dataset.id);
+            });
+        });
+
+        // Setup swipe events
+        setupSwipeEvents();
+        
+        // Update mark all as read button
+        updateMarkAllReadButton(notifications);
+    }
+
+    // Handle notification click based on type/url
+    function handleNotificationClick(id, type, url) {
+        // Mark as read first if unread
+        const notification = notifications.find(n => n.id === id);
+        if (notification && !notification.read) {
+            markAsRead(id);
+        }
+        
+        // Navigate based on type or URL
+        if (url) {
+            window.location.href = url;
+        } else if (type === 'order') {
+            window.location.href = 'orders.html';
+        } else if (type === 'service') {
+            window.location.href = 'services.html';
+        } else if (type === 'payment') {
+            window.location.href = 'payment.html';
+        } else if (type === 'profile') {
+            window.location.href = 'profile.html';
+        }
+        // If no specific type or URL, just mark as read and stay on page
+    }
+
+    // Setup swipe events for notifications
+    function setupSwipeEvents() {
+        const notificationWrappers = document.querySelectorAll('.notification-wrapper');
+        
+        notificationWrappers.forEach(wrapper => {
+            const notification = wrapper.querySelector('.notification');
+            const deleteBtn = wrapper.querySelector('.delete-notification');
+            let isSwiping = false;
+            let startX = 0;
+            let currentX = 0;
+            let transformValue = 0;
+            
+            // Touch events for mobile
+            notification.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                isSwiping = true;
+            });
+            
+            notification.addEventListener('touchmove', (e) => {
+                if (!isSwiping) return;
+                currentX = e.touches[0].clientX;
+                transformValue = Math.min(0, currentX - startX);
+                
+                // Only allow left swipe (negative transform)
+                if (transformValue < 0) {
+                    notification.style.transform = `translateX(${transformValue}px)`;
+                    deleteBtn.style.width = `${Math.abs(transformValue)}px`;
+                }
+            });
+            
+            notification.addEventListener('touchend', () => {
+                isSwiping = false;
+                
+                // If swiped more than 30% of the width, complete the swipe
+                if (Math.abs(transformValue) > notification.offsetWidth * 0.3) {
+                    notification.style.transform = `translateX(-70px)`;
+                    deleteBtn.style.width = '70px';
+                } else {
+                    // Reset position
+                    notification.style.transform = 'translateX(0)';
+                    deleteBtn.style.width = '0';
+                }
+            });
+            
+            // Mouse events for desktop
+            notification.addEventListener('mousedown', (e) => {
+                startX = e.clientX;
+                isSwiping = true;
+                notification.style.cursor = 'grabbing';
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isSwiping) return;
+                currentX = e.clientX;
+                transformValue = Math.min(0, currentX - startX);
+                
+                // Only allow left swipe (negative transform)
+                if (transformValue < 0) {
+                    notification.style.transform = `translateX(${transformValue}px)`;
+                    deleteBtn.style.width = `${Math.abs(transformValue)}px`;
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (!isSwiping) return;
+                isSwiping = false;
+                notification.style.cursor = 'grab';
+                
+                // If swiped more than 30% of the width, complete the swipe
+                if (Math.abs(transformValue) > notification.offsetWidth * 0.3) {
+                    notification.style.transform = `translateX(-70px)`;
+                    deleteBtn.style.width = '70px';
+                } else {
+                    // Reset position
+                    notification.style.transform = 'translateX(0)';
+                    deleteBtn.style.width = '0';
+                }
+            });
+            
+            // Click to reset
+            notification.addEventListener('click', (e) => {
+                if (Math.abs(transformValue) > 0) {
+                    e.preventDefault();
+                    notification.style.transform = 'translateX(0)';
+                    deleteBtn.style.width = '0';
+                    transformValue = 0;
+                }
+            });
+        });
+    }
+
+    // Format time ago
+    function formatTimeAgo(date) {
+        if (!date) return 'অজানা সময়';
+        
+        const now = new Date();
+        const diff = now - date;
+        const seconds = Math.floor(diff / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        
+        if (seconds < 60) return 'এইমাত্র';
+        if (minutes < 60) return `${minutes} মিনিট আগে`;
+        if (hours < 24) return `${hours} ঘন্টা আগে`;
+        if (days < 7) return `${days} দিন আগে`;
+        
+        return date.toLocaleDateString('bn-BD');
+    }
+
+    // Mark notification as read
+    function markAsRead(notificationId) {
+        db.collection('notifications').doc(notificationId).update({
+            read: true,
+            readAt: FieldValue.serverTimestamp()
+        });
+    }
+
+    // Delete notification
+    function deleteNotification(notificationId) {
+        db.collection('notifications').doc(notificationId).delete()
+            .then(() => {
+                showToast('নোটিফিকেশন মুছে ফেলা হয়েছে');
+            })
+            .catch((error) => {
+                console.error("Error deleting notification:", error);
+                showToast('নোটিফিকেশন মুছতে সমস্যা হয়েছে', false);
+            });
+    }
+
+    // Mark all notifications as read
+    function markAllAsRead() {
+        const batch = db.batch();
+        const unreadNotifications = notifications.filter(n => !n.read);
+        
+        if (unreadNotifications.length === 0) {
+            showToast('সব নোটিফিকেশন পড়া হিসেবে চিহ্নিত আছে');
+            return;
+        }
+        
+        unreadNotifications.forEach(notification => {
+            const ref = db.collection('notifications').doc(notification.id);
+            batch.update(ref, {
+                read: true,
+                readAt: FieldValue.serverTimestamp()
+            });
+        });
+        
+        batch.commit().then(() => {
+            showToast('সব নোটিফিকেশন পড়া হিসেবে চিহ্নিত করা হয়েছে');
+        }).catch(error => {
+            console.error("Error marking all as read:", error);
+            showToast('নোটিফিকেশন পড়া হিসেবে চিহ্নিত করতে সমস্যা হয়েছে', false);
+        });
+    }
+
+    // Load all notifications (both read and unread)
+    function loadNotifications(userId) {
+        // Query all notifications for this user (both read and unread)
+        db.collection('notifications')
+            .where('userId', '==', userId)
+            .get()
+            .then(snapshot => {
+                notifications = [];
+                snapshot.forEach(doc => {
+                    notifications.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // Client-side sort by creation time (newest first)
+                notifications.sort((a, b) => {
+                    const aTime = a.createdAt?.toDate()?.getTime() || 0;
+                    const bTime = b.createdAt?.toDate()?.getTime() || 0;
+                    return bTime - aTime;
+                });
+                
+                showNotifications(notifications);
+                hideLoading();
+                
+                // Now setup realtime listener for all notifications
+                setupRealtimeListener(userId);
+            })
+            .catch(error => {
+                console.error("Error loading notifications:", error);
+                notificationsContainer.innerHTML = `
+                    <div class="error-notification">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>নোটিফিকেশন লোড করতে সমস্যা হয়েছে</p>
+                        <button onclick="location.reload()">আবার চেষ্টা করুন</button>
+                    </div>
+                `;
+                hideLoading();
+            });
+    }
+
+    // Setup realtime listener for all notifications
+    function setupRealtimeListener(userId) {
+        if (unsubscribe) unsubscribe();
+        
+        unsubscribe = db.collection('notifications')
+            .where('userId', '==', userId)
+            .onSnapshot(snapshot => {
+                notifications = [];
+                snapshot.forEach(doc => {
+                    notifications.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // Client-side sort by creation time (newest first)
+                notifications.sort((a, b) => {
+                    const aTime = a.createdAt?.toDate()?.getTime() || 0;
+                    const bTime = b.createdAt?.toDate()?.getTime() || 0;
+                    return bTime - aTime;
+                });
+                
+                showNotifications(notifications);
+            }, error => {
+                console.error("Realtime update error:", error);
+            });
+    }
+
+    // Update mark all as read button
+    function updateMarkAllReadButton(notifications) {
+        const unreadCount = notifications.filter(n => !n.read).length;
+        markAllReadBtn.style.display = unreadCount > 0 ? 'flex' : 'none';
+    }
+
+    // ✅ STRICT AUTH CHECK
+    async function checkAuthAndRedirect() {
+        return new Promise((resolve, reject) => {
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    resolve(user);
+                } else {
+                    window.location.replace('login.html');
+                    reject(new Error("User not authenticated"));
+                }
+            }, (error) => {
+                window.location.replace('login.html');
+                reject(error);
+            });
+        });
+    }
+
+    // Initialize app
+    async function init() {
+        showLoading();
+        createBackgroundAnimation();
+        setupThemeToggle();
+        setupNavigation();
+        loadHeaderFromFirestore();
+        
+        try {
+            const user = await checkAuthAndRedirect();
+            currentUser = user;
+            
+            // Setup notification listener for badge
+            setupNotificationListener(user.uid);
+            
+            // Load notifications
+            loadNotifications(user.uid);
+            
+            // Mark all as read button
+            markAllReadBtn.addEventListener('click', markAllAsRead);
+            
+        } catch (error) {
+            console.error("Error in app initialization:", error);
+        }
+    }
+
+    // ✅ Set up a real-time auth state listener
+    auth.onAuthStateChanged(function(user) {
+        if (!user) {
+            window.location.replace('login.html');
+        }
+    });
+
+    // ✅ Initialize the app when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+
+    // ✅ Prevent access through browser back button after logout
+    window.onpageshow = function(event) {
+        if (event.persisted) {
+            auth.onAuthStateChanged(user => {
+                if (!user) {
+                    window.location.replace('login.html');
+                }
+            });
+        }
+    };
+</script>
+    <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/NVTA/sw.js');
+}
+</script>
+</body>
+</html>
