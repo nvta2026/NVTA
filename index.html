@@ -731,7 +731,6 @@ body.dark-mode .loading-text {
 
 <script>
 // Firebase config
-// Firebase config
 const firebaseConfig = {
     apiKey: "AIzaSyBnUqarL-c8oEA52EPBCUdoz67kzvsDnM0",
     authDomain: "nvta-f70ed.firebaseapp.com",
@@ -965,10 +964,12 @@ function loadHeaderFromFirestore() {
     });
 }
 
-// Setup real-time notification listener
-function setupNotificationListener(userId) {
+// Setup real-time notification listener - FIXED VERSION
+function setupNotificationListener(memberId) {
+    if (!memberId) return;
+    
     const notificationsRef = db.collection('notifications')
-        .where('userId', '==', userId)
+        .where('memberId', '==', memberId)
         .where('read', '==', false);
         
     notificationsRef.onSnapshot((snapshot) => {
@@ -1587,9 +1588,7 @@ async function initializeApp(user) {
     try {
         currentUser = user;
         
-        // Setup notification listener
-        setupNotificationListener(user.uid);
-        
+        // Get memberId from Registration collection
         const memberId = await getUserMemberId(user);
         
         if (!memberId) {
@@ -1598,6 +1597,9 @@ async function initializeApp(user) {
             }, 300);
             return;
         }
+        
+        // Setup notification listener with memberId
+        setupNotificationListener(memberId);
         
         await initializeAllCollections(memberId);
         await loadAllDataInParallel(memberId);
