@@ -517,36 +517,6 @@
             text-decoration: underline;
         }
         
-        /* Toast notification */
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--success-color);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 4px;
-            box-shadow: var(--shadow);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 1000;
-            max-width: 90%;
-            text-align: center;
-        }
-        
-        .toast.show {
-            opacity: 1;
-        }
-        
-        .toast.error {
-            background-color: var(--notification-color);
-        }
-        
-        .toast.warning {
-            background-color: var(--warning-color);
-        }
-        
         /* Responsive */
         @media (max-width: 768px) {
             body {
@@ -682,9 +652,6 @@
     </a>
 </nav>
 
-<!-- Toast Notification -->
-<div class="toast" id="toast"></div>
-
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
@@ -717,7 +684,6 @@
     const headerLogo = document.getElementById('header-logo');
     const headerTitle = document.getElementById('header-title');
     const notificationBadge = document.getElementById('notification-badge');
-    const toast = document.getElementById('toast');
     const bgAnimation = document.getElementById('bg-animation');
     const loadingOverlay = document.getElementById('loadingOverlay');
     const mainContainer = document.getElementById('mainContainer');
@@ -725,6 +691,7 @@
 
     // App state
     let currentUser = null;
+    let currentMemberId = null;
     let notifications = [];
     let unsubscribe = null;
     let fcmToken = null;
@@ -826,10 +793,32 @@
         });
     }
 
+    // Get memberId from Registration collection using user email
+    async function getMemberIdFromEmail(userEmail) {
+        try {
+            const registrationQuery = await db.collection('Registration')
+                .where('email', '==', userEmail)
+                .limit(1)
+                .get();
+            
+            if (!registrationQuery.empty) {
+                const doc = registrationQuery.docs[0];
+                return doc.data().memberId || doc.id;
+            }
+            
+            return null;
+        } catch (error) {
+            console.error("Error getting memberId:", error);
+            return null;
+        }
+    }
+
     // Setup notification listener
-    function setupNotificationListener(userId) {
+    async function setupNotificationListener(memberId) {
+        if (!memberId) return;
+        
         const notificationsRef = db.collection('notifications')
-            .where('userId', '==', userId)
+            .where('memberId', '==', memberId)
             .where('read', '==', false);
             
         notificationsRef.onSnapshot((snapshot) => {
@@ -885,16 +874,6 @@
             console.error("Error loading header:", error);
             headerLogo.src = 'https://via.placeholder.com/150x50?text=Error+Loading+Logo';
         });
-    }
-
-    // Show toast message
-    function showToast(message, isSuccess = true) {
-        toast.textContent = message;
-        toast.className = isSuccess ? 'toast show' : 'toast show error';
-        
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
     }
 
     // Show notifications
@@ -1101,12 +1080,8 @@
     // Delete notification
     function deleteNotification(notificationId) {
         db.collection('notifications').doc(notificationId).delete()
-            .then(() => {
-                showToast('নোটিফিকেশন মুছে ফেলা হয়েছে');
-            })
             .catch((error) => {
                 console.error("Error deleting notification:", error);
-                showToast('নোটিফিকেশন মুছতে সমস্যা হয়েছে', false);
             });
     }
 
@@ -1116,7 +1091,6 @@
         const unreadNotifications = notifications.filter(n => !n.read);
         
         if (unreadNotifications.length === 0) {
-            showToast('সব নোটিফিকেশন পড়া হিসেবে চিহ্নিত আছে');
             return;
         }
         
@@ -1128,19 +1102,28 @@
             });
         });
         
-        batch.commit().then(() => {
-            showToast('সব নোটিফিকেশন পড়া হিসেবে চিহ্নিত করা হয়েছে');
-        }).catch(error => {
+        batch.commit().catch(error => {
             console.error("Error marking all as read:", error);
-            showToast('নোটিফিকেশন পড়া হিসেবে চিহ্নিত করতে সমস্যা হয়েছে', false);
         });
     }
 
     // Load all notifications (both read and unread)
-    function loadNotifications(userId) {
-        // Query all notifications for this user (both read and unread)
+    async function loadNotifications(memberId) {
+        if (!memberId) {
+            notificationsContainer.innerHTML = `
+                <div class="error-notification">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>সদস্য আইডি পাওয়া যায়নি</p>
+                    <button onclick="location.reload()">আবার চেষ্টা করুন</button>
+                </div>
+            `;
+            hideLoading();
+            return;
+        }
+        
+        // Query all notifications for this member (both read and unread)
         db.collection('notifications')
-            .where('userId', '==', userId)
+            .where('memberId', '==', memberId)
             .get()
             .then(snapshot => {
                 notifications = [];
@@ -1162,7 +1145,7 @@
                 hideLoading();
                 
                 // Now setup realtime listener for all notifications
-                setupRealtimeListener(userId);
+                setupRealtimeListener(memberId);
             })
             .catch(error => {
                 console.error("Error loading notifications:", error);
@@ -1178,11 +1161,11 @@
     }
 
     // Setup realtime listener for all notifications
-    function setupRealtimeListener(userId) {
+    function setupRealtimeListener(memberId) {
         if (unsubscribe) unsubscribe();
         
         unsubscribe = db.collection('notifications')
-            .where('userId', '==', userId)
+            .where('memberId', '==', memberId)
             .onSnapshot(snapshot => {
                 notifications = [];
                 snapshot.forEach(doc => {
@@ -1240,11 +1223,26 @@
             const user = await checkAuthAndRedirect();
             currentUser = user;
             
+            // Get memberId from Registration collection
+            currentMemberId = await getMemberIdFromEmail(user.email);
+            
+            if (!currentMemberId) {
+                notificationsContainer.innerHTML = `
+                    <div class="error-notification">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>সদস্য রেজিস্ট্রেশন পাওয়া যায়নি</p>
+                        <button onclick="location.reload()">আবার চেষ্টা করুন</button>
+                    </div>
+                `;
+                hideLoading();
+                return;
+            }
+            
             // Setup notification listener for badge
-            setupNotificationListener(user.uid);
+            setupNotificationListener(currentMemberId);
             
             // Load notifications
-            loadNotifications(user.uid);
+            loadNotifications(currentMemberId);
             
             // Mark all as read button
             markAllReadBtn.addEventListener('click', markAllAsRead);
