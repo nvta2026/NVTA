@@ -1111,7 +1111,7 @@ const bgAnimation = document.getElementById('bg-animation');
 
 // App state
 let currentUser = null;
-let userDataCache = null;
+let currentMemberId = null;
 
 // ✅ Show loading (only on content area)
 function showLoading() {
@@ -1241,10 +1241,34 @@ function loadHeaderFromFirestore() {
     });
 }
 
-// Setup real-time notification listener
-function setupNotificationListener(userId) {
+// ✅ Get memberId from Registration collection using user UID
+async function getUserMemberId(userUid) {
+    try {
+        const registrationQuery = await db.collection('Registration')
+            .where('userId', '==', userUid)
+            .limit(1)
+            .get();
+        
+        if (!registrationQuery.empty) {
+            const doc = registrationQuery.docs[0];
+            const data = doc.data();
+            return data.memberId || doc.id; // Return memberId field or document ID
+        }
+        
+        console.error("No registration found for user:", userUid);
+        return null;
+    } catch (error) {
+        console.error("Error getting memberId:", error);
+        return null;
+    }
+}
+
+// ✅ Setup real-time notification listener with memberId
+function setupNotificationListener(memberId) {
+    if (!memberId) return;
+    
     const notificationsRef = db.collection('notifications')
-        .where('userId', '==', userId)
+        .where('memberId', '==', memberId)
         .where('read', '==', false);
         
     notificationsRef.onSnapshot((snapshot) => {
@@ -1276,71 +1300,26 @@ function updateNotificationBadge(count) {
     notificationBadge.dataset.prevCount = num;
 }
 
-// ✅ FAST AUTH CHECK with localStorage cache
-async function checkAuthAndRedirect() {
-    return new Promise((resolve, reject) => {
-        // First check localStorage cache
-        const cachedUser = localStorage.getItem('cachedUser');
-        if (cachedUser) {
-            try {
-                const user = JSON.parse(cachedUser);
-                resolve(user);
-                return;
-            } catch (e) {
-                // Cache is invalid, proceed with Firebase check
-            }
-        }
-        
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                // Cache the user data
-                localStorage.setItem('cachedUser', JSON.stringify({
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName
-                }));
-                resolve(user);
-            } else {
-                window.location.replace('login.html');
-                reject(new Error("User not authenticated"));
-            }
-        }, (error) => {
-            window.location.replace('login.html');
-            reject(error);
-        });
-    });
-}
-
-// ১. Firestore থেকে ডেটা লোড করার ফাংশন (Optimized)
-async function loadProfileDataFromFirestore(userId) {
+// ✅ Load profile data using memberId
+async function loadProfileDataFromFirestore(memberId) {
+    if (!memberId) {
+        console.error("No memberId provided");
+        hideLoading();
+        return;
+    }
+    
     try {
-        // Try to load from cache first
-        const cachedData = localStorage.getItem(`profileData_${userId}`);
-        if (cachedData) {
-            const userData = JSON.parse(cachedData);
-            updateProfileUI(userData);
-            hideLoading(); // Hide loading immediately for cached data
-        }
-        
-        const userRef = db.collection('Registration')
-            .where('userId', '==', userId);
+        const memberRef = db.collection('Registration').doc(memberId);
         
         // Set up real-time listener
-        userRef.onSnapshot((querySnapshot) => {
-            if (!querySnapshot.empty) {
-                querySnapshot.forEach((doc) => {
-                    const userData = doc.data();
-                    userDataCache = userData;
-                    
-                    // Cache the data
-                    localStorage.setItem(`profileData_${userId}`, JSON.stringify(userData));
-                    
-                    updateProfileUI(userData);
-                    hideLoading();
-                });
+        memberRef.onSnapshot((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                updateProfileUI(userData);
+                hideLoading();
             } else {
-                console.log('কোনো ব্যবহারকারী তথ্য পাওয়া যায়নি');
-                window.location.href = 'login.html';
+                console.error('Member not found:', memberId);
+                hideLoading();
             }
         }, (error) => {
             console.error('রিয়েলটাইম ডেটা লোডে ত্রুটি:', error);
@@ -1385,7 +1364,8 @@ function updateProfileUI(userData) {
         removeSkeleton(nomineeBirthDate);
         
         // প্রোফাইল হেডার আপডেট
-        memberId.textContent = `সদস্য আইডি: ${userData.memberId || ''}`;
+        const displayMemberId = userData.memberId || 'N/A';
+        memberId.textContent = `সদস্য আইডি: ${displayMemberId}`;
         memberName.textContent = userData.name || '';
         memberStatus.textContent = userData.status === 'active' ? 'সক্রিয় সদস্য' : 'নিষ্ক্রিয় সদস্য';
         
@@ -1506,16 +1486,7 @@ function updateProfileUI(userData) {
 logoutBtn.addEventListener('click', async function() {
     try {
         // Clear all cache
-        localStorage.removeItem('cachedUser');
-        localStorage.removeItem('userData');
-        localStorage.removeItem('memberId');
-        localStorage.removeItem('rememberMe');
-        localStorage.removeItem('mobileNumber');
-        
-        // Clear profile cache
-        if (currentUser) {
-            localStorage.removeItem(`profileData_${currentUser.uid}`);
-        }
+        localStorage.clear();
         
         await auth.signOut();
         window.location.href = 'login.html';
@@ -1534,7 +1505,24 @@ function initHeaderComponents() {
     loadHeaderFromFirestore();
 }
 
-// ✅ Optimized: Main initialization function
+// ✅ STRICT AUTH CHECK
+async function checkAuthAndRedirect() {
+    return new Promise((resolve, reject) => {
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                resolve(user);
+            } else {
+                window.location.replace('login.html');
+                reject(new Error("User not authenticated"));
+            }
+        }, (error) => {
+            window.location.replace('login.html');
+            reject(error);
+        });
+    });
+}
+
+// ✅ Main initialization function
 async function initApp() {
     showLoading();
     initHeaderComponents();
@@ -1549,16 +1537,20 @@ async function initApp() {
         const user = await checkAuthAndRedirect();
         currentUser = user;
         
+        // Get memberId from Registration collection
+        currentMemberId = await getUserMemberId(user.uid);
+        
+        if (!currentMemberId) {
+            console.error("Could not get memberId");
+            hideLoading();
+            return;
+        }
+        
         // Setup notification listener
-        setupNotificationListener(user.uid);
+        setupNotificationListener(currentMemberId);
         
         // Load profile data
-        loadProfileDataFromFirestore(user.uid);
-        
-        // Set timeout to hide loading if data takes too long
-        setTimeout(() => {
-            hideLoading();
-        }, 5000); // Max 5 seconds loading time
+        loadProfileDataFromFirestore(currentMemberId);
         
     } catch (error) {
         console.error("Error in app initialization:", error);
@@ -1587,8 +1579,6 @@ window.onpageshow = function(event) {
 // ✅ Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log('প্রোফাইল পেজ লোড হয়েছে');
-    
-    // Initialize app
     initApp();
 });
 </script>
