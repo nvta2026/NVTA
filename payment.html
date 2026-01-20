@@ -1,582 +1,822 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>জমা দিন</title>
-
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-
-<style>
-:root {
-    --primary-color: #4a6bff;
-    --secondary-color: #f5f7ff;
-    --text-color: #333;
-    --white: #fff;
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    --notification-color: #ff6b6b;
-    --dark-bg: #1a1a1a;
-    --dark-text: #f0f0f0;
-    --dark-secondary: #2d2d2d;
-    --dark-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Segoe UI','Kalpurush','Siyam Rupali',sans-serif;
-}
-body{
-    color:#333;
-    font-size:14px; 
-    background-color: white;
-    padding-top: 50px;
-    padding-bottom: 70px;
-    transition: background-color 0.3s, color 0.3s;
-    position: relative;
-    overflow-x: hidden;
-}
-
-body.dark-mode {
-    background-color: var(--dark-bg);
-    color: var(--dark-text);
-}
-
-/* Background Animation */
-.bg-animation {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
-}
-
-.bg-bubble {
-    position: absolute;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #27ae60 0%, #4a6bff 100%);
-    animation: float 15s infinite ease-in-out;
-    opacity: 0.2;
-}
-
-body.dark-mode .bg-bubble {
-    background: linear-gradient(135deg, #2ecc71 0%, #3498db 100%);
-    opacity: 0.15;
-}
-
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0) translateX(0);
-    }
-    25% {
-        transform: translateY(-20px) translateX(10px);
-    }
-    50% {
-        transform: translateY(-40px) translateX(-10px);
-    }
-    75% {
-        transform: translateY(-20px) translateX(-5px);
-    }
-}
-
-/* Header Styles */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    background-color: var(--white);
-    box-shadow: var(--shadow);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    transition: background-color 0.3s, box-shadow 0.3s;
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
-    border-bottom: 1px solid #2ecc71;
-    height: 50px;
-}
-
-body.dark-mode header {
-    background-color: var(--dark-secondary);
-    box-shadow: var(--dark-shadow);
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    max-width: 50%;
-    overflow: hidden;
-}
-
-.logo {
-    height: 40px;
-    width: auto;
-    max-width: 100%;
-    object-fit: contain;
-}
-
-.app-title {
-    font-weight: 700;
-    font-size: 16px;
-    color: var(--primary-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.header-controls {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.icon-btn {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    font-size: 18px;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.3s;
-    padding: 5px;
-    width: 15px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-body.dark-mode .icon-btn {
-    color: var(--dark-text);
-}
-
-.notification-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: var(--notification-color);
-    color: white;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: bold;
-    transition: all 0.3s;
-}
-
-.notification-badge.pulse {
-    animation: pulse 0.5s 2;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
-}
-
-.theme-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.theme-toggle .fa-sun,
-.theme-toggle .fa-moon {
-    transition: opacity 0.3s;
-}
-
-body.dark-mode .theme-toggle .fa-sun {
-    display: block;
-    opacity: 1;
-}
-
-body.dark-mode .theme-toggle .fa-moon {
-    display: none;
-    opacity: 0;
-}
-
-body:not(.dark-mode) .theme-toggle .fa-sun {
-    display: none;
-    opacity: 0;
-}
-
-body:not(.dark-mode) .theme-toggle .fa-moon {
-    display: block;
-    opacity: 1;
-}
-
-/* Navigation Bar Styles */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: var(--white);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-around;
-    padding: 12px 0;
-    z-index: 100;
-    transition: background-color 0.3s, box-shadow 0.3s;
-    border-top-left-radius: 30px;
-    border-top-right-radius: 30px;
-    border-top: 1px solid #2ecc71;
-    height: 60px;
-}
-
-body.dark-mode .bottom-nav {
-    background-color: var(--dark-secondary);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.nav-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    color: var(--text-color);
-    font-size: 12px;
-    transition: all 0.3s;
-    padding: 8px 12px;
-    position: relative;
-    flex: 1;
-    max-width: 33.33%;
-}
-
-body.dark-mode .nav-btn {
-    color: var(--dark-text);
-}
-
-.nav-btn i {
-    font-size: 20px;
-    margin-bottom: 4px;
-    transition: color 0.3s;
-}
-
-.nav-btn:hover i {
-    color: var(--primary-color);
-}
-
-.nav-btn.active i {
-    color: var(--primary-color);
-}
-
-.nav-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    width: 6px;
-    height: 6px;
-    background-color: var(--primary-color);
-    border-radius: 50%;
-}
-
-/* Main Content Styles */
-.container{
-    max-width:1200px;
-    margin:auto;
-    opacity: 1;
-    padding: 15px;
-    transition: opacity 0.3s;
-}
-
-.container.loading {
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-/* Payment Processing Styles */
-.payment-wait {
-    min-height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.payment-box {
-    text-align: center;
-    padding: 40px 30px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.95);
-    max-width: 400px;
-    width: 100%;
-    box-shadow: var(--shadow);
-    border: 1px solid rgba(74, 107, 255, 0.1);
-}
-
-body.dark-mode .payment-box {
-    background: rgba(45, 45, 45, 0.95);
-    border-color: rgba(74, 107, 255, 0.2);
-}
-
-.spinner {
-    width: 60px;
-    height: 60px;
-    border: 5px solid #ddd;
-    border-top: 5px solid #4a6bff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 25px;
-}
-
-body.dark-mode .spinner {
-    border-color: #444;
-    border-top-color: #4a6bff;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.payment-title {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #2c3e9e;
-}
-
-body.dark-mode .payment-title {
-    color: var(--primary-color);
-}
-
-.payment-desc {
-    font-size: 16px;
-    opacity: 0.9;
-    line-height: 1.5;
-    margin-bottom: 30px;
-}
-
-body.dark-mode .payment-desc {
-    color: var(--dark-text);
-    opacity: 0.8;
-}
-
-.payment-info {
-    background: var(--secondary-color);
-    padding: 15px;
-    border-radius: 10px;
-    margin-top: 20px;
-    font-size: 14px;
-    text-align: left;
-}
-
-body.dark-mode .payment-info {
-    background: rgba(74, 107, 255, 0.1);
-}
-
-.payment-info-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-body.dark-mode .payment-info-item {
-    border-bottom-color: rgba(255, 255, 255, 0.1);
-}
-
-.payment-info-item:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-}
-
-.payment-label {
-    font-weight: 600;
-    color: #555;
-}
-
-body.dark-mode .payment-label {
-    color: #aaa;
-}
-
-.payment-value {
-    color: #333;
-    font-weight: 600;
-}
-
-body.dark-mode .payment-value {
-    color: var(--dark-text);
-}
-
-/* Loading State */
-.loading-overlay {
-    position: fixed;
-    top: 50px; /* Header height */
-    left: 0;
-    width: 100%;
-    height: calc(100% - 110px); /* Full height minus header and footer */
-    background: rgba(255, 255, 255, 0.9);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 90;
-    transition: background-color 0.3s;
-}
-
-body.dark-mode .loading-overlay {
-    background: rgba(26, 26, 26, 0.9);
-}
-
-.loading-spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #27ae60;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 20px;
-}
-
-body.dark-mode .loading-spinner {
-    border: 4px solid #2d2d2d;
-    border-top: 4px solid #2ecc71;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.loading-text {
-    color: #333;
-    font-size: 18px;
-    font-family: 'Kalpurush', 'Siyam Rupali', sans-serif;
-    transition: color 0.3s;
-}
-
-body.dark-mode .loading-text {
-    color: #f0f0f0;
-}
-
-/* Content Loading State */
-.content-loading {
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .container{
-        padding:10px;
-    }
-    body{
-        font-size:13px;
-    }
-    
-    .payment-box {
-        padding: 30px 20px;
-        max-width: 350px;
-    }
-    
-    .spinner {
-        width: 50px;
-        height: 50px;
-        border-width: 4px;
-    }
-    
-    .payment-title {
-        font-size: 20px;
-    }
-    
-    .payment-desc {
-        font-size: 15px;
-    }
-    
-    /* Header Responsive */
-    .logo {
-        height: 40px;
-    }
-    
-    .app-title {
-        font-size: 14px;
-    }
-    
-    .header-controls {
-        gap: 10px;
-    }
-    
-    .icon-btn {
-        font-size: 16px;
-    }
-    
-    .notification-badge {
-        width: 16px;
-        height: 16px;
-        font-size: 9px;
-    }
-}
-
-@media (max-width: 480px) {
-    .payment-box {
-        padding: 25px 15px;
-        max-width: 300px;
-    }
-    
-    .spinner {
-        width: 45px;
-        height: 45px;
-        border-width: 4px;
-    }
-    
-    .payment-title {
-        font-size: 18px;
-    }
-    
-    .payment-desc {
-        font-size: 14px;
-    }
-    
-    .payment-info {
-        padding: 12px;
-        font-size: 13px;
-    }
-    
-    .loading-spinner {
-        width: 35px;
-        height: 35px;
-        border-width: 3px;
-    }
-
-    .loading-text {
-        font-size: 14px;
-    }
-}
-
-@media (min-width: 768px) {
-    .logo {
-        height: 35px;
-    }
-    
-    .app-title {
-        font-size: 18px;
-    }
-    
-    .icon-btn {
-        font-size: 20px;
-    }
-}
-</style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="manifest" href="/NVTA/manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>পেমেন্ট গেটওয়ে</title>
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  
+  <style>
+      :root {
+          --primary-color: #4a6bff;
+          --secondary-color: #f5f7ff;
+          --text-color: #333;
+          --white: #fff;
+          --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          --notification-color: #ff6b6b;
+          --dark-bg: #1a1a1a;
+          --dark-text: #f0f0f0;
+          --dark-secondary: #2d2d2d;
+          --dark-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          --success-color: #4CAF50;
+          --warning-color: #FFC107;
+          --pending-color: #FFA000;
+      }
+      
+      *{
+          margin:0;
+          padding:0;
+          box-sizing:border-box;
+          font-family:'Segoe UI','Kalpurush','Siyam Rupali',sans-serif;
+      }
+      
+      body{
+          color:#333;
+          font-size:14px; 
+          background-color: white;
+          padding-top: 50px;
+          padding-bottom: 70px;
+          transition: background-color 0.3s, color 0.3s;
+          position: relative;
+          overflow-x: hidden;
+      }
+
+      body.dark-mode {
+          background-color: var(--dark-bg);
+          color: var(--dark-text);
+      }
+
+      /* Background Animation */
+      .bg-animation {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: -1;
+          overflow: hidden;
+      }
+
+      .bg-bubble {
+          position: absolute;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #27ae60 0%, #4a6bff 100%);
+          animation: float 15s infinite ease-in-out;
+          opacity: 0.2;
+      }
+
+      body.dark-mode .bg-bubble {
+          background: linear-gradient(135deg, #2ecc71 0%, #3498db 100%);
+          opacity: 0.15;
+      }
+
+      @keyframes float {
+          0%, 100% {
+              transform: translateY(0) translateX(0);
+          }
+          25% {
+              transform: translateY(-20px) translateX(10px);
+          }
+          50% {
+              transform: translateY(-40px) translateX(-10px);
+          }
+          75% {
+              transform: translateY(-20px) translateX(-5px);
+          }
+      }
+
+      /* Header Styles */
+      header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0 20px;
+          background-color: var(--white);
+          box-shadow: var(--shadow);
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          z-index: 100;
+          transition: background-color 0.3s, box-shadow 0.3s;
+          border-bottom-left-radius: 30px;
+          border-bottom-right-radius: 30px;
+          border-bottom: 1px solid #2ecc71;
+          height: 50px;
+      }
+
+      body.dark-mode header {
+          background-color: var(--dark-secondary);
+          box-shadow: var(--dark-shadow);
+      }
+
+      .logo-container {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          max-width: 50%;
+          overflow: hidden;
+      }
+
+      .logo {
+          height: 40px;
+          width: auto;
+          max-width: 100%;
+          object-fit: contain;
+      }
+
+      .app-title {
+          font-weight: 700;
+          font-size: 16px;
+          color: var(--primary-color);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+      }
+
+      .header-controls {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+      }
+
+      .icon-btn {
+          background: none;
+          border: none;
+          color: var(--text-color);
+          font-size: 18px;
+          cursor: pointer;
+          position: relative;
+          transition: all 0.3s;
+          padding: 5px;
+          width: 15px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+      }
+
+      body.dark-mode .icon-btn {
+          color: var(--dark-text);
+      }
+
+      .notification-badge {
+          position: absolute;
+          top: -5px;
+          right: -5px;
+          background-color: var(--notification-color);
+          color: white;
+          border-radius: 50%;
+          width: 18px;
+          height: 18px;
+          display: none;
+          align-items: center;
+          justify-content: center;
+          font-size: 10px;
+          font-weight: bold;
+          transition: all 0.3s;
+      }
+
+      .notification-badge.pulse {
+          animation: pulse 0.5s 2;
+      }
+
+      @keyframes pulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.3); }
+          100% { transform: scale(1); }
+      }
+
+      .theme-toggle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+
+      .theme-toggle .fa-sun,
+      .theme-toggle .fa-moon {
+          transition: opacity 0.3s;
+      }
+
+      body.dark-mode .theme-toggle .fa-sun {
+          display: block;
+          opacity: 1;
+      }
+
+      body.dark-mode .theme-toggle .fa-moon {
+          display: none;
+          opacity: 0;
+      }
+
+      body:not(.dark-mode) .theme-toggle .fa-sun {
+          display: none;
+          opacity: 0;
+      }
+
+      body:not(.dark-mode) .theme-toggle .fa-moon {
+          display: block;
+          opacity: 1;
+      }
+
+      /* Navigation Bar Styles */
+      .bottom-nav {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background-color: var(--white);
+          box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+          display: flex;
+          justify-content: space-around;
+          padding: 12px 0;
+          z-index: 100;
+          transition: background-color 0.3s, box-shadow 0.3s;
+          border-top-left-radius: 30px;
+          border-top-right-radius: 30px;
+          border-top: 1px solid #2ecc71;
+          height: 60px;
+      }
+
+      body.dark-mode .bottom-nav {
+          background-color: var(--dark-secondary);
+          box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .nav-btn {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-decoration: none;
+          color: var(--text-color);
+          font-size: 12px;
+          transition: all 0.3s;
+          padding: 8px 12px;
+          position: relative;
+          flex: 1;
+          max-width: 33.33%;
+      }
+
+      body.dark-mode .nav-btn {
+          color: var(--dark-text);
+      }
+
+      .nav-btn i {
+          font-size: 20px;
+          margin-bottom: 4px;
+          transition: color 0.3s;
+      }
+
+      .nav-btn:hover i {
+          color: var(--primary-color);
+      }
+
+      .nav-btn.active i {
+          color: var(--primary-color);
+      }
+
+      .nav-btn.active::after {
+          content: '';
+          position: absolute;
+          bottom: -8px;
+          width: 6px;
+          height: 6px;
+          background-color: var(--primary-color);
+          border-radius: 50%;
+      }
+
+      /* Main Content Container */
+      .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 20px;
+          flex: 1;
+          width: 100%;
+      }
+      
+      main {
+          padding: 20px 0;
+          overflow-y: auto;
+      }
+      
+      .page-title {
+          margin-bottom: 20px;
+          text-align: center;
+          color: var(--primary-color);
+          font-size: 1.5rem;
+      }
+      
+      /* Payment Gateway Styles */
+      .premium-box {
+          max-width: 500px;
+          margin: 5% auto;
+          padding: 20px;
+          border-radius: 20px;
+          background: rgba(255,255,255,0.05);
+          backdrop-filter: blur(12px);
+          box-shadow: inset 0 0 10px #aaa, 0 8px 20px rgba(0,0,0,0.2);
+          border: 2px solid #00c6ff;
+          color: inherit;
+          font-family: 'Segoe UI', sans-serif;
+      }
+
+      body.dark-mode .premium-box {
+          background: rgba(0,0,0,0.2);
+          box-shadow: inset 0 0 10px #000, 0 8px 20px rgba(0,0,0,0.3);
+      }
+
+      .premium-box h2 {
+          text-align: center;
+          font-weight: 600;
+          color: inherit;
+          margin-bottom: 2px;
+      }
+      
+      .premium-box h3 {
+        text-align: center;
+      
+      }
+      
+      .verification-step .subtitle {
+          text-align: center;
+          font-size: 16px;
+          font-weight: 400;
+          color: #666;
+          margin-bottom: 30px;
+      }
+
+      body.dark-mode .verification-step .subtitle {
+          color: #aaa;
+      }
+      
+      .subtitle {
+        text-align: center;
+      }
+
+      .premium-box label {
+          display: block;
+          font-weight: 500;
+          color: inherit;
+          text-transform: uppercase;
+          margin-top: 15px;
+      }
+
+      .premium-box input {
+          width: 100%;
+          padding: 12px;
+          margin: 8px 0 15px;
+          border-radius: 10px;
+          border: 2px solid #00c6ff;
+          font-size: 16px;
+          background: rgba(240,240,240,0.9);
+          color: #000;
+      }
+
+      body.dark-mode .premium-box input {
+          background: rgba(255,255,255,0.9);
+      }
+
+      .submit-btn {
+          width: 100%;
+          padding: 12px;
+          margin: 20px 0 10px;
+          border-radius: 10px;
+          background: linear-gradient(to right, #00c6ff, #0072ff);
+          color: #fff;
+          font-weight: bold;
+          border: none;
+          font-size: 16px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+      }
+
+      .submit-btn:hover {
+          transform: scale(1.02);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      }
+
+      .back-button {
+          background: #ccc;
+          width: 100%;
+          padding: 12px;
+          margin: 20px 0 10px;
+          border-radius: 10px;
+          color: #fff;
+          font-weight: bold;
+          border: none;
+          font-size: 16px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+      }
+
+      .copy-btn {
+          background: #0072ff;
+          color: white;
+          border: none;
+          padding: 3px 8px;
+          border-radius: 4px;
+          font-size: 11px;
+          cursor: pointer;
+          margin-left: 5px;
+          transition: all 0.2s ease;
+      }
+
+      .copy-btn:hover {
+          background: #0055cc;
+          transform: translateY(-1px);
+      }
+
+      .payment-methods {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 15px;
+          margin: 20px 0;
+      }
+
+      .payment-method {
+          background: rgba(255,255,255,0.9);
+          border-radius: 10px;
+          padding: 15px;
+          text-align: center;
+          cursor: pointer;
+          border: 2px solid #ddd;
+          transition: all 0.3s ease;
+      }
+
+      body.dark-mode .payment-method {
+          background: rgba(71, 70, 70, 0.651);
+      }
+
+      .payment-method:hover {
+          border-color: #00c6ff;
+          transform: translateY(-3px);
+      }
+
+      .payment-method.selected {
+          border-color: #0072ff;
+          background: rgba(0,114,255,0.1);
+      }
+
+      .payment-method img {
+          width: 80px;
+          height: 80px;
+          object-fit: contain;
+          margin-bottom: 10px;
+      }
+
+      .verification-step {
+          display: none;
+      }
+
+      .step-title {
+          text-align: center;
+          margin-bottom: 20px;
+          font-size: 20px;
+          color: #0072ff;
+      }
+
+      .verification-item {
+          display: flex;
+          align-items: center;
+          margin-bottom: 10px;
+          padding-bottom: 10px;
+          border-bottom: 1px dashed #ddd;
+      }
+      
+      .verification-number {
+          font-weight: bold;
+          color: #0072ff;
+          min-width: 20px;
+          margin-right: 5px;
+      }
+      
+      .verification-text {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 5px;
+      }
+
+      .error-message {
+          color: #ff4444;
+          font-size: 14px;
+          margin-top: -10px;
+          margin-bottom: 15px;
+          display: none;
+      }
+
+      /* Charge info style */
+      .charge-info {
+          text-align: center;
+          color: #0072ff;
+          font-weight: 600;
+          margin: 15px 0 25px 0;
+          font-size: 16px;
+          padding: 10px;
+          background: rgba(0, 114, 255, 0.1);
+          border-radius: 8px;
+          border: 1px solid rgba(0, 114, 255, 0.3);
+      }
+
+      body.dark-mode .charge-info {
+          background: rgba(0, 114, 255, 0.15);
+          border-color: rgba(0, 114, 255, 0.4);
+      }
+
+      /* Total amount style */
+      .total-amount {
+          color: #ff4444;
+          font-weight: bold;
+      }
+
+      /* Premium Verification Popup */
+      .verification-popup {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.7);
+          display: none;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+      }
+      
+      .verification-content {
+          background: var(--white);
+          border-radius: 15px;
+          padding: 30px;
+          width: 90%;
+          max-width: 500px;
+          box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+          position: relative;
+      }
+      
+      body.dark-mode .verification-content {
+          background: var(--dark-secondary);
+      }
+      
+      .verification-header {
+          text-align: center;
+          margin-bottom: 20px;
+      }
+      
+      .verification-header h2 {
+          color: #000000; /* কালো কালার */
+          margin-bottom: 5px;
+          font-weight: 700;
+      }
+      
+      .verification-header p {
+          color: #0072ff; /* নীল কালার */
+          font-size: 14px;
+          margin-top: 5px;
+      }
+      
+      .verification-details {
+          background: #f9f9f9;
+          padding: 20px;
+          border-radius: 10px;
+          margin-bottom: 20px;
+      }
+      
+      body.dark-mode .verification-details {
+          background: rgba(255,255,255,0.1);
+      }
+      
+      .verification-item-premium {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 15px;
+          padding-bottom: 15px;
+          border-bottom: 1px solid #eee;
+      }
+      
+      body.dark-mode .verification-item-premium {
+          border-bottom: 1px solid #444;
+      }
+      
+      .verification-label {
+          font-weight: 600;
+          color: #555;
+      }
+      
+      body.dark-mode .verification-label {
+          color: #aaa;
+      }
+      
+      .verification-value {
+          font-weight: 700;
+          color: #333;
+          text-align: right;
+      }
+      
+      body.dark-mode .verification-value {
+          color: var(--dark-text);
+      }
+      
+      .verification-description {
+          background: #f0f0f0;
+          padding: 15px;
+          border-radius: 10px;
+          margin-bottom: 20px;
+          border: 2px solid #ff4444;
+          text-align: center;
+      }
+      
+      body.dark-mode .verification-description {
+          background: rgba(255,255,255,0.1);
+          border-color: #ff4444;
+      }
+      
+      .verification-warning {
+          color: #ff4444;
+          font-weight: bold;
+          margin-bottom: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+      }
+      
+      .verification-buttons {
+          display: flex;
+          justify-content: center;
+      }
+      
+      .confirm-btn {
+          background: #25D366;
+          color: white;
+          padding: 12px 25px;
+          border-radius: 8px;
+          border: none;
+          font-weight: bold;
+          cursor: pointer;
+          width: 100%;
+          max-width: 200px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          transition: all 0.3s;
+      }
+      
+      .confirm-btn:hover {
+          background: #128C7E;
+          transform: translateY(-2px);
+      }
+      
+      /* Success Popup */
+      .success-popup {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.7);
+          display: none;
+          justify-content: center;
+          align-items: center;
+          z-index: 1001;
+      }
+      
+      .success-content {
+          background: var(--white);
+          border-radius: 15px;
+          padding: 30px;
+          width: 90%;
+          max-width: 400px;
+          text-align: center;
+          box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      }
+      
+      body.dark-mode .success-content {
+          background: var(--dark-secondary);
+      }
+      
+      .success-icon {
+          font-size: 60px;
+          color: #4CAF50;
+          margin-bottom: 20px;
+          animation: bounce 0.5s;
+      }
+      
+      @keyframes bounce {
+          0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+          40% {transform: translateY(-20px);}
+          60% {transform: translateY(-10px);}
+      }
+      
+      .success-title {
+          font-size: 24px;
+          font-weight: 700;
+          color: #4CAF50;
+          margin-bottom: 10px;
+      }
+      
+      .success-message {
+          font-size: 16px;
+          color: 555;
+          margin-bottom: 20px;
+      }
+      
+      body.dark-mode .success-message {
+          color: #aaa;
+      }
+      
+      .success-btn {
+          background: #4CAF50;
+          color: white;
+          border: none;
+          padding: 12px 25px;
+          border-radius: 8px;
+          font-weight: bold;
+          cursor: pointer;
+          width: 100%;
+          max-width: 200px;
+          margin: 0 auto;
+          transition: all 0.3s;
+      }
+      
+      .success-btn:hover {
+          background: #3d8b40;
+      }
+      
+      /* Pending Status */
+      .pending-status {
+          background: var(--pending-color);
+          color: white;
+          padding: 8px 15px;
+          border-radius: 20px;
+          font-size: 14px;
+          font-weight: 600;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          margin-top: 10px;
+      }
+      
+      /* Amount Step */
+      .amount-step {
+          display: none;
+      }
+      
+      .amount-input {
+          font-size: 24px;
+          text-align: center;
+          font-weight: bold;
+      }
+
+      @media (min-width: 768px) {
+          .logo {
+              height: 35px;
+          }
+          
+          .app-title {
+              font-size: 18px;
+          }
+          
+          .icon-btn {
+              font-size: 20px;
+          }
+      }
+      
+      @media (max-width: 480px) {
+          .app-title {
+              font-size: 14px;
+          }
+          
+          .logo {
+              height: 40px;
+          }
+          
+          .header-controls {
+              gap: 10px;
+          }
+          
+          .icon-btn {
+              font-size: 16px;
+          }
+          
+          .notification-badge {
+              width: 16px;
+              height: 16px;
+              font-size: 9px;
+          }
+      }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body>
@@ -585,375 +825,735 @@ body.dark-mode .loading-text {
 
 <!-- Header -->
 <header>
-    <div class="logo-container">
-        <a href="index.html">
-            <img src="https://blogger.googleusercontent.com/img/a/AVvXsEivqTIaHdAT5pCu40npVAhBQUB7v15cU-vog8HUrrsluvCpu3Q4kRsQ2XiX2pnPi441r1CIxxxgLe9HPVq8lVPQKg22UyoVEQZdm_JRehypwRK8WWfDQY45SCFonpHDeLrTr0u2Qhk1RnVew6cLpcWrUN9FfLdv6f_sG9KwJi1EpHbRs5DGk4ZlRIqL" alt="App Logo" class="logo" id="header-logo">
-        </a>
-        <div class="app-title" id="header-title"></div>
-    </div>
-    
-    <div class="header-controls">
-        <button class="icon-btn theme-toggle" id="theme-toggle">
-            <i class="fas fa-sun"></i>
-            <i class="fas fa-moon"></i>
-        </button>
-        <button class="icon-btn" id="notification-btn" onclick="window.location.href='notifications.html'">
-            <i class="fas fa-bell"></i>
-            <span class="notification-badge" id="notification-badge">0</span>
-        </button>
-    </div>
+  <div class="logo-container">
+      <a href="index.html">
+          <img src="https://blogger.googleusercontent.com/img/a/AVvXsEivqTIaHdAT5pCu40npVAhBQUB7v15cU-vog8HUrrsluvCpu3Q4kRsQ2XiX2pnPi441r1CIxxxgLe9HPVq8lVPQKg22UyoVEQZdm_JRehypwRK8WWfDQY45SCFonpHDeLrTr0u2Qhk1RnVew6cLpcWrUN9FfLdv6f_sG9KwJi1EpHbRs5DGk4ZlRIqL" alt="App Logo" class="logo" id="header-logo">
+      </a>
+      <div class="app-title" id="header-title"></div>
+  </div>
+  
+  <div class="header-controls">
+      <button class="icon-btn theme-toggle" id="theme-toggle">
+          <i class="fas fa-sun"></i>
+          <i class="fas fa-moon"></i>
+      </button>
+      <button class="icon-btn" id="notification-btn" onclick="window.location.href='notifications.html'">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge" id="notification-badge">0</span>
+      </button>
+  </div>
 </header>
 
-<!-- Loading Overlay with Spinner -->
-<div id="loadingOverlay" class="loading-overlay" style="display: none;">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">অপেক্ষা করুন</div>
+<!-- Main Content -->
+<div class="container">
+  <main>
+      <!-- Payment Gateway Content -->
+      <div class="premium-box">
+          <!-- Step 1: Payment Method Selection -->
+          <div id="step1">
+              <h3>নিউ ভিশন ট্রেড অ্যাসোসিয়েশন</h3>
+              <p class="subtitle">পেমেন্ট গেটওয়ে</p>
+              
+              <div class="payment-methods">
+                  <div class="payment-method" onclick="selectPaymentMethod('bkash')">
+                      <img src="https://blogger.googleusercontent.com/img/a/AVvXsEgz0EwMsakdNi1MBfnfk6ccKmXgp42cVKAlJf2TxnHu5Pmpdlfy6d8xjBmBmuSh_PNpLII82Ll6-61GBjB2St_bYLx7k74tmhMb2h81HlDECTDdbF4xuyqQwYMvhKxIu4f79roPFX1QTvbXz2Lajjd5DTNoJFzkGSIt4Ah56eHforjkAvxuLqOiOZwY" alt="bKash">
+                      <div>bKash</div>
+                  </div>
+                  <div class="payment-method" onclick="selectPaymentMethod('nagad')">
+                      <img src="https://blogger.googleusercontent.com/img/a/AVvXsEh3c2hqaFXah4humzIfG_s_Z7aD0gyX9K5jOQlbbwDVMooT9JCUnQTBSFpvx27bIx6rCnlwPHoenMvWRNt7UonZAEgB1kMPxKyjuwPNYSx4UW473F-ATKc3L3HnzeLNBWg9S_Phx77njNWluF3ucktNyBjzXCXXlythiIPW-ui3DLVJQmYKps0NR65w" alt="Nagad">
+                      <div>Nagad</div>
+                  </div>
+                  <div class="payment-method" onclick="selectPaymentMethod('rocket')">
+                      <img src="https://blogger.googleusercontent.com/img/a/AVvXsEg1x9_C_BehUFBmWepQDJXBC6-q8mfl9Ah6fpf5NZtARJshyHB4hJzvvQ4MwWNl-lmGnBLtYsfoasce4HaEq3gkL7TfbUyKGDv9GxtFc8HjeylG0rfIle-crZabTcf_A5X3YR6J-SKX4hLV2AscRgNHGXmcwqFtT2wKirtP8DuGy_A4muxRnwtNV4wr" alt="Rocket">
+                      <div>Rocket</div>
+                  </div>
+                  <div class="payment-method" onclick="selectPaymentMethod('bank')">
+                      <img src="https://blogger.googleusercontent.com/img/a/AVvXsEjcciVRDKtzzzwbuJv7cuWl_yl3yXEy4y8yh4GdAuCSRHVwZ_Azkt_tSKNLsc55HuDYHnH4oxgB14IxvfKp1TMhlVraIUGQlxiETe3rFLvwMnt3josiNIhp8710fQ4X1thx4cy9YcXjvnw6FQwukrm88sBemZ7vNsakSNA9Z1YF7nV_20AOm_o7Cv7I" alt="Bank">
+                      <div>CellFin</div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Step 2: Enter Amount -->
+          <div id="step2" class="amount-step">
+              <h2>টাকার পরিমাণ লিখুন</h2>
+              <p class="subtitle">দয়া করে পেমেন্টের টাকার পরিমাণ লিখুন</p>
+              
+              <!-- চার্জ সম্পর্কিত তথ্য যোগ করা হয়েছে -->
+              <div class="charge-info">
+                  অনলাইন পেমেন্ট চার্জ প্রযোজ্য!
+              </div>
+              
+              <div class="input-group">
+                  <label for="paymentAmount">টাকার পরিমাণ (টাকা):</label>
+                  <input type="number" id="paymentAmountInput" class="amount-input" placeholder="টাকার পরিমাণ লিখুন" value="">
+              </div>
+              
+              <button class="submit-btn" onclick="proceedToVerification()">পেমেন্ট পাঠান</button>
+              <button onclick="backToStep1()" class="back-button">পেছনে</button>
+          </div>
+
+          <!-- Step 3: Payment Verification -->
+          <div id="step3" class="verification-step">
+              <h2>পেমেন্ট যাচাই করুন</h2>
+              
+              <div class="step-title">পেমেন্ট যাচাইকরণ</div>
+              
+              <!-- Payment Instructions -->
+              <div class="payment-instructions">
+                  <div class="verification-item">
+                      <span class="verification-number">১.</span>
+                      <div class="verification-text">
+                          <span>আপনার <span id="paymentAppName">Nagad</span> মোবাইল অ্যাপে যান!</span>
+                      </div>
+                  </div>
+                  <div class="verification-item">
+                      <span class="verification-number">২.</span>
+                      <div class="verification-text">
+                          <span>নির্বাচন করুন: <strong>সেন্ড মানি</strong></span>
+                      </div>
+                  </div>
+                  <div class="verification-item">
+                      <span class="verification-number">৩.</span>
+                      <div class="verification-text">
+                          <span>নম্বর দিন: <span id="paymentNumber">01XXXXXXXXXX</span></span>
+                          <button onclick="copyPaymentNumber()" class="copy-btn">কপি করুন</button>
+                      </div>
+                  </div>
+                  <div class="verification-item">
+                      <span class="verification-number">৪.</span>
+                      <div class="verification-text">
+                          <span>টাকার পরিমাণ দিন: <strong id="displayAmount">0</strong> + <strong id="displayCharge">0</strong> (চার্জ) = <span class="total-amount" id="displayTotal">0৳</span></span>
+                      </div>
+                  </div>
+                  <div class="verification-item" style="border-bottom: none;">
+                      <span class="verification-number">৫.</span>
+                      <div class="verification-text">
+                          <span> নিশ্চিত করতে আপনার <span id="paymentPinName">Nagad</span> পিন দিন</span>
+                      </div>
+                  </div>
+              </div>
+              
+              <!-- Transaction ID Input -->
+              <div class="input-group">
+                  <label for="transactionId">লেনদেন আইডি:</label>
+                  <input type="text" id="transactionId" placeholder="আপনার লেনদেন আইডি লিখুন">
+                  <div class="error-message" id="transactionError" style="display: none;">দয়া করে লেনদেন আইডি লিখুন</div>
+              </div>
+              
+              <button onclick="showVerificationPopup()" class="submit-btn">যাচাই সম্পন্ন</button>
+              <button onclick="backToAmountStep()" class="back-button">পেছনে</button>
+          </div>
+      </div>
+  </main>
 </div>
 
-<div class="container" id="mainContainer">
-    <!-- Payment Processing Content -->
-    <div class="payment-wait">
-        <div class="payment-box">
-            <div class="spinner"></div>
-            <div class="payment-title">অপেক্ষা করুন</div>
-            <div class="payment-desc">Payment system এর কাজ চলমান</div>
-            
-            <div class="payment-info">
-                <div class="payment-info-item">
-                    <span class="payment-label">স্ট্যাটাস:</span>
-                    <span class="payment-value" id="paymentStatus">প্রসেসিং</span>
-                </div>
-                <div class="payment-info-item">
-                    <span class="payment-label">সময়:</span>
-                    <span class="payment-value" id="paymentTime">--:--</span>
-                </div>
-                <div class="payment-info-item">
-                    <span class="payment-label">রেফারেন্স:</span>
-                    <span class="payment-value" id="paymentRef">লোড হচ্ছে...</span>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- Verification Popup -->
+<div class="verification-popup" id="verificationPopup">
+  <div class="verification-content">
+      <div class="verification-header">
+          <h2>পেমেন্ট বিবরণ যাচাই করুন</h2>
+          <p>দয়া করে নিশ্চিত করুন সব তথ্য সঠিক</p>
+      </div>
+      
+      <div class="verification-details">
+          <div class="verification-item-premium">
+              <span class="verification-label">পেমেন্ট পদ্ধতি:</span>
+              <span class="verification-value" id="popupPaymentMethod"></span>
+          </div>
+          <div class="verification-item-premium">
+              <span class="verification-label">পেমেন্ট নম্বর:</span>
+              <span class="verification-value" id="popupPaymentNumber"></span>
+          </div>
+          <div class="verification-item-premium">
+              <span class="verification-label">মোট টাকার পরিমাণ:</span>
+              <span class="verification-value total-amount" id="popupTotal"></span>
+          </div>
+          <div class="verification-item-premium">
+              <span class="verification-label">লেনদেন আইডি:</span>
+              <span class="verification-value" id="popupTransactionId"></span>
+          </div>
+      </div>
+      
+      <div class="verification-description">
+          <div class="verification-warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              সতর্কতা
+          </div>
+          <div>নিশ্চিত করার আগে সব তথ্য যাচাই করুন। ভুল তথ্য আপনার পেমেন্ট প্রক্রিয়াকরণ বিলম্বিত করতে পারে।</div>
+      </div>
+      
+      <div class="verification-buttons">
+          <button class="confirm-btn" onclick="confirmPayment()">
+              <i class="fas fa-check-circle"></i>
+              নিশ্চিতকরণ সম্পন্ন
+          </button>
+      </div>
+  </div>
+</div>
+
+<!-- Success Popup -->
+<div class="success-popup" id="successPopup">
+  <div class="success-content">
+      <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+      </div>
+      <h2 class="success-title">পেমেন্ট সফল!</h2>
+      <p class="success-message">আপনার পেমেন্ট প্রক্রিয়া চলছে এবং শীঘ্রই আপনার ব্যালেন্সে যোগ হবে।</p>
+      
+      <button class="success-btn" onclick="closeSuccessPopup()">ঠিক আছে</button>
+  </div>
 </div>
 
 <!-- Navigation Bar -->
 <nav class="bottom-nav">
-    <a href="payment.html" class="nav-btn active" id="deposit-btn">
-        <i class="fas fa-money-bill-wave"></i>
-        <span>জমা দিন</span>
-    </a>
-    <a href="index.html" class="nav-btn" id="home-btn">
-        <i class="fas fa-home"></i>
-        <span>হোম</span>
-    </a>
-    <a href="profile.html" class="nav-btn" id="profile-btn">
-        <i class="fas fa-user"></i>
-        <span>প্রোফাইল</span>
-    </a>
+  <a href="payment.html" class="nav-btn" id="deposit-btn">
+      <i class="fas fa-money-bill-wave"></i>
+      <span>জমা দিন</span>
+  </a>
+  <a href="index.html" class="nav-btn" id="home-btn">
+      <i class="fas fa-home"></i>
+      <span>হোম</span>
+  </a>
+  <a href="profile.html" class="nav-btn" id="profile-btn">
+      <i class="fas fa-user"></i>
+      <span>প্রোফাইল</span>
+  </a>
 </nav>
 
 <script>
-// Firebase config
-const firebaseConfig = {
-    apiKey: "AIzaSyBnUqarL-c8oEA52EPBCUdoz67kzvsDnM0",
-    authDomain: "nvta-f70ed.firebaseapp.com",
-    projectId: "nvta-f70ed",
-    storageBucket: "nvta-f70ed.firebasestorage.app",
-    messagingSenderId: "832906232424",
-    appId: "1:832906232424:web:df35b6c489c9c9c03ef1dd"
-};
+  // Firebase Configuration
+  const firebaseConfig = {
+      apiKey: "AIzaSyBnUqarL-c8oEA52EPBCUdoz67kzvsDnM0",
+      authDomain: "nvta-f70ed.firebaseapp.com",
+      projectId: "nvta-f70ed",
+      storageBucket: "nvta-f70ed.firebasestorage.app",
+      messagingSenderId: "832906232424",
+      appId: "1:832906232424:web:df35b6c489c9c9c03ef1dd"
+  };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
 
-const db = firebase.firestore();
-const auth = firebase.auth();
+  // Cache important elements from header
+  const headerLogo = document.getElementById('header-logo');
+  const headerTitle = document.getElementById('header-title');
+  const themeToggle = document.getElementById('theme-toggle');
+  const notificationBadge = document.getElementById('notification-badge');
+  const body = document.body;
+  const navBtns = document.querySelectorAll('.nav-btn');
+  const bgAnimation = document.getElementById('bg-animation');
 
-// ✅ Cache important elements
-const loadingOverlay = document.getElementById('loadingOverlay');
-const mainContainer = document.getElementById('mainContainer');
-const paymentStatus = document.getElementById('paymentStatus');
-const paymentTime = document.getElementById('paymentTime');
-const paymentRef = document.getElementById('paymentRef');
+  // App state
+  let currentUser = null;
+  let currentMemberId = null;
+  let unreadNotifications = 0;
 
-// Header and Navigation Elements
-const headerLogo = document.getElementById('header-logo');
-const headerTitle = document.getElementById('header-title');
-const themeToggle = document.getElementById('theme-toggle');
-const notificationBadge = document.getElementById('notification-badge');
-const body = document.body;
-const navBtns = document.querySelectorAll('.nav-btn');
-const bgAnimation = document.getElementById('bg-animation');
+  // Payment Method Data - Admin Panel অনুযায়ী
+  const paymentMethods = {
+      bkash: {
+          name: "বিকাশ",
+          number: "01992447748",
+          pinName: "বিকাশ",
+          method: "বিকাশ"
+      },
+      nagad: {
+          name: "Nagad",
+          number: "01992447748",
+          pinName: "Nagad",
+          method: "নগদ"
+      },
+      rocket: {
+          name: "Rocket",
+          number: "01992447748",
+          pinName: "Rocket",
+          method: "রকেট"
+      },
+      bank: {
+          name: "CellFin",
+          number: "ব্রাঞ্চ নাম্বার",
+          pinName: "ব্যান্ক পিন",
+          method: "ব্যাংক"
+      }
+  };
 
-// App state
-let currentUser = null;
+  // Form data - Admin Panel 'payments' collection অনুযায়ী
+  let formData = {
+      memberId: '',
+      transactionId: '',
+      amount: 0,
+      paymentMethod: '',
+      status: 'pending',
+      timestamp: null,
+      paymentNumber: '',
+      charge: 0,
+      total: 0,
+      memberName: '',
+      addedAt: null,
+      addedBy: 'user_payment'
+  };
 
-// ✅ Show loading (only on content area)
-function showLoading() {
-    loadingOverlay.style.display = 'flex';
-    mainContainer.classList.add('loading');
-}
+  let selectedPaymentMethod = '';
 
-// ✅ Hide loading
-function hideLoading() {
-    loadingOverlay.style.display = 'none';
-    mainContainer.classList.remove('loading');
-    mainContainer.style.opacity = '1';
-}
+  // Create background animation
+  function createBackgroundAnimation() {
+      const bubbleCount = 15;
+      
+      for (let i = 0; i < bubbleCount; i++) {
+          const bubble = document.createElement('div');
+          bubble.classList.add('bg-bubble');
+          
+          const size = Math.random() * 80 + 20;
+          bubble.style.width = `${size}px`;
+          bubble.style.height = `${size}px`;
+          
+          bubble.style.left = `${Math.random() * 100}%`;
+          bubble.style.top = `${Math.random() * 100}%`;
+          
+          const delay = Math.random() * 5;
+          const duration = Math.random() * 10 + 10;
+          bubble.style.animationDelay = `${delay}s`;
+          bubble.style.animationDuration = `${duration}s`;
+          
+          bgAnimation.appendChild(bubble);
+      }
+  }
 
-// Create background animation
-function createBackgroundAnimation() {
-    const bubbleCount = 15;
-    
-    for (let i = 0; i < bubbleCount; i++) {
-        const bubble = document.createElement('div');
-        bubble.classList.add('bg-bubble');
-        
-        // Random size between 20px and 100px
-        const size = Math.random() * 80 + 20;
-        bubble.style.width = `${size}px`;
-        bubble.style.height = `${size}px`;
-        
-        // Random position
-        bubble.style.left = `${Math.random() * 100}%`;
-        bubble.style.top = `${Math.random() * 100}%`;
-        
-        // Random animation delay and duration
-        const delay = Math.random() * 5;
-        const duration = Math.random() * 10 + 10;
-        bubble.style.animationDelay = `${delay}s`;
-        bubble.style.animationDuration = `${duration}s`;
-        
-        bgAnimation.appendChild(bubble);
-    }
-}
+  // Setup theme toggle functionality
+  function setupThemeToggle() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+          body.classList.add('dark-mode');
+      }
+      
+      themeToggle.addEventListener('click', () => {
+          body.classList.toggle('dark-mode');
+          const isDark = body.classList.contains('dark-mode');
+          localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      });
+  }
 
-// Setup theme toggle functionality
-function setupThemeToggle() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        body.classList.add('dark-mode');
-    }
-    
-    themeToggle.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-        const isDark = body.classList.contains('dark-mode');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        
-        // Update loading overlay theme
-        if (isDark) {
-            loadingOverlay.classList.add('dark-mode');
-        } else {
-            loadingOverlay.classList.remove('dark-mode');
-        }
-    });
-}
+  // Setup navigation buttons
+  function setupNavigation() {
+      const currentPage = window.location.pathname.split('/').pop().toLowerCase();
+      
+      navBtns.forEach(btn => {
+          btn.classList.remove('active');
+      });
+      
+      switch(currentPage) {
+          case 'index.html':
+          case '':
+          case '/':
+              document.getElementById('home-btn').classList.add('active');
+              break;
+          case 'payment.html':
+              document.getElementById('deposit-btn').classList.add('active');
+              break;
+          case 'profile.html':
+              document.getElementById('profile-btn').classList.add('active');
+              break;
+          default:
+              document.getElementById('home-btn').classList.add('active');
+      }
+  }
 
-// Setup navigation buttons - FIXED VERSION
-function setupNavigation() {
-    // Get current page filename
-    const currentPage = window.location.pathname.split('/').pop().toLowerCase();
-    
-    // Remove active class from all buttons first
-    navBtns.forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Set active class based on current page
-    switch(currentPage) {
-        case 'index.html':
-        case '':
-        case '/':
-            // Home page
-            document.getElementById('home-btn').classList.add('active');
-            break;
-        case 'payment.html':
-            // Payment page
-            document.getElementById('deposit-btn').classList.add('active');
-            break;
-        case 'profile.html':
-            // Profile page
-            document.getElementById('profile-btn').classList.add('active');
-            break;
-        default:
-            // Default to home if page not recognized
-            document.getElementById('home-btn').classList.add('active');
-    }
-}
+  // Load header from Firestore
+  function loadHeaderFromFirestore() {
+      const headerRef = db.collection('settings').doc('general');
+      
+      headerRef.get().then((doc) => {
+          if (doc.exists) {
+              const data = doc.data();
+              
+              if (data.headerLogoUrl) {
+                  headerLogo.src = data.headerLogoUrl;
+                  headerLogo.style.display = 'block';
+                  headerLogo.onerror = () => {
+                      headerLogo.src = 'https://via.placeholder.com/150x50?text=Logo+Not+Found';
+                  };
+              }
+              
+              if (data.siteTitle) {
+                  headerTitle.textContent = data.siteTitle;
+              }
+          }
+      }).catch((error) => {
+          console.error("Error loading header:", error);
+          headerLogo.src = 'https://via.placeholder.com/150x50?text=Error+Loading+Logo';
+      });
+  }
 
-// Load header from Firestore
-function loadHeaderFromFirestore() {
-    const headerRef = db.collection('settings').doc('general');
-    
-    headerRef.get().then((doc) => {
-        if (doc.exists) {
-            const data = doc.data();
-            
-            if (data.headerLogoUrl) {
-                headerLogo.src = data.headerLogoUrl;
-                headerLogo.style.display = 'block';
-                headerLogo.onerror = () => {
-                    headerLogo.src = 'https://via.placeholder.com/150x50?text=Logo+Not+Found';
-                };
-            }
-            
-            if (data.siteTitle) {
-                headerTitle.textContent = data.siteTitle;
-            }
-        }
-    }).catch((error) => {
-        console.error("Error loading header:", error);
-        headerLogo.src = 'https://via.placeholder.com/150x50?text=Error+Loading+Logo';
-    });
-}
+  // Setup real-time notification listener with memberId
+  function setupNotificationListener(memberId) {
+      if (!memberId) return;
+      
+      const notificationsRef = db.collection('notifications')
+          .where('memberId', '==', memberId)
+          .where('read', '==', false);
+          
+      notificationsRef.onSnapshot((snapshot) => {
+          const unreadCount = snapshot.size;
+          updateNotificationBadge(unreadCount);
+      }, (error) => {
+          console.error("Notification listener error:", error);
+      });
+  }
 
-// Setup real-time notification listener
-function setupNotificationListener(userId) {
-    const notificationsRef = db.collection('notifications')
-        .where('userId', '==', userId)
-        .where('read', '==', false);
-        
-    notificationsRef.onSnapshot((snapshot) => {
-        const unreadCount = snapshot.size;
-        updateNotificationBadge(unreadCount);
-    }, (error) => {
-        console.error("Notification listener error:", error);
-    });
-}
+  // Update notification badge with animation
+  function updateNotificationBadge(count) {
+      const num = parseInt(count) || 0;
+      
+      if (num > 0) {
+          notificationBadge.textContent = num;
+          notificationBadge.style.display = 'flex';
+          
+          if (num > parseInt(notificationBadge.dataset.prevCount || 0)) {
+              notificationBadge.classList.add('pulse');
+              setTimeout(() => {
+                  notificationBadge.classList.remove('pulse');
+              }, 1000);
+          }
+      } else {
+          notificationBadge.style.display = 'none';
+      }
+      
+      notificationBadge.dataset.prevCount = num;
+  }
 
-// Update notification badge with animation
-function updateNotificationBadge(count) {
-    const num = parseInt(count) || 0;
-    
-    if (num > 0) {
-        notificationBadge.textContent = num;
-        notificationBadge.style.display = 'flex';
-        
-        if (num > parseInt(notificationBadge.dataset.prevCount || 0)) {
-            notificationBadge.classList.add('pulse');
-            setTimeout(() => {
-                notificationBadge.classList.remove('pulse');
-            }, 1000);
-        }
-    } else {
-        notificationBadge.style.display = 'none';
-    }
-    
-    notificationBadge.dataset.prevCount = num;
-}
+  // ✅ STRICT AUTH CHECK
+  async function checkAuthAndRedirect() {
+      return new Promise((resolve, reject) => {
+          auth.onAuthStateChanged((user) => {
+              if (user) {
+                  resolve(user);
+              } else {
+                  window.location.replace('login.html');
+                  reject(new Error("User not authenticated"));
+              }
+          }, (error) => {
+              window.location.replace('login.html');
+              reject(error);
+          });
+      });
+  }
 
-// ✅ STRICT AUTH CHECK
-async function checkAuthAndRedirect() {
-    return new Promise((resolve, reject) => {
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                resolve(user);
-            } else {
-                window.location.replace('login.html');
-                reject(new Error("User not authenticated"));
-            }
-        }, (error) => {
-            window.location.replace('login.html');
-            reject(error);
-        });
-    });
-}
+  // ✅ Get memberId from Registration collection using user UID
+  async function getUserMemberId(userUid) {
+      try {
+          const registrationQuery = await db.collection('Registration')
+              .where('userId', '==', userUid)
+              .limit(1)
+              .get();
+          
+          if (!registrationQuery.empty) {
+              const doc = registrationQuery.docs[0];
+              const data = doc.data();
+              currentMemberId = data.memberId || doc.id;
+              return currentMemberId;
+          }
+          
+          console.error("No registration found for user:", userUid);
+          return null;
+      } catch (error) {
+          console.error("Error getting memberId:", error);
+          return null;
+      }
+  }
 
-// Update payment time
-function updatePaymentTime() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('bn-BD', {
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-    paymentTime.textContent = timeString;
-    
-    // Generate random reference number
-    const refNumber = 'REF-' + Math.floor(100000 + Math.random() * 900000);
-    paymentRef.textContent = refNumber;
-}
+  // ✅ Get user name from Registration collection
+  async function getUserName(memberId) {
+      try {
+          const registrationQuery = await db.collection('Registration')
+              .where('memberId', '==', memberId)
+              .limit(1)
+              .get();
+          
+          if (!registrationQuery.empty) {
+              const doc = registrationQuery.docs[0];
+              const data = doc.data();
+              return data.name || 'Unknown User';
+          }
+          
+          return 'Unknown User';
+      } catch (error) {
+          console.error("Error getting user name:", error);
+          return 'Unknown User';
+      }
+  }
 
-// Initialize header components
-function initHeaderComponents() {
-    createBackgroundAnimation();
-    setupThemeToggle();
-    setupNavigation();
-    loadHeaderFromFirestore();
-}
+  // Initialize header components
+  function initHeaderComponents() {
+      createBackgroundAnimation();
+      setupThemeToggle();
+      setupNavigation();
+      loadHeaderFromFirestore();
+  }
 
-// ✅ Main initialization function
-async function initApp() {
-    showLoading();
-    initHeaderComponents();
-    
-    // Apply theme to loading overlay immediately
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        loadingOverlay.classList.add('dark-mode');
-    }
-    
-    try {
-        const user = await checkAuthAndRedirect();
-        currentUser = user;
-        
-        // Setup notification listener
-        setupNotificationListener(user.uid);
-        
-        // Update payment info
-        updatePaymentTime();
-        
-        // Update time every minute
-        setInterval(updatePaymentTime, 60000);
-        
-        // Simulate payment processing
-        setTimeout(() => {
-            paymentStatus.textContent = "প্রসেসিং";
-        }, 1000);
-        
-        setTimeout(() => {
-            paymentStatus.textContent = "ভেরিফিকেশন";
-        }, 3000);
-        
-        setTimeout(() => {
-            paymentStatus.textContent = "অপেক্ষা করুন";
-        }, 5000);
-        
-        setTimeout(() => {
-            hideLoading();
-        }, 300);
-        
-    } catch (error) {
-        console.error("Error in app initialization:", error);
-        // Still hide loading even if there's an error
-        setTimeout(() => {
-            hideLoading();
-        }, 300);
-    }
-}
+  // ✅ Main initialization function
+  async function initApp() {
+      initHeaderComponents();
+      
+      try {
+          const user = await checkAuthAndRedirect();
+          currentUser = user;
+          
+          // Get memberId from Registration collection
+          const memberId = await getUserMemberId(user.uid);
+          
+          if (memberId) {
+              // Setup notification listener
+              setupNotificationListener(memberId);
+              
+              // Get user name
+              const userName = await getUserName(memberId);
+              formData.memberName = userName;
+          }
+          
+      } catch (error) {
+          console.error("Error in app initialization:", error);
+      }
+  }
 
-// ✅ Set up a real-time auth state listener
-auth.onAuthStateChanged(function(user) {
-    if (!user) {
-        window.location.replace('login.html');
-    }
-});
+  // ✅ Set up a real-time auth state listener
+  auth.onAuthStateChanged(function(user) {
+      if (!user) {
+          window.location.replace('login.html');
+      }
+  });
 
-// ✅ Prevent access through browser back button after logout
-window.onpageshow = function(event) {
-    if (event.persisted) {
-        auth.onAuthStateChanged(user => {
-            if (!user) {
-                window.location.replace('login.html');
-            }
-        });
-    }
-};
+  // ✅ Prevent access through browser back button after logout
+  window.onpageshow = function(event) {
+      if (event.persisted) {
+          auth.onAuthStateChanged(user => {
+              if (!user) {
+                  window.location.replace('login.html');
+              }
+          });
+      }
+  };
 
-// ✅ Initialize the app when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    initApp();
-});
+  // ✅ Initialize the app when DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+      console.log('পেমেন্ট পেজ লোড হয়েছে');
+      initApp();
+  });
+
+  /* Payment Gateway Functions */
+  // Select payment method
+  function selectPaymentMethod(method) {
+      selectedPaymentMethod = method;
+      
+      // Update UI
+      document.querySelectorAll('.payment-method').forEach(el => {
+          el.classList.remove('selected');
+      });
+      event.currentTarget.classList.add('selected');
+      
+      // Automatically proceed to amount step after 500ms
+      setTimeout(() => {
+          proceedToAmountStep();
+      }, 500);
+  }
+
+  // Proceed to amount step
+  function proceedToAmountStep() {
+      if (!selectedPaymentMethod) return;
+      
+      // Show amount step
+      document.getElementById('step1').style.display = 'none';
+      document.getElementById('step2').style.display = 'block';
+  }
+
+  // Calculate charge (2% or 2৳ per 100৳)
+  function calculateCharge(amount) {
+      const amountNum = parseFloat(amount);
+      if (isNaN(amountNum)) return 0;
+      
+      // 2% charge or 2৳ per 100৳
+      const charge = Math.round(amountNum * 0.02);
+      return Math.max(charge, 0);
+  }
+
+  // Proceed to verification step with minimum amount validation
+  function proceedToVerification() {
+      const amount = document.getElementById('paymentAmountInput').value.trim();
+      const minAmount = 20;
+      
+      if (!amount || isNaN(amount)) {
+          document.getElementById('transactionError').textContent = "দয়া করে সঠিক টাকার পরিমাণ লিখুন";
+          document.getElementById('transactionError').style.display = 'block';
+          return;
+      }
+      
+      if (parseFloat(amount) < minAmount) {
+          document.getElementById('transactionError').textContent = `ন্যূনতম পেমেন্টের পরিমাণ ${minAmount} টাকা`;
+          document.getElementById('transactionError').style.display = 'block';
+          return;
+      }
+      
+      // Clear error message
+      document.getElementById('transactionError').style.display = 'none';
+      
+      // Calculate charge and total
+      const charge = calculateCharge(amount);
+      const total = parseFloat(amount) + charge;
+      
+      // Update form data
+      formData.amount = parseFloat(amount);
+      formData.charge = charge;
+      formData.total = total;
+      formData.paymentMethod = paymentMethods[selectedPaymentMethod].method;
+      formData.paymentNumber = paymentMethods[selectedPaymentMethod].number;
+      formData.memberId = currentMemberId;
+      
+      // Update verification step
+      document.getElementById('paymentAppName').textContent = paymentMethods[selectedPaymentMethod].name;
+      document.getElementById('paymentNumber').textContent = paymentMethods[selectedPaymentMethod].number;
+      document.getElementById('paymentPinName').textContent = paymentMethods[selectedPaymentMethod].pinName;
+      
+      // Update display with proper formatting - FIXED FORMAT
+      document.getElementById('displayAmount').textContent = amount;
+      document.getElementById('displayCharge').textContent = charge + '৳';
+      document.getElementById('displayTotal').textContent = total + '৳';
+      
+      // Show verification step
+      document.getElementById('step2').style.display = 'none';
+      document.getElementById('step3').style.display = 'block';
+  }
+
+  // Copy payment number
+  function copyPaymentNumber() {
+      const number = document.getElementById('paymentNumber').textContent;
+      navigator.clipboard.writeText(number).then(() => {
+          // No toast notification
+      }).catch(() => {
+          // No toast notification
+      });
+  }
+
+  // Show verification popup
+  function showVerificationPopup() {
+      const transactionId = document.getElementById('transactionId').value.trim();
+      
+      if (!transactionId) {
+          document.getElementById('transactionError').textContent = "দয়া করে লেনদেন আইডি লিখুন";
+          document.getElementById('transactionError').style.display = 'block';
+          return;
+      }
+      
+      // Clear error message
+      document.getElementById('transactionError').style.display = 'none';
+      
+      formData.transactionId = transactionId;
+      
+      // Update popup content
+      document.getElementById('popupPaymentMethod').textContent = formData.paymentMethod;
+      document.getElementById('popupPaymentNumber').textContent = formData.paymentNumber;
+      document.getElementById('popupTotal').textContent = formData.total + '৳';
+      document.getElementById('popupTransactionId').textContent = formData.transactionId;
+      
+      // Show popup
+      document.getElementById('verificationPopup').style.display = 'flex';
+  }
+
+  // Close verification popup
+  function closeVerificationPopup() {
+      document.getElementById('verificationPopup').style.display = 'none';
+  }
+
+  // ✅ Confirm payment and save to Firebase - Admin Panel 'payments' collection অনুযায়ী
+  async function confirmPayment() {
+      // Add timestamp and additional fields
+      formData.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+      formData.addedAt = new Date().toISOString();
+      formData.status = 'pending';
+      
+      try {
+          // Save payment to Firestore - 'payments' collection
+          const docRef = await db.collection('payments').add(formData);
+          
+          console.log("Payment saved with ID: ", docRef.id);
+          
+          // Show success popup
+          document.getElementById('verificationPopup').style.display = 'none';
+          document.getElementById('successPopup').style.display = 'flex';
+          
+      } catch (error) {
+          console.error("Error saving payment: ", error);
+          alert("পেমেন্ট সংরক্ষণে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।");
+      }
+  }
+
+  // Close success popup and redirect to home
+  function closeSuccessPopup() {
+      document.getElementById('successPopup').style.display = 'none';
+      resetForm();
+      window.location.href = 'index.html';
+  }
+
+  // Back to Step 1
+  function backToStep1() {
+      document.getElementById('step1').style.display = 'block';
+      document.getElementById('step2').style.display = 'none';
+      document.getElementById('step3').style.display = 'none';
+  }
+
+  // Back to Amount Step
+  function backToAmountStep() {
+      document.getElementById('step2').style.display = 'block';
+      document.getElementById('step3').style.display = 'none';
+  }
+
+  // Reset form
+  function resetForm() {
+      document.getElementById('paymentAmountInput').value = '';
+      document.getElementById('transactionId').value = '';
+      selectedPaymentMethod = '';
+      formData = {
+          memberId: currentMemberId,
+          transactionId: '',
+          amount: 0,
+          paymentMethod: '',
+          status: 'pending',
+          timestamp: null,
+          paymentNumber: '',
+          charge: 0,
+          total: 0,
+          memberName: formData.memberName,
+          addedAt: null,
+          addedBy: 'user_payment'
+      };
+      
+      document.querySelectorAll('.payment-method').forEach(el => {
+          el.classList.remove('selected');
+      });
+      
+      document.getElementById('step1').style.display = 'block';
+      document.getElementById('step2').style.display = 'none';
+      document.getElementById('step3').style.display = 'none';
+  }
+  
+/* 🔒 Fix bottom nav jumping on keyboard open */
+(function () {
+  const bottomNav = document.querySelector('.bottom-nav');
+  let initialHeight = window.innerHeight;
+
+  window.addEventListener('resize', () => {
+      if (window.innerHeight < initialHeight - 150) {
+          bottomNav.style.display = 'none';
+      } else {
+          bottomNav.style.display = 'flex';
+      }
+     });
+})();
 </script>
-
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/NVTA/sw.js');
+}
+</script>
 </body>
 </html>
