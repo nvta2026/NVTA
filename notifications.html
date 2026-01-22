@@ -26,6 +26,10 @@
             --success-color: #4CAF50;
             --warning-color: #FFC107;
             --delete-color: #ff4757;
+            --skeleton-bg: #e0e0e0;
+            --skeleton-bg-dark: #333;
+            --skeleton-highlight: #f5f5f5;
+            --skeleton-highlight-dark: #444;
         }
         
         * {
@@ -36,7 +40,7 @@
         }
         
         body {
-            background-color: white;
+            background-color: #1a1a1a; 
             color: var(--text-color);
             font-size: 14px;
             transition: background-color 0.3s, color 0.3s;
@@ -44,6 +48,12 @@
             padding-bottom: 70px;
             position: relative;
             overflow-x: hidden;
+            visibility: hidden;
+            opacity: 0;
+        }
+        
+        body:not(.dark-mode) {
+            background-color: white;
         }
         
         body.dark-mode {
@@ -51,7 +61,17 @@
             color: var(--dark-text);
         }
         
-        /* Background Animation */
+        body.dark-mode .app-title,
+        body.dark-mode .nav-btn.active i,
+        body.dark-mode .nav-btn:hover i,
+        body.dark-mode .notification-link {
+            color: #08A33F !important; 
+        }
+        
+        body.dark-mode .nav-btn.active::after {
+            background-color: #08A33F; 
+        }
+        
         .bg-animation {
             position: fixed;
             top: 0;
@@ -90,7 +110,6 @@
             }
         }
         
-        /* Header Styles */
         header {
             display: flex;
             justify-content: space-between;
@@ -305,13 +324,142 @@
             pointer-events: none;
         }
         
+        #skeletonScreen {
+            max-width: 1200px;
+            margin: auto;
+            padding: 15px;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .skeleton-container {
+            display: none;
+        }
+        
+        .skeleton-container.active {
+            display: block;
+        }
+        
+        /* Skeleton Header Section */
+        .skeleton-header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .skeleton-mark-all-read {
+            width: 200px;
+            height: 44px;
+            background-color: var(--skeleton-bg);
+            border-radius: 4px;
+            animation: skeleton-pulse 1.5s ease-in-out infinite;
+        }
+        
+        body.dark-mode .skeleton-mark-all-read {
+            background-color: var(--skeleton-bg-dark);
+        }
+        
+        /* Skeleton Notifications Container */
+        .skeleton-notifications-container {
+            background-color: var(--white);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        body.dark-mode .skeleton-notifications-container {
+            background-color: var(--dark-secondary);
+        }
+        
+        /* Skeleton Notifications */
+        .skeleton-notification {
+            padding: 15px;
+            border-bottom: 1px solid var(--skeleton-bg);
+            position: relative;
+            background-color: var(--white);
+            animation: skeleton-pulse 1.5s ease-in-out infinite;
+        }
+        
+        body.dark-mode .skeleton-notification {
+            border-bottom: 1px solid var(--skeleton-bg-dark);
+            background-color: var(--dark-secondary);
+        }
+        
+        .skeleton-notification:last-child {
+            border-bottom: none;
+        }
+        
+        .skeleton-notification-title {
+            width: 70%;
+            height: 20px;
+            background-color: var(--skeleton-bg);
+            border-radius: 4px;
+            margin-bottom: 10px;
+            animation: skeleton-pulse 1.5s ease-in-out infinite;
+        }
+        
+        body.dark-mode .skeleton-notification-title {
+            background-color: var(--skeleton-bg-dark);
+        }
+        
+        .skeleton-notification-message {
+            width: 85%;
+            height: 16px;
+            background-color: var(--skeleton-highlight);
+            border-radius: 4px;
+            margin-bottom: 8px;
+            animation: skeleton-pulse 1.5s ease-in-out infinite;
+        }
+        
+        body.dark-mode .skeleton-notification-message {
+            background-color: var(--skeleton-highlight-dark);
+        }
+        
+        .skeleton-notification-time {
+            width: 120px;
+            height: 12px;
+            background-color: var(--skeleton-highlight);
+            border-radius: 4px;
+            animation: skeleton-pulse 1.5s ease-in-out infinite;
+        }
+        
+        body.dark-mode .skeleton-notification-time {
+            background-color: var(--skeleton-highlight-dark);
+        }
+        
+        /* Skeleton Animation */
+        @keyframes skeleton-pulse {
+            0% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.6;
+            }
+        }
+        
+        /* Responsive Skeleton */
+        @media (max-width: 768px) {
+            #skeletonScreen {
+                padding: 10px;
+            }
+            
+            .skeleton-mark-all-read {
+                width: 150px;
+                height: 40px;
+            }
+        }
+        
         /* Loading State */
         .loading-overlay {
             position: fixed;
             top: 50px; /* Header height */
             left: 0;
             width: 100%;
-            height: calc(100% - 110px); /* Full height minus header and footer */
+            height: calc(100% - 110px); 
             background: rgba(255, 255, 255, 0.9);
             display: flex;
             flex-direction: column;
@@ -459,8 +607,8 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
-            width: 100%; /* Full width */
-            text-align: center; /* Center text */
+            width: 100%;
+            text-align: center;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -618,10 +766,45 @@
     <div class="loading-text">অপেক্ষা করুন</div>
 </div>
 
-<div class="container" id="mainContainer">
+<!-- ===================== -->
+<!-- SKELETON SCREEN (PLACEHOLDER UI) -->
+<!-- ====================== -->
+<div id="skeletonScreen" class="skeleton-container active">
+    <div class="skeleton-header-section">
+        <div class="skeleton-mark-all-read"></div>
+    </div>
+    
+    <div class="skeleton-notifications-container">
+        <div class="skeleton-notification">
+            <div class="skeleton-notification-title"></div>
+            <div class="skeleton-notification-message"></div>
+            <div class="skeleton-notification-time"></div>
+        </div>
+        <div class="skeleton-notification">
+            <div class="skeleton-notification-title"></div>
+            <div class="skeleton-notification-message"></div>
+            <div class="skeleton-notification-time"></div>
+        </div>
+        <div class="skeleton-notification">
+            <div class="skeleton-notification-title"></div>
+            <div class="skeleton-notification-message"></div>
+            <div class="skeleton-notification-time"></div>
+        </div>
+        <div class="skeleton-notification">
+            <div class="skeleton-notification-title"></div>
+            <div class="skeleton-notification-message"></div>
+            <div class="skeleton-notification-time"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================= -->
+<!-- ACTUAL CONTENT (Hidden by default) -->
+<!-- ========================= -->
+<div class="container" id="mainContainer" style="display: none;">
     <div class="header-section">
         <div class="user-info">
-            <!-- User ID display removed as requested -->
+
         </div>
         <button id="mark-all-read" class="mark-all-read" style="display: none;">
             <i class="fas fa-check"></i> সব পড়া হিসেবে চিহ্নিত করুন
@@ -677,6 +860,7 @@
     const messaging = firebase.messaging();
 
     // DOM elements
+    const skeletonScreen = document.getElementById('skeletonScreen');
     const notificationsContainer = document.getElementById('notifications-container');
     const markAllReadBtn = document.getElementById('mark-all-read');
     const themeToggle = document.getElementById('theme-toggle');
@@ -696,17 +880,22 @@
     let unsubscribe = null;
     let fcmToken = null;
 
-    // ✅ Show loading (only on content area)
-    function showLoading() {
-        loadingOverlay.style.display = 'flex';
-        mainContainer.classList.add('loading');
+    // ✅ FIX: Show skeleton screen (independent of body visibility)
+    function showSkeleton() {
+        // Hide the main content
+        mainContainer.style.display = 'none';
+        
+        // Show the skeleton screen
+        skeletonScreen.classList.add('active');
     }
 
-    // ✅ Hide loading
-    function hideLoading() {
-        loadingOverlay.style.display = 'none';
-        mainContainer.classList.remove('loading');
-        mainContainer.style.opacity = '1';
+    // ✅ FIX: Hide skeleton and show actual content
+    function hideSkeleton() {
+        // Hide the skeleton screen
+        skeletonScreen.classList.remove('active');
+        
+        // Show the main content
+        mainContainer.style.display = 'block';
     }
 
     // Create background animation
@@ -1117,7 +1306,7 @@
                     <button onclick="location.reload()">আবার চেষ্টা করুন</button>
                 </div>
             `;
-            hideLoading();
+            hideSkeleton();
             return;
         }
         
@@ -1142,7 +1331,7 @@
                 });
                 
                 showNotifications(notifications);
-                hideLoading();
+                hideSkeleton();
                 
                 // Now setup realtime listener for all notifications
                 setupRealtimeListener(memberId);
@@ -1156,7 +1345,7 @@
                         <button onclick="location.reload()">আবার চেষ্টা করুন</button>
                     </div>
                 `;
-                hideLoading();
+                hideSkeleton();
             });
     }
 
@@ -1194,33 +1383,62 @@
         markAllReadBtn.style.display = unreadCount > 0 ? 'flex' : 'none';
     }
 
-    // ✅ STRICT AUTH CHECK
-    async function checkAuthAndRedirect() {
-        return new Promise((resolve, reject) => {
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    resolve(user);
-                } else {
-                    window.location.replace('login.html');
-                    reject(new Error("User not authenticated"));
-                }
-            }, (error) => {
+    // ✅ FIX: Immediate auth check - NO FLASH, NO DELAY
+    let isAuthenticating = false;
+    let authChecked = false;
+
+    // Show skeleton immediately when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show skeleton immediately (before auth check)
+        showSkeleton();
+        
+        // Hide everything except skeleton during auth check
+        document.body.style.visibility = 'hidden';
+        document.body.style.opacity = '0';
+        
+        // Strict authentication check - NO DELAY
+        checkAuthImmediately();
+    });
+
+    // FIX: Immediate auth check function
+    function checkAuthImmediately() {
+        isAuthenticating = true;
+        
+        auth.onAuthStateChanged((user) => {
+            isAuthenticating = false;
+            authChecked = true;
+            
+            if (!user) {
+                // User not logged in - IMMEDIATE REDIRECT
+                console.log('User not authenticated, redirecting immediately...');
                 window.location.replace('login.html');
-                reject(error);
-            });
+                return;
+            }
+            
+            // FIX: User is authenticated - show content and initialize app
+            document.body.style.visibility = 'visible';
+            document.body.style.opacity = '1';
+            
+            // Apply correct theme before showing anything
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
+            }
+            
+            initializeApp(user);
         });
     }
 
-    // Initialize app
-    async function init() {
-        showLoading();
+    // ✅ Main initialization function
+    async function initializeApp(user) {
         createBackgroundAnimation();
         setupThemeToggle();
         setupNavigation();
         loadHeaderFromFirestore();
         
         try {
-            const user = await checkAuthAndRedirect();
             currentUser = user;
             
             // Get memberId from Registration collection
@@ -1234,14 +1452,14 @@
                         <button onclick="location.reload()">আবার চেষ্টা করুন</button>
                     </div>
                 `;
-                hideLoading();
+                hideSkeleton();
                 return;
             }
             
             // Setup notification listener for badge
             setupNotificationListener(currentMemberId);
             
-            // Load notifications
+            // Load notifications (skeleton will hide when data loads)
             loadNotifications(currentMemberId);
             
             // Mark all as read button
@@ -1249,6 +1467,7 @@
             
         } catch (error) {
             console.error("Error in app initialization:", error);
+            hideSkeleton();
         }
     }
 
@@ -1257,11 +1476,6 @@
         if (!user) {
             window.location.replace('login.html');
         }
-    });
-
-    // ✅ Initialize the app when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        init();
     });
 
     // ✅ Prevent access through browser back button after logout
