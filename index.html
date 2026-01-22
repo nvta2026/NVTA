@@ -28,6 +28,10 @@
     --dark-text: #f0f0f0;
     --dark-secondary: #2d2d2d;
     --dark-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --skeleton-bg: #e0e0e0;
+    --skeleton-bg-dark: #333;
+    --skeleton-highlight: #f0f0f0;
+    --skeleton-highlight-dark: #444;
 }
 
 *{
@@ -39,17 +43,34 @@
 body{
     color:#333;
     font-size:14px; 
-    background-color: white;
+    background-color: #1a1a1a; /* FIX 1: Start with dark mode color to prevent white flash */
     padding-top: 50px;
     padding-bottom: 70px;
     transition: background-color 0.3s, color 0.3s;
     position: relative;
     overflow-x: hidden;
+    visibility: hidden; /* FIX 1: Hide until auth check completes */
+    opacity: 0; /* FIX 1: Hide until auth check completes */
+}
+
+/* FIX 1: Light mode background */
+body:not(.dark-mode) {
+    background-color: white;
 }
 
 body.dark-mode {
     background-color: var(--dark-bg);
     color: var(--dark-text);
+}
+
+/* FIX 2: Dark mode blue text override to green */
+body.dark-mode .financial-value,
+body.dark-mode .section-title,
+body.dark-mode .history-table th,
+body.dark-mode .nav-btn.active i,
+body.dark-mode .app-title,
+body.dark-mode .nav-btn:hover i {
+    color: #08A33F !important; /* green color for dark mode */
 }
 
 /* Background Animation */
@@ -292,6 +313,11 @@ body.dark-mode .nav-btn {
     border-radius: 50%;
 }
 
+/* FIX 2: Dark mode active nav button indicator */
+body.dark-mode .nav-btn.active::after {
+    background-color: #08A33F; /* green color for dark mode */
+}
+
 /* Main Content Styles */
 .container{
     max-width:1200px;
@@ -409,6 +435,11 @@ body.dark-mode .marquee-scroll {
     margin-right: auto;
 }
 
+/* FIX 2: Committee photo border in dark mode */
+body.dark-mode .committee-photo {
+    border-color: #08A33F; /* green color for dark mode */
+}
+
 /* History */
 .history-wrapper{
     overflow-x:auto;
@@ -436,6 +467,272 @@ body.dark-mode .marquee-scroll {
 }
 .history-table tbody tr:hover{
     background-color:#F54927;
+}
+
+/* ========================================= */
+/* SKELETON SCREEN STYLES */
+/* ========================================= */
+
+.skeleton {
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--skeleton-highlight) 50%,
+        transparent 100%
+    );
+    animation: shimmer 1.5s infinite ease-in-out;
+    z-index: 1;
+}
+
+body.dark-mode .skeleton::after {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--skeleton-highlight-dark) 50%,
+        transparent 100%
+    );
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Skeleton Marquee */
+.skeleton-marquee {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    background-color: var(--skeleton-bg);
+}
+
+body.dark-mode .skeleton-marquee {
+    background-color: var(--skeleton-bg-dark);
+    border-color: var(--skeleton-bg-dark);
+}
+
+.skeleton-marquee-left {
+    float: left;
+    width: 60px;
+    height: 20px;
+    margin-right: 10px;
+    border-radius: 4px;
+    background-color: var(--skeleton-bg);
+}
+
+body.dark-mode .skeleton-marquee-left {
+    background-color: var(--skeleton-bg-dark);
+}
+
+.skeleton-marquee-content {
+    width: 80%;
+    height: 20px;
+    border-radius: 4px;
+    background-color: var(--skeleton-bg);
+}
+
+body.dark-mode .skeleton-marquee-content {
+    background-color: var(--skeleton-bg-dark);
+}
+
+/* Skeleton Section Title */
+.skeleton-section-title {
+    width: 180px;
+    height: 24px;
+    border-radius: 4px;
+    background-color: var(--skeleton-bg);
+    margin-top: 30px;
+    margin-bottom: 12px;
+}
+
+body.dark-mode .skeleton-section-title {
+    background-color: var(--skeleton-bg-dark);
+}
+
+/* Skeleton Financial Cards */
+.skeleton-financial-grid {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.skeleton-financial-card {
+    flex: 1;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    background-color: var(--skeleton-bg);
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+body.dark-mode .skeleton-financial-card {
+    background-color: var(--skeleton-bg-dark);
+    border-color: var(--skeleton-bg-dark);
+}
+
+.skeleton-financial-value {
+    width: 80px;
+    height: 32px;
+    border-radius: 6px;
+    background-color: var(--skeleton-highlight);
+    margin-bottom: 10px;
+}
+
+body.dark-mode .skeleton-financial-value {
+    background-color: var(--skeleton-highlight-dark);
+}
+
+.skeleton-financial-label {
+    width: 100px;
+    height: 16px;
+    border-radius: 4px;
+    background-color: var(--skeleton-highlight);
+}
+
+body.dark-mode .skeleton-financial-label {
+    background-color: var(--skeleton-highlight-dark);
+}
+
+/* Skeleton History Table */
+.skeleton-history-wrapper {
+    overflow-x: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 0;
+    background-color: var(--skeleton-bg);
+}
+
+body.dark-mode .skeleton-history-wrapper {
+    background-color: var(--skeleton-bg-dark);
+    border-color: var(--skeleton-bg-dark);
+}
+
+.skeleton-history-table {
+    width: 100%;
+    min-width: 300px;
+    border-collapse: collapse;
+}
+
+.skeleton-history-header {
+    background-color: var(--skeleton-highlight);
+}
+
+body.dark-mode .skeleton-history-header {
+    background-color: var(--skeleton-highlight-dark);
+}
+
+.skeleton-history-header th {
+    padding: 12px 10px;
+    text-align: left;
+}
+
+.skeleton-history-header-cell {
+    height: 20px;
+    border-radius: 4px;
+    background-color: var(--skeleton-bg);
+    margin: 0 5px;
+}
+
+body.dark-mode .skeleton-history-header-cell {
+    background-color: var(--skeleton-bg-dark);
+}
+
+.skeleton-history-row {
+    height: 60px;
+}
+
+.skeleton-history-cell {
+    height: 16px;
+    border-radius: 4px;
+    background-color: var(--skeleton-highlight);
+    margin: 0 5px;
+}
+
+body.dark-mode .skeleton-history-cell {
+    background-color: var(--skeleton-highlight-dark);
+}
+
+/* Skeleton Committee Cards */
+.skeleton-committee-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.skeleton-committee-member {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    background-color: var(--skeleton-bg);
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+body.dark-mode .skeleton-committee-member {
+    background-color: var(--skeleton-bg-dark);
+    border-color: var(--skeleton-bg-dark);
+}
+
+.skeleton-committee-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--skeleton-highlight);
+    margin-bottom: 12px;
+}
+
+body.dark-mode .skeleton-committee-photo {
+    background-color: var(--skeleton-highlight-dark);
+}
+
+.skeleton-committee-name {
+    width: 100px;
+    height: 18px;
+    border-radius: 4px;
+    background-color: var(--skeleton-highlight);
+    margin-bottom: 6px;
+}
+
+body.dark-mode .skeleton-committee-name {
+    background-color: var(--skeleton-highlight-dark);
+}
+
+.skeleton-committee-position {
+    width: 80px;
+    height: 14px;
+    border-radius: 4px;
+    background-color: var(--skeleton-highlight);
+}
+
+body.dark-mode .skeleton-committee-position {
+    background-color: var(--skeleton-highlight-dark);
 }
 
 /* Loading State */
@@ -532,6 +829,25 @@ body.dark-mode .loading-text {
         font-size: 16px;
     }
     
+    /* Skeleton Responsive */
+    .skeleton-committee-photo {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .skeleton-financial-card {
+        height: 90px;
+    }
+    
+    .skeleton-committee-member {
+        height: 160px;
+    }
+    
+    .skeleton-section-title {
+        height: 20px;
+        width: 150px;
+    }
+    
     /* Header Responsive */
     .logo {
         height: 40px;
@@ -575,6 +891,35 @@ body.dark-mode .loading-text {
     }
     .loading-text {
         font-size: 14px;
+    }
+    
+    /* Skeleton Responsive */
+    .skeleton-committee-photo {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .skeleton-committee-member {
+        height: 150px;
+        padding: 10px 6px;
+    }
+    
+    .skeleton-committee-grid {
+        gap: 10px;
+    }
+    
+    .skeleton-financial-card {
+        height: 85px;
+        padding: 10px;
+    }
+    
+    .skeleton-financial-value {
+        width: 70px;
+        height: 28px;
+    }
+    
+    .skeleton-financial-label {
+        width: 90px;
     }
 }
 
@@ -626,7 +971,94 @@ body.dark-mode .loading-text {
     <div class="loading-text">অপেক্ষা করুন</div>
 </div>
 
-<div class="container" id="mainContainer">
+<!-- ========================================= -->
+<!-- SKELETON SCREEN HTML -->
+<!-- ========================================= -->
+<div id="skeletonScreen" class="container" style="display: none;">
+    <!-- Skeleton Marquee -->
+    <div class="skeleton-marquee skeleton">
+        <div class="skeleton-marquee-left"></div>
+        <div class="skeleton-marquee-content"></div>
+    </div>
+
+    <!-- Skeleton Financial -->
+    <div class="skeleton-section-title skeleton"></div>
+    <div class="skeleton-financial-grid">
+        <div class="skeleton-financial-card skeleton">
+            <div class="skeleton-financial-value"></div>
+            <div class="skeleton-financial-label"></div>
+        </div>
+        <div class="skeleton-financial-card skeleton">
+            <div class="skeleton-financial-value"></div>
+            <div class="skeleton-financial-label"></div>
+        </div>
+    </div>
+
+    <!-- Skeleton History -->
+    <div class="skeleton-section-title skeleton"></div>
+    <div class="skeleton-history-wrapper skeleton">
+        <table class="skeleton-history-table">
+            <thead class="skeleton-history-header">
+                <tr>
+                    <th><div class="skeleton-history-header-cell"></div></th>
+                    <th><div class="skeleton-history-header-cell"></div></th>
+                    <th><div class="skeleton-history-header-cell"></div></th>
+                    <th><div class="skeleton-history-header-cell"></div></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="skeleton-history-row">
+                    <td><div class="skeleton-history-cell"></div></td>
+                    <td><div class="skeleton-history-cell"></div></td>
+                    <td><div class="skeleton-history-cell"></div></td>
+                    <td><div class="skeleton-history-cell"></div></td>
+                </tr>
+                <tr class="skeleton-history-row">
+                    <td><div class="skeleton-history-cell"></div></td>
+                    <td><div class="skeleton-history-cell"></div></td>
+                    <td><div class="skeleton-history-cell"></div></td>
+                    <td><div class="skeleton-history-cell"></div></td>
+                </tr>
+                <tr class="skeleton-history-row">
+                    <td><div class="skeleton-history-cell"></div></td>
+                    <td><div class="skeleton-history-cell"></div></td>
+                    <td><div class="skeleton-history-cell"></div></td>
+                    <td><div class="skeleton-history-cell"></div></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Skeleton Committee -->
+    <div class="skeleton-section-title skeleton"></div>
+    <div class="skeleton-committee-grid">
+        <div class="skeleton-committee-member skeleton">
+            <div class="skeleton-committee-photo"></div>
+            <div class="skeleton-committee-name"></div>
+            <div class="skeleton-committee-position"></div>
+        </div>
+        <div class="skeleton-committee-member skeleton">
+            <div class="skeleton-committee-photo"></div>
+            <div class="skeleton-committee-name"></div>
+            <div class="skeleton-committee-position"></div>
+        </div>
+        <div class="skeleton-committee-member skeleton">
+            <div class="skeleton-committee-photo"></div>
+            <div class="skeleton-committee-name"></div>
+            <div class="skeleton-committee-position"></div>
+        </div>
+        <div class="skeleton-committee-member skeleton">
+            <div class="skeleton-committee-photo"></div>
+            <div class="skeleton-committee-name"></div>
+            <div class="skeleton-committee-position"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================ -->
+<!-- ACTUAL CONTENT -->
+<!-- ============================ -->
+<div class="container" id="mainContainer" style="display: none;">
 
 <!-- Marquee -->
 <div class="marquee-section">
@@ -657,8 +1089,8 @@ body.dark-mode .loading-text {
 <tr>
     <th>তারিখ</th>
     <th>সময়</th>
-    <th>টাকার পরিমাণ</th>
-    <th>জমার মাধ্যম</th>
+    <th>পরিমাণ</th>
+    <th>জমা পদ্ধতি</th>
 </tr>
 </thead>
 <tbody id="historyTableBody">
@@ -760,7 +1192,7 @@ document.addEventListener('DOMContentLoaded', function() {
     checkAuthImmediately();
 });
 
-// Immediate auth check - NO FLASH, NO DELAY
+// FIX 1: Immediate auth check - NO FLASH, NO DELAY
 function checkAuthImmediately() {
     isAuthenticating = true;
     
@@ -775,9 +1207,18 @@ function checkAuthImmediately() {
             return;
         }
         
-        // User is authenticated - show content and initialize app
+        // FIX 1: User is authenticated - show content and initialize app
         document.body.style.visibility = 'visible';
         document.body.style.opacity = '1';
+        
+        // FIX 1: Apply correct theme before showing anything
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+        } else {
+            body.classList.remove('dark-mode');
+        }
+        
         initializeApp(user);
     });
 }
@@ -808,6 +1249,7 @@ window.onpageshow = function(event) {
 };
 
 // Cache important elements
+const skeletonScreen = document.getElementById('skeletonScreen');
 const loadingOverlay = document.getElementById('loadingOverlay');
 const mainContainer = document.getElementById('mainContainer');
 const marqueeText = document.getElementById('marqueeText');
@@ -839,17 +1281,16 @@ const bgAnimation = document.getElementById('bg-animation');
 // App state
 let currentUser = null;
 
-// ✅ Show loading (only on content area)
-function showLoading() {
-    loadingOverlay.style.display = 'flex';
-    mainContainer.classList.add('loading');
+// ✅ Show skeleton loading screen
+function showSkeleton() {
+    skeletonScreen.style.display = 'block';
+    mainContainer.style.display = 'none';
 }
 
-// ✅ Hide loading
-function hideLoading() {
-    loadingOverlay.style.display = 'none';
-    mainContainer.classList.remove('loading');
-    mainContainer.style.opacity = '1';
+// ✅ Hide skeleton and show actual content
+function hideSkeleton() {
+    skeletonScreen.style.display = 'none';
+    mainContainer.style.display = 'block';
 }
 
 // ✅ Optimized number formatter
@@ -896,13 +1337,6 @@ function setupThemeToggle() {
         body.classList.toggle('dark-mode');
         const isDark = body.classList.contains('dark-mode');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        
-        // Update loading overlay theme
-        if (isDark) {
-            loadingOverlay.classList.add('dark-mode');
-        } else {
-            loadingOverlay.classList.remove('dark-mode');
-        }
     });
 }
 
@@ -1576,14 +2010,9 @@ function initHeaderComponents() {
 
 // ✅ Main app initialization (ONLY called after successful auth)
 async function initializeApp(user) {
-    showLoading();
+    // Show skeleton screen immediately
+    showSkeleton();
     initHeaderComponents();
-    
-    // Apply theme to loading overlay immediately
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        loadingOverlay.classList.add('dark-mode');
-    }
     
     try {
         currentUser = user;
@@ -1593,7 +2022,7 @@ async function initializeApp(user) {
         
         if (!memberId) {
             setTimeout(() => {
-                hideLoading();
+                hideSkeleton();
             }, 300);
             return;
         }
@@ -1604,15 +2033,16 @@ async function initializeApp(user) {
         await initializeAllCollections(memberId);
         await loadAllDataInParallel(memberId);
         
+        // Smooth transition from skeleton to content
         setTimeout(() => {
-            hideLoading();
+            hideSkeleton();
         }, 300);
         
     } catch (error) {
         console.error("Error in app initialization:", error);
-        // Still hide loading even if there's an error
+        // Still hide skeleton even if there's an error
         setTimeout(() => {
-            hideLoading();
+            hideSkeleton();
         }, 300);
     }
 }
