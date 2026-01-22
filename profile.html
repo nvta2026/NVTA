@@ -28,6 +28,10 @@
     --dark-text: #f0f0f0;
     --dark-secondary: #2d2d2d;
     --dark-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --skeleton-bg: #e0e0e0;
+    --skeleton-bg-dark: #333;
+    --skeleton-highlight: #f5f5f5;
+    --skeleton-highlight-dark: #444;
 }
 
 *{
@@ -39,17 +43,31 @@
 body{
     color:#333;
     font-size:14px; 
-    background-color: white;
+    background-color: #1a1a1a;
     padding-top: 50px;
     padding-bottom: 70px;
     transition: background-color 0.3s, color 0.3s;
     position: relative;
     overflow-x: hidden;
+    visibility: hidden;
+    opacity: 0;
+}
+
+body:not(.dark-mode) {
+    background-color: white;
 }
 
 body.dark-mode {
     background-color: var(--dark-bg);
     color: var(--dark-text);
+}
+
+body.dark-mode .section-title,
+body.dark-mode .address-title,
+body.dark-mode .app-title,
+body.dark-mode .nav-btn.active i,
+body.dark-mode .nav-btn:hover i {
+    color: #08A33F !important;
 }
 
 /* Background Animation */
@@ -292,6 +310,11 @@ body.dark-mode .nav-btn {
     border-radius: 50%;
 }
 
+
+body.dark-mode .nav-btn.active::after {
+    background-color: #08A33F;
+}
+
 /* Main Content Styles */
 .container{
     max-width:1200px;
@@ -304,6 +327,344 @@ body.dark-mode .nav-btn {
 .container.loading {
     opacity: 0.5;
     pointer-events: none;
+}
+
+/* ============================ */
+/* SKELETON SCREEN STYLES - PROFILE PAGE */
+/* ============================ */
+
+#skeletonScreen {
+    max-width: 1200px;
+    margin: auto;
+    padding: 15px;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.skeleton-container {
+    display: none;
+}
+
+.skeleton-container.active {
+    display: block;
+}
+
+/* Skeleton Profile Header */
+.skeleton-profile-header {
+    padding: 25px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    background: linear-gradient(135deg, #FFA726 0%, #FF9800 100%);
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    min-height: 180px;
+}
+
+body.dark-mode .skeleton-profile-header {
+    background: linear-gradient(135deg, #FF8A00 0%, #FF5722 100%);
+}
+
+.skeleton-profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-profile-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 0;
+}
+
+.skeleton-member-name {
+    width: 200px;
+    height: 32px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-member-id {
+    width: 150px;
+    height: 30px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-member-status {
+    width: 120px;
+    height: 36px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* Skeleton Section Titles */
+.skeleton-section-title {
+    width: 180px;
+    height: 24px;
+    background-color: var(--skeleton-bg);
+    border-radius: 4px;
+    margin-top: 30px;
+    margin-bottom: 12px;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+body.dark-mode .skeleton-section-title {
+    background-color: var(--skeleton-bg-dark);
+}
+
+/* Skeleton Info Grid */
+.skeleton-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.skeleton-info-row {
+    display: flex;
+    border-bottom: 1px solid var(--skeleton-bg);
+    padding: 12px 0;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-info-row:last-child {
+    border-bottom: none;
+}
+
+.skeleton-info-label {
+    width: 200px;
+    height: 16px;
+    background-color: var(--skeleton-bg);
+    border-radius: 4px;
+    flex-shrink: 0;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+body.dark-mode .skeleton-info-label {
+    background-color: var(--skeleton-bg-dark);
+}
+
+.skeleton-info-value {
+    flex: 1;
+    height: 16px;
+    background-color: var(--skeleton-highlight);
+    border-radius: 4px;
+    margin-left: 10px;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+body.dark-mode .skeleton-info-value {
+    background-color: var(--skeleton-highlight-dark);
+}
+
+/* Skeleton Address Cards */
+.skeleton-address-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+.skeleton-address-card {
+    padding: 20px;
+    border: 1px solid var(--skeleton-bg);
+    border-radius: 8px;
+    background-color: var(--white);
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+body.dark-mode .skeleton-address-card {
+    background-color: var(--dark-secondary);
+    border-color: var(--skeleton-bg-dark);
+}
+
+.skeleton-address-title {
+    width: 150px;
+    height: 24px;
+    background-color: var(--skeleton-bg);
+    border-radius: 4px;
+    margin-bottom: 15px;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+body.dark-mode .skeleton-address-title {
+    background-color: var(--skeleton-bg-dark);
+}
+
+/* Skeleton Nominee Card */
+.skeleton-nominee-card {
+    padding: 10px;
+    border: 1px solid var(--skeleton-bg);
+    border-radius: 8px;
+    background-color: var(--white);
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+body.dark-mode .skeleton-nominee-card {
+    background-color: var(--dark-secondary);
+    border-color: var(--skeleton-bg-dark);
+}
+
+.skeleton-nominee-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.skeleton-nominee-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--skeleton-bg);
+    flex-shrink: 0;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+body.dark-mode .skeleton-nominee-photo {
+    background-color: var(--skeleton-bg-dark);
+}
+
+.skeleton-nominee-info {
+    flex: 1;
+}
+
+.skeleton-nominee-name {
+    width: 180px;
+    height: 24px;
+    background-color: var(--skeleton-bg);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+body.dark-mode .skeleton-nominee-name {
+    background-color: var(--skeleton-bg-dark);
+}
+
+.skeleton-nominee-relation {
+    width: 120px;
+    height: 20px;
+    background-color: var(--skeleton-highlight);
+    border-radius: 4px;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+body.dark-mode .skeleton-nominee-relation {
+    background-color: var(--skeleton-highlight-dark);
+}
+
+.skeleton-nominee-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+/* Skeleton Logout Button */
+.skeleton-logout-btn {
+    width: 200px;
+    height: 44px;
+    background-color: var(--skeleton-bg);
+    border-radius: 6px;
+    margin: 40px auto;
+    display: block;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+body.dark-mode .skeleton-logout-btn {
+    background-color: var(--skeleton-bg-dark);
+}
+
+/* Animation */
+@keyframes skeleton-pulse {
+    0% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.6;
+    }
+}
+
+/* Responsive Skeleton */
+@media (max-width: 768px) {
+    #skeletonScreen {
+        padding: 10px;
+    }
+    
+    .skeleton-profile-header {
+        padding: 20px;
+        gap: 20px;
+        min-height: auto;
+    }
+    
+    .skeleton-profile-photo {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .skeleton-member-name {
+        width: 150px;
+        height: 28px;
+    }
+    
+    .skeleton-member-id {
+        width: 120px;
+        height: 26px;
+    }
+    
+    .skeleton-member-status {
+        width: 100px;
+        height: 32px;
+    }
+    
+    .skeleton-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .skeleton-address-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .skeleton-info-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .skeleton-info-label {
+        width: 100%;
+    }
+    
+    .skeleton-info-value {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .skeleton-nominee-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .skeleton-nominee-photo {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .skeleton-logout-btn {
+        width: 100%;
+    }
 }
 
 /* প্রোফাইল স্টাইল - নতুন যুক্ত */
@@ -425,8 +786,7 @@ body.dark-mode .member-id {
 }
 
 body.dark-mode .section-title {
-    color: var(--primary-color);
-    border-bottom-color: var(--primary-color);
+    border-bottom-color: #08A33F; /* FIX 2: green border for dark mode */
 }
 
 .info-grid {
@@ -500,7 +860,6 @@ body.dark-mode .address-card {
 }
 
 body.dark-mode .address-title {
-    color: var(--primary-color);
     border-bottom-color: #444;
 }
 
@@ -535,6 +894,10 @@ body.dark-mode .nominee-card {
     object-fit: cover;
     border: 3px solid #2c3e9e;
     flex-shrink: 0;
+}
+
+body.dark-mode .nominee-photo {
+    border-color: #08A33F; /* FIX 2: green border for dark mode */
 }
 
 .nominee-basic-info {
@@ -867,7 +1230,150 @@ body.dark-mode .loading-text {
     <div class="loading-text">অপেক্ষা করুন</div>
 </div>
 
-<div class="container" id="mainContainer">
+<!-- ========================== -->
+<!-- SKELETON SCREEN (PLACEHOLDER UI) -->
+<!-- ========================= -->
+<div id="skeletonScreen" class="skeleton-container active">
+    <!-- Skeleton Profile Header -->
+    <div class="skeleton-profile-header">
+        <div class="skeleton-profile-photo"></div>
+        <div class="skeleton-profile-info">
+            <div class="skeleton-member-name"></div>
+            <div class="skeleton-member-id"></div>
+            <div class="skeleton-member-status"></div>
+        </div>
+    </div>
+    
+    <!-- Skeleton Personal Information -->
+    <div class="skeleton-section-title"></div>
+    <div class="skeleton-info-grid">
+        <div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+        </div>
+        <div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Skeleton Address Information -->
+    <div class="skeleton-section-title"></div>
+    <div class="skeleton-address-grid">
+        <div class="skeleton-address-card">
+            <div class="skeleton-address-title"></div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+        </div>
+        <div class="skeleton-address-card">
+            <div class="skeleton-address-title"></div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Skeleton Nominee Information -->
+    <div class="skeleton-section-title"></div>
+    <div class="skeleton-nominee-card">
+        <div class="skeleton-nominee-header">
+            <div class="skeleton-nominee-photo"></div>
+            <div class="skeleton-nominee-info">
+                <div class="skeleton-nominee-name"></div>
+                <div class="skeleton-nominee-relation"></div>
+            </div>
+        </div>
+        <div class="skeleton-nominee-grid">
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+            <div class="skeleton-info-row">
+                <div class="skeleton-info-label"></div>
+                <div class="skeleton-info-value"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Skeleton Logout Button -->
+    <div class="skeleton-logout-btn"></div>
+</div>
+
+<!-- ========================================= -->
+<!-- ACTUAL CONTENT (Hidden by default) -->
+<!-- ========================================= -->
+<div class="container" id="mainContainer" style="display: none;">
     <!-- প্রোফাইল হেডার -->
     <div class="profile-header">
         <div class="profile-photo-container">
@@ -1064,7 +1570,8 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-// ✅ Cache important elements
+// FIX: Cache skeleton and main content elements
+const skeletonScreen = document.getElementById('skeletonScreen');
 const loadingOverlay = document.getElementById('loadingOverlay');
 const mainContainer = document.getElementById('mainContainer');
 
@@ -1113,19 +1620,25 @@ const bgAnimation = document.getElementById('bg-animation');
 let currentUser = null;
 let currentMemberId = null;
 
-// ✅ Show loading (only on content area)
-function showLoading() {
-    loadingOverlay.style.display = 'flex';
-    mainContainer.classList.add('loading');
+// ✅ FIX: Show skeleton screen (independent of body visibility)
+function showSkeleton() {
+    // Hide the main content
+    mainContainer.style.display = 'none';
+    
+    // Show the skeleton screen
+    skeletonScreen.classList.add('active');
 }
 
-// ✅ Hide loading
-function hideLoading() {
-    loadingOverlay.style.display = 'none';
-    mainContainer.classList.remove('loading');
+// ✅ FIX: Hide skeleton and show actual content
+function hideSkeleton() {
+    // Hide the skeleton screen
+    skeletonScreen.classList.remove('active');
+    
+    // Show the main content
+    mainContainer.style.display = 'block';
 }
 
-// Remove skeleton loading effect
+// Remove skeleton loading effect from actual content
 function removeSkeleton(element) {
     if (element && element.classList.contains('profile-skeleton')) {
         element.classList.remove('profile-skeleton');
@@ -1173,13 +1686,6 @@ function setupThemeToggle() {
         body.classList.toggle('dark-mode');
         const isDark = body.classList.contains('dark-mode');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        
-        // Update loading overlay theme
-        if (isDark) {
-            loadingOverlay.classList.add('dark-mode');
-        } else {
-            loadingOverlay.classList.remove('dark-mode');
-        }
     });
 }
 
@@ -1304,7 +1810,7 @@ function updateNotificationBadge(count) {
 async function loadProfileDataFromFirestore(memberId) {
     if (!memberId) {
         console.error("No memberId provided");
-        hideLoading();
+        hideSkeleton();
         return;
     }
     
@@ -1316,19 +1822,22 @@ async function loadProfileDataFromFirestore(memberId) {
             if (doc.exists) {
                 const userData = doc.data();
                 updateProfileUI(userData);
-                hideLoading();
+                // Hide skeleton and show content after data loads
+                setTimeout(() => {
+                    hideSkeleton();
+                }, 300); // Small delay for smooth transition
             } else {
                 console.error('Member not found:', memberId);
-                hideLoading();
+                hideSkeleton();
             }
         }, (error) => {
             console.error('রিয়েলটাইম ডেটা লোডে ত্রুটি:', error);
-            hideLoading();
+            hideSkeleton();
         });
         
     } catch (error) {
         console.error('প্রোফাইল ডেটা লোডে ত্রুটি:', error);
-        hideLoading();
+        hideSkeleton();
     }
 }
 
@@ -1505,36 +2014,59 @@ function initHeaderComponents() {
     loadHeaderFromFirestore();
 }
 
-// ✅ STRICT AUTH CHECK
-async function checkAuthAndRedirect() {
-    return new Promise((resolve, reject) => {
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                resolve(user);
-            } else {
-                window.location.replace('login.html');
-                reject(new Error("User not authenticated"));
-            }
-        }, (error) => {
+// ✅ FIX: Immediate auth check - NO FLASH, NO DELAY
+let isAuthenticating = false;
+let authChecked = false;
+
+// Show skeleton immediately when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Show skeleton immediately (before auth check)
+    showSkeleton();
+    
+    // Hide everything except skeleton during auth check
+    document.body.style.visibility = 'hidden';
+    document.body.style.opacity = '0';
+    
+    // Strict authentication check - NO DELAY
+    checkAuthImmediately();
+});
+
+// FIX: Immediate auth check function
+function checkAuthImmediately() {
+    isAuthenticating = true;
+    
+    auth.onAuthStateChanged((user) => {
+        isAuthenticating = false;
+        authChecked = true;
+        
+        if (!user) {
+            // User not logged in - IMMEDIATE REDIRECT
+            console.log('User not authenticated, redirecting immediately...');
             window.location.replace('login.html');
-            reject(error);
-        });
+            return;
+        }
+        
+        // FIX: User is authenticated - show content and initialize app
+        document.body.style.visibility = 'visible';
+        document.body.style.opacity = '1';
+        
+        // Apply correct theme before showing anything
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+        } else {
+            body.classList.remove('dark-mode');
+        }
+        
+        initializeApp(user);
     });
 }
 
 // ✅ Main initialization function
-async function initApp() {
-    showLoading();
+async function initializeApp(user) {
     initHeaderComponents();
     
-    // Apply theme to loading overlay immediately
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        loadingOverlay.classList.add('dark-mode');
-    }
-    
     try {
-        const user = await checkAuthAndRedirect();
         currentUser = user;
         
         // Get memberId from Registration collection
@@ -1542,19 +2074,19 @@ async function initApp() {
         
         if (!currentMemberId) {
             console.error("Could not get memberId");
-            hideLoading();
+            hideSkeleton();
             return;
         }
         
         // Setup notification listener
         setupNotificationListener(currentMemberId);
         
-        // Load profile data
+        // Load profile data (skeleton will hide when data loads)
         loadProfileDataFromFirestore(currentMemberId);
         
     } catch (error) {
         console.error("Error in app initialization:", error);
-        hideLoading();
+        hideSkeleton();
     }
 }
 
@@ -1575,12 +2107,6 @@ window.onpageshow = function(event) {
         });
     }
 };
-
-// ✅ Initialize the app when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('প্রোফাইল পেজ লোড হয়েছে');
-    initApp();
-});
 </script>
 <script>
 if ('serviceWorker' in navigator) {
