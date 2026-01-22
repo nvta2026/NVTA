@@ -13,7 +13,7 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   
   <style>
       :root {
@@ -42,17 +42,34 @@
       body{
           color:#333;
           font-size:14px; 
-          background-color: white;
+          background-color: #1a1a1a; /* FIX 1: Start with dark mode color to prevent white flash */
           padding-top: 50px;
           padding-bottom: 70px;
           transition: background-color 0.3s, color 0.3s;
           position: relative;
           overflow-x: hidden;
+          visibility: hidden; /* FIX 1: Hide until auth check completes */
+          opacity: 0; /* FIX 1: Hide until auth check completes */
+      }
+
+      /* FIX 1: Light mode background */
+      body:not(.dark-mode) {
+          background-color: white;
       }
 
       body.dark-mode {
           background-color: var(--dark-bg);
           color: var(--dark-text);
+      }
+
+      body.dark-mode .app-title,
+      body.dark-mode .nav-btn.active i,
+      body.dark-mode .nav-btn:hover i,
+      body.dark-mode .page-title,
+      body.dark-mode .step-title,
+      body.dark-mode .verification-number,
+      body.dark-mode .verification-header h2 {
+          color: #08A33F !important;
       }
 
       /* Background Animation */
@@ -293,6 +310,11 @@
           height: 6px;
           background-color: var(--primary-color);
           border-radius: 50%;
+      }
+
+      /* FIX 2: Dark mode active nav button indicator */
+      body.dark-mode .nav-btn.active::after {
+          background-color: #08A33F; /* Pink color for dark mode */
       }
 
       /* Main Content Container */
@@ -1097,6 +1119,51 @@
 
   let selectedPaymentMethod = '';
 
+  // FIX 1: Immediate auth check - NO FLASH, NO DELAY
+  let isAuthenticating = false;
+  let authChecked = false;
+
+  // Show content immediately when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+      // Hide everything during auth check
+      document.body.style.visibility = 'hidden';
+      document.body.style.opacity = '0';
+      
+      // Strict authentication check - NO DELAY
+      checkAuthImmediately();
+  });
+
+  // FIX 1: Immediate auth check function
+  function checkAuthImmediately() {
+      isAuthenticating = true;
+      
+      auth.onAuthStateChanged((user) => {
+          isAuthenticating = false;
+          authChecked = true;
+          
+          if (!user) {
+              // User not logged in - IMMEDIATE REDIRECT
+              console.log('User not authenticated, redirecting immediately...');
+              window.location.replace('login.html');
+              return;
+          }
+          
+          // FIX 1: User is authenticated - show content and initialize app
+          document.body.style.visibility = 'visible';
+          document.body.style.opacity = '1';
+          
+          // Apply correct theme before showing anything
+          const savedTheme = localStorage.getItem('theme');
+          if (savedTheme === 'dark') {
+              body.classList.add('dark-mode');
+          } else {
+              body.classList.remove('dark-mode');
+          }
+          
+          initApp(user);
+      });
+  }
+
   // Create background animation
   function createBackgroundAnimation() {
       const bubbleCount = 15;
@@ -1123,11 +1190,6 @@
 
   // Setup theme toggle functionality
   function setupThemeToggle() {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark') {
-          body.classList.add('dark-mode');
-      }
-      
       themeToggle.addEventListener('click', () => {
           body.classList.toggle('dark-mode');
           const isDark = body.classList.contains('dark-mode');
@@ -1223,23 +1285,6 @@
       notificationBadge.dataset.prevCount = num;
   }
 
-  // ✅ STRICT AUTH CHECK
-  async function checkAuthAndRedirect() {
-      return new Promise((resolve, reject) => {
-          auth.onAuthStateChanged((user) => {
-              if (user) {
-                  resolve(user);
-              } else {
-                  window.location.replace('login.html');
-                  reject(new Error("User not authenticated"));
-              }
-          }, (error) => {
-              window.location.replace('login.html');
-              reject(error);
-          });
-      });
-  }
-
   // ✅ Get memberId from Registration collection using user UID
   async function getUserMemberId(userUid) {
       try {
@@ -1293,11 +1338,10 @@
   }
 
   // ✅ Main initialization function
-  async function initApp() {
+  async function initApp(user) {
       initHeaderComponents();
       
       try {
-          const user = await checkAuthAndRedirect();
           currentUser = user;
           
           // Get memberId from Registration collection
@@ -1317,13 +1361,6 @@
       }
   }
 
-  // ✅ Set up a real-time auth state listener
-  auth.onAuthStateChanged(function(user) {
-      if (!user) {
-          window.location.replace('login.html');
-      }
-  });
-
   // ✅ Prevent access through browser back button after logout
   window.onpageshow = function(event) {
       if (event.persisted) {
@@ -1334,12 +1371,6 @@
           });
       }
   };
-
-  // ✅ Initialize the app when DOM is loaded
-  document.addEventListener('DOMContentLoaded', function() {
-      console.log('পেমেন্ট পেজ লোড হয়েছে');
-      initApp();
-  });
 
   /* Payment Gateway Functions */
   // Select payment method
