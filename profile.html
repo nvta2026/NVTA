@@ -48,8 +48,8 @@ body{
     color:#333;
     font-size:14px; 
     background-color: #1a1a1a;
-    padding-top: 50px;
-    padding-bottom: 70px;
+    padding-top: 32px;
+    padding-bottom: 50px;
     transition: background-color 0.3s, color 0.3s;
     position: relative;
     overflow-x: hidden;
@@ -687,12 +687,12 @@ body.dark-mode .address-title {
     }
     
     .address-card .info-label {
-        font-size: 11px;
+        font-size: 14px;
         width: 100%;
     }
     
     .address-card .info-value {
-        font-size: 11px;
+        font-size: 14px;
     }
 }
 
@@ -1617,7 +1617,7 @@ async function saveProfilePicture(imageUrl) {
     if (!currentDocId) return;
     await db.collection('Registration').doc(currentDocId).update({ memberPhotoLink: imageUrl });
     profilePhoto.src = imageUrl;
-    showToast("প্রোফাইল ছবি আপডেট হয়েছে!", "success");
+    showToast("আপডেট হয়েছে!", "success");
 }
 
 // Save cover photo
@@ -1625,7 +1625,7 @@ async function saveCoverPhoto(imageUrl) {
     if (!currentDocId) return;
     await db.collection('Registration').doc(currentDocId).update({ coverPhotoLink: imageUrl });
     coverPhoto.src = imageUrl;
-    showToast("কভার ছবি আপডেট হয়েছে!", "success");
+    showToast("আপডেট হয়েছে!", "success");
 }
 
 // Remove profile picture
@@ -1633,7 +1633,7 @@ async function removeProfilePicture() {
     if (!currentDocId) return;
     await db.collection('Registration').doc(currentDocId).update({ memberPhotoLink: DEFAULT_PROFILE_PIC });
     profilePhoto.src = DEFAULT_PROFILE_PIC;
-    showToast("প্রোফাইল ছবি রিমুভ করা হয়েছে!", "success");
+    showToast("রিমুভ করা হয়েছে!", "success");
 }
 
 // Cropper functions
