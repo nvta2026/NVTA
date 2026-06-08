@@ -74,7 +74,6 @@ body.dark-mode .nav-btn:hover i {
     color: #08A33F !important;
 }
 
-/* Background Animation */
 .bg-animation {
     position: fixed;
     top: 0;
@@ -113,7 +112,6 @@ body.dark-mode .bg-bubble {
     }
 }
 
-/* Header Styles */
 header {
     display: flex;
     justify-content: space-between;
@@ -247,7 +245,6 @@ body:not(.dark-mode) .theme-toggle .fa-moon {
     opacity: 1;
 }
 
-/* Navigation Bar Styles */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -327,10 +324,6 @@ body.dark-mode .nav-btn.active::after {
     transition: opacity 0.3s;
 }
 
-/* ============================ */
-/* COVER PHOTO - NO RADIUS, NO PADDING/MARGIN */
-/* ============================ */
-
 .cover-container {
     position: relative;
     width: 100%;
@@ -375,7 +368,6 @@ body.dark-mode .cover-container {
     transform: scale(1.05);
 }
 
-/* Profile Header - Name and ID lower position */
 .profile-header {
     position: relative;
     padding: 0 20px;
@@ -429,11 +421,11 @@ body.dark-mode .profile-photo {
     transform: scale(1.05);
 }
 
-/* Avatar Menu - New Design without breaking other designs */
 .avatar-menu {
     position: absolute;
-    bottom: 55px;
+    bottom: -90px;
     right: 0;
+    left: 50px;
     background: var(--white);
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -547,7 +539,6 @@ body.dark-mode .section-title {
     border-bottom-color: #08A33F;
 }
 
-/* Desktop and Tablet: 2 columns */
 .info-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -616,7 +607,6 @@ body.dark-mode .info-value {
     color: var(--dark-text);
 }
 
-/* ঠিকানা সেকশন - Side by Side (2 columns) */
 .address-section {
     margin-bottom: 30px;
     padding: 0 20px;
@@ -653,7 +643,6 @@ body.dark-mode .address-title {
     border-bottom-color: #444;
 }
 
-/* Mobile: Address still 2 columns side by side */
 @media (max-width: 768px) {
     .address-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -701,7 +690,6 @@ body.dark-mode .address-title {
     }
 }
 
-/* নমিনি সেকশন */
 .nominee-section {
     margin-bottom: 10px;
     padding: 0 20px;
@@ -763,14 +751,13 @@ body.dark-mode .nominee-relation {
     color: #aaa;
 }
 
-/* Nominee Grid - 2 columns always */
 .nominee-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
+    text-align: center;
 }
 
-/* Mobile: Nominee photo center aligned, grid 2 columns */
 @media (max-width: 768px) {
     .nominee-header {
         flex-direction: column;
@@ -832,10 +819,9 @@ body.dark-mode .nominee-relation {
     }
 }
 
-/* লগআউট বাটন সেকশন */
 .logout-section {
     text-align: center;
-    margin-top: 40px;
+    margin-top: 20px;
     margin-bottom: 40px;
 }
 
@@ -846,7 +832,7 @@ body.dark-mode .nominee-relation {
     border: none;
     border-radius: 6px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     transition: background-color 0.3s;
 }
@@ -855,7 +841,6 @@ body.dark-mode .nominee-relation {
     background-color: #c0392b;
 }
 
-/* Cropper Modal Styles */
 .cropper-modal-overlay {
     position: fixed;
     top: 0;
@@ -921,7 +906,6 @@ body.dark-mode .nominee-relation {
     color: #333;
 }
 
-/* Toast Notification */
 .toast-notification {
     position: fixed;
     bottom: 80px;
@@ -954,7 +938,6 @@ body.dark-mode .nominee-relation {
     background-color: var(--danger-color);
 }
 
-/* Skeleton Screen */
 #skeletonScreen {
     max-width: 1200px;
     margin: auto;
@@ -993,6 +976,7 @@ body.dark-mode .nominee-relation {
     border-radius: 50%;
     background: linear-gradient(135deg, #ccc, #aaa);
     animation: skeleton-pulse 1.5s ease-in-out infinite;
+    flex-shrink: 0;
 }
 
 .skeleton-info {
@@ -1039,15 +1023,43 @@ body.dark-mode .skeleton-section-title {
     padding: 0 20px;
 }
 
+.skeleton-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
 .skeleton-info-row {
-    height: 40px;
-    background: #eee;
-    border-radius: 6px;
+    display: flex;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+    gap: 15px;
+}
+
+.skeleton-label {
+    width: 140px;
+    height: 14px;
+    background: #ddd;
+    border-radius: 4px;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+.skeleton-value {
+    flex: 1;
+    height: 14px;
+    background: #e0e0e0;
+    border-radius: 4px;
     animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
 body.dark-mode .skeleton-info-row {
-    background: #3a3a3a;
+    border-bottom-color: #444;
+}
+
+body.dark-mode .skeleton-label,
+body.dark-mode .skeleton-value {
+    background: #4a4a4a;
 }
 
 .skeleton-address-grid {
@@ -1058,26 +1070,141 @@ body.dark-mode .skeleton-info-row {
 }
 
 .skeleton-address-card {
-    height: 200px;
-    background: #eee;
+    padding: 20px;
+    border: 1px solid #ddd;
     border-radius: 8px;
+    background: #eee;
     animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-address-title {
+    width: 120px;
+    height: 22px;
+    background: #d0d0d0;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+}
+
+.skeleton-address-row {
+    display: flex;
+    padding: 10px 0;
+    gap: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.skeleton-address-label {
+    width: 100px;
+    height: 14px;
+    background: #ddd;
+    border-radius: 4px;
+}
+
+.skeleton-address-value {
+    flex: 1;
+    height: 14px;
+    background: #ddd;
+    border-radius: 4px;
 }
 
 body.dark-mode .skeleton-address-card {
     background: #3a3a3a;
+    border-color: #444;
+}
+
+body.dark-mode .skeleton-address-title,
+body.dark-mode .skeleton-address-label,
+body.dark-mode .skeleton-address-value {
+    background: #4a4a4a;
+}
+
+body.dark-mode .skeleton-address-row {
+    border-bottom-color: #444;
 }
 
 .skeleton-nominee-card {
-    height: 180px;
-    background: #eee;
-    border-radius: 8px;
     margin: 0 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #eee;
     animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-nominee-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.skeleton-nominee-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #ccc;
+    flex-shrink: 0;
+}
+
+.skeleton-nominee-info {
+    flex: 1;
+}
+
+.skeleton-nominee-name {
+    width: 150px;
+    height: 20px;
+    background: #ccc;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.skeleton-nominee-relation {
+    width: 100px;
+    height: 14px;
+    background: #ddd;
+    border-radius: 4px;
+}
+
+.skeleton-nominee-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.skeleton-nominee-row {
+    display: flex;
+    padding: 8px 0;
+    gap: 10px;
+}
+
+.skeleton-nominee-label {
+    width: 100px;
+    height: 14px;
+    background: #ddd;
+    border-radius: 4px;
+}
+
+.skeleton-nominee-value {
+    flex: 1;
+    height: 14px;
+    background: #ddd;
+    border-radius: 4px;
 }
 
 body.dark-mode .skeleton-nominee-card {
     background: #3a3a3a;
+    border-color: #444;
+}
+
+body.dark-mode .skeleton-nominee-photo {
+    background: #555;
+}
+
+body.dark-mode .skeleton-nominee-name,
+body.dark-mode .skeleton-nominee-relation,
+body.dark-mode .skeleton-nominee-label,
+body.dark-mode .skeleton-nominee-value {
+    background: #4a4a4a;
 }
 
 .skeleton-logout-btn {
@@ -1099,7 +1226,29 @@ body.dark-mode .skeleton-logout-btn {
     100% { opacity: 0.6; }
 }
 
-/* Responsive Header */
+@media (max-width: 768px) {
+    .skeleton-cover { height: 140px; }
+    .skeleton-profile-area { margin-top: -40px; gap: 15px; padding: 0 15px; }
+    .skeleton-avatar { width: 90px; height: 90px; }
+    .skeleton-name { width: 160px; height: 22px; }
+    .skeleton-id { width: 120px; height: 12px; }
+    .skeleton-section-title { margin-left: 15px; }
+    .skeleton-info-grid, .skeleton-address-grid { padding: 0 15px; }
+    .skeleton-nominee-card { margin: 0 15px; }
+    .skeleton-label { width: 110px; }
+}
+
+@media (max-width: 480px) {
+    .skeleton-cover { height: 120px; }
+    .skeleton-profile-area { margin-top: -35px; }
+    .skeleton-avatar { width: 80px; height: 80px; }
+    .skeleton-name { width: 140px; height: 20px; }
+    .skeleton-info-row { flex-direction: column; gap: 6px; padding: 8px 0; }
+    .skeleton-label { width: 100%; }
+    .skeleton-address-row { flex-direction: column; gap: 6px; padding: 8px 0; }
+    .skeleton-address-label { width: 100%; }
+}
+
 @media (max-width: 768px) {
     body{
         font-size:13px;
@@ -1177,24 +1326,13 @@ body.dark-mode .skeleton-logout-btn {
     .avatar-menu {
         min-width: 150px;
         right: 0px;
-        bottom: 48px;
+        left: 50px;
+        bottom: -80px;
     }
     
     .menu-item {
         padding: 10px 16px;
         font-size: 13px;
-    }
-    
-    .skeleton-section-title {
-        margin-left: 15px;
-    }
-    
-    .skeleton-info-grid, .skeleton-address-grid {
-        padding: 0 15px;
-    }
-    
-    .skeleton-nominee-card {
-        margin: 0 15px;
     }
 }
 
@@ -1232,8 +1370,9 @@ body.dark-mode .skeleton-logout-btn {
     
     .avatar-menu {
         min-width: 145px;
-        right: -5px;
-        bottom: 45px;
+        right: 0;
+        left: 50px;
+        bottom: -80px;
     }
 }
 
@@ -1279,7 +1418,7 @@ body.dark-mode .skeleton-logout-btn {
     </div>
 </header>
 
-<!-- Skeleton Screen -->
+<!-- Skeleton Screen - Fixed Version (No Jump) -->
 <div id="skeletonScreen" class="skeleton-container active">
     <div class="skeleton-cover"></div>
     <div class="skeleton-profile-area">
@@ -1289,31 +1428,72 @@ body.dark-mode .skeleton-logout-btn {
             <div class="skeleton-id"></div>
         </div>
     </div>
+    
     <div class="skeleton-section-title"></div>
     <div class="skeleton-info-grid">
-        <div><div class="skeleton-info-row"></div><div class="skeleton-info-row"></div><div class="skeleton-info-row"></div><div class="skeleton-info-row"></div><div class="skeleton-info-row"></div><div class="skeleton-info-row"></div></div>
-        <div><div class="skeleton-info-row"></div><div class="skeleton-info-row"></div><div class="skeleton-info-row"></div><div class="skeleton-info-row"></div><div class="skeleton-info-row"></div><div class="skeleton-info-row"></div></div>
+        <div class="skeleton-col">
+            <div class="skeleton-info-row"><div class="skeleton-label"></div><div class="skeleton-value"></div></div>
+            <div class="skeleton-info-row"><div class="skeleton-label"></div><div class="skeleton-value"></div></div>
+            <div class="skeleton-info-row"><div class="skeleton-label"></div><div class="skeleton-value"></div></div>
+            <div class="skeleton-info-row"><div class="skeleton-label"></div><div class="skeleton-value"></div></div>
+            <div class="skeleton-info-row"><div class="skeleton-label"></div><div class="skeleton-value"></div></div>
+            <div class="skeleton-info-row"><div class="skeleton-label"></div><div class="skeleton-value"></div></div>
+        </div>
+        <div class="skeleton-col">
+            <div class="skeleton-info-row"><div class="skeleton-label"></div><div class="skeleton-value"></div></div>
+            <div class="skeleton-info-row"><div class="skeleton-label"></div><div class="skeleton-value"></div></div>
+            <div class="skeleton-info-row"><div class="skeleton-label"></div><div class="skeleton-value"></div></div>
+            <div class="skeleton-info-row"><div class="skeleton-label"></div><div class="skeleton-value"></div></div>
+            <div class="skeleton-info-row"><div class="skeleton-label"></div><div class="skeleton-value"></div></div>
+            <div class="skeleton-info-row"><div class="skeleton-label"></div><div class="skeleton-value"></div></div>
+        </div>
     </div>
+    
     <div class="skeleton-section-title"></div>
     <div class="skeleton-address-grid">
-        <div class="skeleton-address-card"></div>
-        <div class="skeleton-address-card"></div>
+        <div class="skeleton-address-card">
+            <div class="skeleton-address-title"></div>
+            <div class="skeleton-address-row"><div class="skeleton-address-label"></div><div class="skeleton-address-value"></div></div>
+            <div class="skeleton-address-row"><div class="skeleton-address-label"></div><div class="skeleton-address-value"></div></div>
+            <div class="skeleton-address-row"><div class="skeleton-address-label"></div><div class="skeleton-address-value"></div></div>
+            <div class="skeleton-address-row"><div class="skeleton-address-label"></div><div class="skeleton-address-value"></div></div>
+        </div>
+        <div class="skeleton-address-card">
+            <div class="skeleton-address-title"></div>
+            <div class="skeleton-address-row"><div class="skeleton-address-label"></div><div class="skeleton-address-value"></div></div>
+            <div class="skeleton-address-row"><div class="skeleton-address-label"></div><div class="skeleton-address-value"></div></div>
+            <div class="skeleton-address-row"><div class="skeleton-address-label"></div><div class="skeleton-address-value"></div></div>
+            <div class="skeleton-address-row"><div class="skeleton-address-label"></div><div class="skeleton-address-value"></div></div>
+        </div>
     </div>
+    
     <div class="skeleton-section-title"></div>
-    <div class="skeleton-nominee-card"></div>
+    <div class="skeleton-nominee-card">
+        <div class="skeleton-nominee-header">
+            <div class="skeleton-nominee-photo"></div>
+            <div class="skeleton-nominee-info">
+                <div class="skeleton-nominee-name"></div>
+                <div class="skeleton-nominee-relation"></div>
+            </div>
+        </div>
+        <div class="skeleton-nominee-grid">
+            <div class="skeleton-nominee-row"><div class="skeleton-nominee-label"></div><div class="skeleton-nominee-value"></div></div>
+            <div class="skeleton-nominee-row"><div class="skeleton-nominee-label"></div><div class="skeleton-nominee-value"></div></div>
+        </div>
+    </div>
+    
     <div class="skeleton-logout-btn"></div>
 </div>
 
 <!-- Main Content -->
 <div class="container" id="mainContainer" style="display: none;">
-    <!-- Cover Photo - No radius, no padding/margin -->
     <div class="cover-container">
         <img src="https://i.postimg.cc/25d6stC3/cover.jpg" alt="Cover" class="cover-photo" id="cover-photo">
         <div class="cover-upload-btn" id="cover-upload-btn"><i class="fas fa-camera"></i></div>
         <input type="file" id="cover-input" accept="image/jpeg,image/png,image/jpg,image/webp" style="display: none;">
     </div>
     
-    <!-- Profile Header - Name and ID lower -->
+    <!-- Profile Header -->
     <div class="profile-header">
         <div class="profile-photo-container">
             <img src="https://i.ibb.co/FkrRGXLB/profile.png" alt="প্রোফাইল ছবি" class="profile-photo" id="profilePhoto">
@@ -1331,7 +1511,7 @@ body.dark-mode .skeleton-logout-btn {
         </div>
     </div>
     
-    <!-- Personal Information - 2 columns on all devices -->
+    <!-- Personal Information -->
     <div class="info-section">
         <h2 class="section-title">ব্যক্তিগত তথ্য</h2>
         <div class="info-grid">
@@ -1354,7 +1534,7 @@ body.dark-mode .skeleton-logout-btn {
         </div>
     </div>
     
-    <!-- Address Information - Side by Side (2 columns) -->
+    <!-- Address Information -->
     <div class="address-section">
         <h2 class="section-title">ঠিকানা তথ্য</h2>
         <div class="address-grid">
@@ -1375,7 +1555,7 @@ body.dark-mode .skeleton-logout-btn {
         </div>
     </div>
     
-    <!-- Nominee Information - Photo center on mobile, grid 2 columns -->
+    <!-- Nominee Information -->
     <div class="nominee-section">
         <h2 class="section-title">নমিনি তথ্য</h2>
         <div class="nominee-card">
