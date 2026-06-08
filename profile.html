@@ -327,7 +327,7 @@ body.dark-mode .nav-btn.active::after {
 .cover-container {
     position: relative;
     width: 100%;
-    height: 180px;
+    height: 200px;
     background: linear-gradient(135deg, var(--primary-color), #6a8bff);
     overflow: hidden;
     border-radius: 0;
@@ -1258,7 +1258,7 @@ body.dark-mode .skeleton-logout-btn {
     }
     
     .cover-container {
-        height: 140px;
+        height: 240px;
     }
     
     .profile-header {
@@ -1338,7 +1338,7 @@ body.dark-mode .skeleton-logout-btn {
 
 @media (max-width: 480px) {
     .cover-container {
-        height: 120px;
+        height: 160px;
     }
     
     .profile-header {
@@ -1373,6 +1373,47 @@ body.dark-mode .skeleton-logout-btn {
         right: 0;
         left: 50px;
         bottom: -80px;
+    }
+}
+
+@media (max-width: 380px) {
+
+    .cover-container {
+        height: 140px;
+    }
+
+    .profile-header {
+        margin-top: -30px;
+        gap: 10px;
+        padding: 0 10px;
+    }
+
+    .profile-photo {
+        width: 70px;
+        height: 70px;
+    }
+
+    .member-name {
+        font-size: 18px;
+    }
+
+    .member-id {
+        font-size: 9px;
+    }
+
+    .avatar-upload-btn {
+        width: 24px;
+        height: 24px;
+    }
+
+    .avatar-upload-btn i {
+        font-size: 9px;
+    }
+
+    .avatar-menu {
+        min-width: 130px;
+        left: 40px;
+        bottom: -75px;
     }
 }
 
@@ -1499,7 +1540,7 @@ body.dark-mode .skeleton-logout-btn {
             <img src="https://i.ibb.co/FkrRGXLB/profile.png" alt="প্রোফাইল ছবি" class="profile-photo" id="profilePhoto">
             <div class="avatar-upload-btn" id="avatar-upload-btn"><i class="fas fa-camera"></i></div>
             <div class="avatar-menu" id="avatar-menu">
-                <div class="menu-item" id="menu-upload"><i class="fas fa-upload"></i> আপলোড করুন</div>
+                <div class="menu-item" id="menu-upload"><i class="fas fa-upload"></i> ছবি আপলোড করুন</div>
                 <div class="menu-item danger" id="menu-remove"><i class="fas fa-trash-alt"></i> ছবি রিমুভ করুন</div>
             </div>
             <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/jpg,image/webp,image/bmp,image/gif" style="display: none;">
