@@ -74,6 +74,7 @@ body.dark-mode .nav-btn:hover i {
     color: #08A33F !important;
 }
 
+/* Background Animation */
 .bg-animation {
     position: fixed;
     top: 0;
@@ -112,6 +113,7 @@ body.dark-mode .bg-bubble {
     }
 }
 
+/* Header Styles */
 header {
     display: flex;
     justify-content: space-between;
@@ -245,6 +247,7 @@ body:not(.dark-mode) .theme-toggle .fa-moon {
     opacity: 1;
 }
 
+/* Navigation Bar Styles */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -315,6 +318,7 @@ body.dark-mode .nav-btn.active::after {
     background-color: #08A33F;
 }
 
+/* Main Content Styles */
 .container{
     max-width:1200px;
     margin:auto;
@@ -322,6 +326,10 @@ body.dark-mode .nav-btn.active::after {
     padding: 0;
     transition: opacity 0.3s;
 }
+
+/* ============================ */
+/* COVER PHOTO - NO RADIUS, NO PADDING/MARGIN */
+/* ============================ */
 
 .cover-container {
     position: relative;
@@ -424,9 +432,8 @@ body.dark-mode .profile-photo {
 /* Avatar Menu - New Design without breaking other designs */
 .avatar-menu {
     position: absolute;
-    bottom: -90px;
+    bottom: 55px;
     right: 0;
-    left: 50px;
     background: var(--white);
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -646,6 +653,7 @@ body.dark-mode .address-title {
     border-bottom-color: #444;
 }
 
+/* Mobile: Address still 2 columns side by side */
 @media (max-width: 768px) {
     .address-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -755,12 +763,14 @@ body.dark-mode .nominee-relation {
     color: #aaa;
 }
 
+/* Nominee Grid - 2 columns always */
 .nominee-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
 }
 
+/* Mobile: Nominee photo center aligned, grid 2 columns */
 @media (max-width: 768px) {
     .nominee-header {
         flex-direction: column;
@@ -1222,9 +1232,8 @@ body.dark-mode .skeleton-logout-btn {
     
     .avatar-menu {
         min-width: 145px;
-        right: 0;
-        left: 50px;
-        bottom: -80px;
+        right: -5px;
+        bottom: 45px;
     }
 }
 
@@ -1310,7 +1319,7 @@ body.dark-mode .skeleton-logout-btn {
             <img src="https://i.ibb.co/FkrRGXLB/profile.png" alt="প্রোফাইল ছবি" class="profile-photo" id="profilePhoto">
             <div class="avatar-upload-btn" id="avatar-upload-btn"><i class="fas fa-camera"></i></div>
             <div class="avatar-menu" id="avatar-menu">
-                <div class="menu-item" id="menu-upload"><i class="fas fa-upload"></i> আপলোড করুন</div>
+                <div class="menu-item" id="menu-upload"><i class="fas fa-upload"></i> ছবি আপলোড করুন</div>
                 <div class="menu-item danger" id="menu-remove"><i class="fas fa-trash-alt"></i> ছবি রিমুভ করুন</div>
             </div>
             <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/jpg,image/webp,image/bmp,image/gif" style="display: none;">
