@@ -1015,63 +1015,93 @@
             .icon-btn { font-size: 20px; }
         }
 
-        /* print override for receipt popup - FIXED: single page, proper size */
+        /* ===== PRINT STYLES - ONLY RECEIPT SLIP VISIBLE ===== */
         @media print {
+            /* Hide everything except the popup overlay and its content */
             html, body {
                 margin: 0;
                 padding: 0;
-                background: white;
-                overflow: hidden !important;
-                height: 100%;
-            }
-            .popup-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: transparent;
-                backdrop-filter: none;
-                padding: 0;
-                display: flex !important;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-            }
-            .popup-card {
-                max-width: 480px;
-                width: 100%;
-                box-shadow: none;
-                border: none;
-                border-radius: 0;
-                padding: 20px 20px 10px;
                 background: white !important;
-                max-height: 100vh;
-                overflow: visible;
-                margin: 0 auto;
+                overflow: hidden !important;
+                height: 100% !important;
+                width: 100% !important;
+                visibility: visible !important;
+                opacity: 1 !important;
             }
-            .close-popup, .action-buttons {
+            
+            /* Hide header, nav, main container, background, footer, loading overlay, skeleton */
+            header, .bottom-nav, .container, #mainContainer, #skeletonScreen, 
+            .bg-animation, #loadingOverlay, .loading-overlay, .marquee-section,
+            .financial-grid, .committee-grid, .section-title, .history-wrapper,
+            #receiptPopupOverlay .close-popup, .action-buttons {
                 display: none !important;
             }
+            
+            /* Show only the popup overlay and its content */
+            .popup-overlay {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: white !important;
+                backdrop-filter: none !important;
+                padding: 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                z-index: 9999 !important;
+                margin: 0 !important;
+                border: none !important;
+            }
+            
+            .popup-card {
+                max-width: 480px !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                padding: 15px 20px 10px !important;
+                background: white !important;
+                max-height: 100vh !important;
+                overflow: visible !important;
+                margin: 0 auto !important;
+                display: block !important;
+            }
+            
+            .popup-card .close-popup {
+                display: none !important;
+            }
+            
             .sig-image {
                 border: none !important;
             }
+            
             .qr-code-container #qrcode {
                 border-color: #000 !important;
             }
+            
             .receipt-meta, .receipt-member, .receipt-transaction {
                 border-color: #000 !important;
             }
+            
             .receipt-total {
                 border-color: #000 !important;
             }
-            /* Ensure no extra page */
+            
             .popup-card * {
                 page-break-inside: avoid;
                 page-break-before: auto;
                 page-break-after: auto;
             }
-            body {
+            
+            /* Remove any extra space */
+            .popup-card .receipt-content {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            body, .popup-overlay, .popup-card, .receipt-content {
                 visibility: visible !important;
                 opacity: 1 !important;
             }
