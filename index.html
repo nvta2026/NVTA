@@ -1015,7 +1015,7 @@
             .icon-btn { font-size: 20px; }
         }
 
-        /* ===== PRINT STYLES - ONLY RECEIPT SLIP VISIBLE ===== */
+        /* ===== PRINT STYLES - ONLY RECEIPT SLIP VISIBLE, 100x150mm ===== */
         @media print {
             /* Hide everything except the popup overlay and its content */
             html, body {
@@ -1037,7 +1037,7 @@
                 display: none !important;
             }
             
-            /* Show only the popup overlay and its content */
+            /* Show only the popup overlay and its content - 100x150mm */
             .popup-overlay {
                 position: fixed !important;
                 top: 0 !important;
@@ -1046,7 +1046,7 @@
                 height: 100% !important;
                 background: white !important;
                 backdrop-filter: none !important;
-                padding: 10px !important;
+                padding: 0 !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
@@ -1056,17 +1056,19 @@
             }
             
             .popup-card {
-                max-width: 480px !important;
-                width: 100% !important;
+                width: 100mm !important;
+                max-width: 100mm !important;
+                height: 150mm !important;
+                max-height: 150mm !important;
                 box-shadow: none !important;
                 border: none !important;
                 border-radius: 0 !important;
-                padding: 15px 20px 10px !important;
+                padding: 8mm 6mm 6mm !important;
                 background: white !important;
-                max-height: 100vh !important;
-                overflow: visible !important;
+                overflow: hidden !important;
                 margin: 0 auto !important;
                 display: block !important;
+                box-sizing: border-box !important;
             }
             
             .popup-card .close-popup {
@@ -1095,10 +1097,69 @@
                 page-break-after: auto;
             }
             
-            /* Remove any extra space */
             .popup-card .receipt-content {
                 padding: 0 !important;
                 margin: 0 !important;
+                font-size: 11px !important;
+            }
+            
+            .receipt-header h2 {
+                font-size: 16px !important;
+            }
+            .receipt-header small {
+                font-size: 12px !important;
+            }
+            .receipt-meta {
+                font-size: 10px !important;
+                padding: 4px 0 !important;
+                margin: 6px 0 4px !important;
+            }
+            .receipt-member {
+                padding: 4px 0 !important;
+                margin-bottom: 4px !important;
+            }
+            .receipt-member .row {
+                padding: 2px 0 !important;
+            }
+            .receipt-transaction {
+                padding: 4px 0 !important;
+            }
+            .receipt-transaction .line {
+                padding: 2px 0 !important;
+            }
+            .receipt-total {
+                font-size: 13px !important;
+                padding: 4px 0 !important;
+                margin: 4px 0 !important;
+            }
+            .signature-area {
+                margin: 10px 0 6px !important;
+                gap: 4px !important;
+            }
+            .sig-image {
+                width: 40px !important;
+                height: 28px !important;
+            }
+            .qr-code-container #qrcode {
+                width: 50px !important;
+                height: 50px !important;
+            }
+            .qr-code-container #qrcode canvas,
+            .qr-code-container #qrcode img {
+                width: 50px !important;
+                height: 50px !important;
+            }
+            .qr-code-container span {
+                font-size: 10px !important;
+            }
+            .signature-block {
+                font-size: 10px !important;
+            }
+            .status-badge {
+                font-size: 11px !important;
+            }
+            .payment-status-row {
+                margin-top: 3px !important;
             }
             
             body, .popup-overlay, .popup-card, .receipt-content {
@@ -2381,9 +2442,14 @@ function openReceipt(data) {
             const closeClone = clone.querySelector('.close-popup');
             if (closeClone) closeClone.style.display = 'none';
             clone.style.background = '#ffffff';
-            clone.style.borderRadius = '12px';
-            clone.style.padding = '20px';
+            clone.style.borderRadius = '0';
+            clone.style.padding = '8mm 6mm 6mm';
             clone.style.boxShadow = 'none';
+            clone.style.width = '100mm';
+            clone.style.height = '150mm';
+            clone.style.overflow = 'hidden';
+            clone.style.boxSizing = 'border-box';
+            clone.style.margin = '0 auto';
 
             // Ensure QR code images are rendered properly in PDF
             const qrDivs = clone.querySelectorAll('[id^="qrcode_"]');
@@ -2392,8 +2458,8 @@ function openReceipt(data) {
                 if (canvas) {
                     const img = document.createElement('img');
                     img.src = canvas.toDataURL('image/png');
-                    img.style.width = '80px';
-                    img.style.height = '80px';
+                    img.style.width = '50px';
+                    img.style.height = '50px';
                     div.innerHTML = '';
                     div.appendChild(img);
                 }
@@ -2404,18 +2470,22 @@ function openReceipt(data) {
             wrapper.style.left = '-9999px';
             wrapper.style.top = '0';
             wrapper.style.background = 'white';
-            wrapper.style.width = '480px';
-            wrapper.style.padding = '12px';
+            wrapper.style.width = '100mm';
+            wrapper.style.height = '150mm';
+            wrapper.style.padding = '0';
+            wrapper.style.margin = '0';
+            wrapper.style.overflow = 'hidden';
+            wrapper.style.boxSizing = 'border-box';
             wrapper.appendChild(clone);
             document.body.appendChild(wrapper);
 
             html2pdf()
                 .set({
-                    margin:        [0.4, 0.4, 0.4, 0.4],
-                    filename:      `নিউ_ভিশন_রশিদ_${Date.now()}.pdf`,
+                    margin:        [0, 0, 0, 0],
+                    filename:      'এনভিটিএ রশিদ.pdf',
                     image:         { type: 'jpeg', quality: 0.98 },
-                    html2canvas:   { scale: 2, letterRendering: true, useCORS: true, background: '#ffffff' },
-                    jsPDF:         { unit: 'in', format: 'a5', orientation: 'portrait' }
+                    html2canvas:   { scale: 2, letterRendering: true, useCORS: true, background: '#ffffff', width: 100 * 2, height: 150 * 2 },
+                    jsPDF:         { unit: 'mm', format: [100, 150], orientation: 'portrait' }
                 })
                 .from(wrapper)
                 .save()
