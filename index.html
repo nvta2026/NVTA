@@ -914,8 +914,8 @@
         body.dark-mode .signature-block { color: #ddd; }
         .sig-placeholder { display: flex; gap: 4px; align-items: center; }
         .sig-image {
-            width: 80px;
-            height: 50px;
+            width: 60px;
+            height: 40px;
             object-fit: contain;
             background: transparent;
             border: none;
@@ -1015,43 +1015,67 @@
             .icon-btn { font-size: 20px; }
         }
 
-        /* print override for receipt popup */
+        /* print override for receipt popup - FIXED: single page, proper size */
         @media print {
-
-    body * {
-        visibility: hidden !important;
-    }
-
-    #popupCard,
-    #popupCard * {
-        visibility: visible !important;
-    }
-
-    #popupCard {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        padding: 15px;
-        background: #fff !important;
-        box-shadow: none !important;
-        border: none !important;
-        border-radius: 0 !important;
-    }
-
-    .close-popup,
-    .action-buttons {
-        display: none !important;
-    }
-
-    .popup-overlay {
-        position: static !important;
-        display: block !important;
-        background: transparent !important;
-    }
-}
+            html, body {
+                margin: 0;
+                padding: 0;
+                background: white;
+                overflow: hidden !important;
+                height: 100%;
+            }
+            .popup-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: transparent;
+                backdrop-filter: none;
+                padding: 0;
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            }
+            .popup-card {
+                max-width: 480px;
+                width: 100%;
+                box-shadow: none;
+                border: none;
+                border-radius: 0;
+                padding: 20px 20px 10px;
+                background: white !important;
+                max-height: 100vh;
+                overflow: visible;
+                margin: 0 auto;
+            }
+            .close-popup, .action-buttons {
+                display: none !important;
+            }
+            .sig-image {
+                border: none !important;
+            }
+            .qr-code-container #qrcode {
+                border-color: #000 !important;
+            }
+            .receipt-meta, .receipt-member, .receipt-transaction {
+                border-color: #000 !important;
+            }
+            .receipt-total {
+                border-color: #000 !important;
+            }
+            /* Ensure no extra page */
+            .popup-card * {
+                page-break-inside: avoid;
+                page-break-before: auto;
+                page-break-after: auto;
+            }
+            body {
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -1787,7 +1811,7 @@ async function loadUserFinancialData(memberId) {
         }
         
         totalInstallments.textContent = formatNumber(installmentCount);
-        totalAmount.textContent = `৳  ${formatNumber(totalAmountValue)}`;
+        totalAmount.textContent = `৳ ${formatNumber(totalAmountValue)}`;
         
         return { totalAmountValue, installmentCount };
     } catch (error) {
@@ -1966,7 +1990,7 @@ function updateHistoryTable(transactions) {
         
         let displayAmount = item.amount || '';
         if (item.amount && item.amount > 0) {
-            displayAmount = `৳  ${formatNumber(item.amount)}`;
+            displayAmount = `৳ ${formatNumber(item.amount)}`;
         }
         
         row.innerHTML = `
@@ -2024,7 +2048,7 @@ function setupUserFinancialRealtimeListener(memberId) {
         if (doc.exists) {
             const data = doc.data();
             const totalAmountValue = data.totalAmount || 0;
-            totalAmount.textContent = `৳  ${formatNumber(totalAmountValue)}`;
+            totalAmount.textContent = `৳ ${formatNumber(totalAmountValue)}`;
             
             try {
                 const historyDoc = await db.collection('History').doc(memberId).get();
@@ -2239,9 +2263,9 @@ function buildReceiptHTML(data) {
         </div>
         <div class="receipt-transaction">
             <div class="line"><span class="label">লেনদেন</span><span class="amount">${transaction || ''}</span></div>
-            <div class="line"><span class="label">পরিমাণ</span><span class="amount">৳ ${amount || '০'}</span></div>
-            <div class="line"><span class="label">সার্ভিস চার্জ</span><span class="amount">৳ ${serviceCharge || '০'}</span></div>
-            <div class="receipt-total"><span>মোট পরিশোধ</span><span>৳ ${total || '০'}</span></div>
+            <div class="line"><span class="label">পরিমাণ</span><span class="amount">৳${amount || '০'}</span></div>
+            <div class="line"><span class="label">সার্ভিস চার্জ</span><span class="amount">৳${serviceCharge || '০'}</span></div>
+            <div class="receipt-total"><span>মোট পরিশোধ</span><span>৳${total || '০'}</span></div>
             <div class="payment-status-row">
                 <span>পেমেন্ট: <strong>${method || ''}</strong></span>
                 <span class="status-badge">${status || 'সফল'}</span>
@@ -2308,9 +2332,10 @@ function openReceipt(data) {
     if (printBtn) {
         const newPrint = printBtn.cloneNode(true);
         printBtn.parentNode.replaceChild(newPrint, printBtn);
-        newPrint.addEventListener("click", () => {
-    window.print();
-});
+        newPrint.addEventListener('click', function(e) {
+            e.stopPropagation();
+            window.print();
+        });
     }
 
     if (pdfBtn) {
