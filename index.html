@@ -607,7 +607,7 @@
 
         /* Skeleton History Table */
         .skeleton-history-wrapper {
-            overflow-x: auto;
+            overflow-x:auto;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 0;
@@ -1107,8 +1107,8 @@
         }
         
         @page {
-          size: 100mm 150mm;
-          margin: 5mm;
+          size: 100mm 130mm;
+          margin: 3mm;
         }
 
         /* ===== PRINT STYLES - UPDATED WITH SQUARE DESIGN & BORDER ===== */
@@ -1145,21 +1145,27 @@
               }
             
             .popup-card {
-                width: 100mm !important;
-                max-width: 100mm !important;
-                height: 150mm !important;
-                max-height: 150mm !important;
-                box-shadow: none !important;
-                border: 4px solid #000 !important;
-                border-radius: 0 !important;
-                padding: 5mm 5mm 8mm 5mm !important;
-                background: white !important;
-                overflow: hidden !important;
-                margin: 0 auto !important;
-                display: block !important;
-                box-sizing: border-box !important;
-                position: relative !important;
-            }
+    width: 94mm !important;
+    max-width: 94mm !important;
+
+    height: 124mm !important;
+    max-height: 124mm !important;
+
+    box-shadow: none !important;
+    border: 2px solid #000 !important;
+    border-radius: 0 !important;
+
+    padding: 5mm !important;
+
+    background: white !important;
+    overflow: hidden !important;
+
+    margin: auto !important;
+
+    display: block !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+}
             
             .popup-card .close-popup {
                 display: none !important;
@@ -2588,7 +2594,7 @@ function openReceipt(data) {
             clone.style.padding = '5mm 5mm 5mm';
             clone.style.boxShadow = 'none';
             clone.style.width = '100mm';
-            clone.style.height = '150mm';
+            clone.style.height = '130mm';
             clone.style.overflow = 'hidden';
             clone.style.boxSizing = 'border-box';
             clone.style.margin = '0 auto';
@@ -2628,34 +2634,55 @@ function openReceipt(data) {
             });
 
             const wrapper = document.createElement('div');
-            wrapper.style.position = 'fixed';
-            wrapper.style.left = '-9999px';
-            wrapper.style.top = '0';
-            wrapper.style.background = 'white';
-            wrapper.style.width = '100mm';
-            wrapper.style.height = '150mm';
-            wrapper.style.padding = '0';
-            wrapper.style.margin = '0';
-            wrapper.style.overflow = 'hidden';
-            wrapper.style.boxSizing = 'border-box';
-            wrapper.appendChild(clone);
-            document.body.appendChild(wrapper);
 
-            html2pdf()
-                .set({
-                    margin:        [0, 0, 0, 0],
-                    filename:      'এনভিটিএ রশিদ.pdf',
-                    image:         { type: 'jpeg', quality: 0.98 },
-                    html2canvas:   { scale: 2, letterRendering: true, useCORS: true, background: '#ffffff', width: 100 * 2, height: 150 * 2 },
-                    jsPDF:         { unit: 'mm', format: [100, 150], orientation: 'portrait' }
-                })
-                .from(wrapper)
-                .save()
-                .then(() => { document.body.removeChild(wrapper); })
-                .catch((err) => { console.warn('PDF error:', err); document.body.removeChild(wrapper); });
-        });
+wrapper.style.position = 'absolute';
+wrapper.style.left = '0';
+wrapper.style.top = '0';
+wrapper.style.opacity = '0';
+wrapper.style.pointerEvents = 'none';
+
+wrapper.style.background = 'white';
+wrapper.style.width = '100mm';
+wrapper.style.height = '130mm';
+wrapper.style.padding = '0';
+wrapper.style.margin = '0';
+wrapper.style.overflow = 'hidden';
+wrapper.style.boxSizing = 'border-box';
+
+wrapper.appendChild(clone);
+document.body.appendChild(wrapper);
+
+html2pdf()
+.set({
+    margin: 0,
+    filename: 'এনভিটিএ রশিদ.pdf',
+    image: {
+        type: 'jpeg',
+        quality: 1
+    },
+    html2canvas: {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+    },
+    jsPDF: {
+        unit: 'mm',
+        format: [100, 130],
+        orientation: 'portrait'
     }
-}
+})
+.from(wrapper)
+.save()
+.then(() => {
+    document.body.removeChild(wrapper);
+})
+.catch(err => {
+    console.error(err);
+    document.body.removeChild(wrapper);
+      });
+        }); // newPdf.addEventListener শেষ
+    }       // if (pdfBtn) শেষ
+}           // openReceipt শেষ
 
 // Attach click listeners to history rows
 function attachHistoryClickListeners() {
