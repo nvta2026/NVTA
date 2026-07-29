@@ -836,6 +836,26 @@
         /* receipt inner styles - UPDATED WITH SQUARE DESIGN & BORDER */
         .receipt-content { 
             background: transparent; 
+            position: relative;
+        }
+        
+        /* Watermark Logo in Middle */
+        .receipt-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+        }
+        
+        .receipt-content > * {
+            position: relative;
+            z-index: 1;
         }
         
         .receipt-header h2 { 
@@ -919,9 +939,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 18px 0 10px;
+            margin: 12px 0 10px;
             flex-wrap: wrap;
             gap: 10px;
+            padding-bottom: 10px;
         }
         .signature-block {
             display: flex;
@@ -1014,6 +1035,7 @@
             .receipt-header h2 { font-size: 19px; }
             .receipt-meta { font-size: 13px; }
             .sig-image { width: 70px; height: 45px; }
+            .receipt-watermark { width: 100px; height: 100px; }
         }
 
         @media (max-width: 480px) {
@@ -1029,6 +1051,7 @@
             .skeleton-financial-value { width: 70px; height: 28px; }
             .skeleton-financial-label { width: 90px; }
             .sig-image { width: 60px; height: 40px; }
+            .receipt-watermark { width: 80px; height: 80px; }
         }
 
         @media (min-width: 768px) {
@@ -1085,16 +1108,31 @@
                 box-shadow: none !important;
                 border: 4px solid #000 !important;
                 border-radius: 0 !important;
-                padding: 6mm 5mm 5mm !important;
+                padding: 5mm 5mm 5mm !important;
                 background: white !important;
                 overflow: hidden !important;
                 margin: 0 auto !important;
                 display: block !important;
                 box-sizing: border-box !important;
+                position: relative !important;
             }
             
             .popup-card .close-popup {
                 display: none !important;
+            }
+            
+            /* Watermark in print */
+            .receipt-watermark {
+                position: absolute !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                opacity: 0.08 !important;
+                pointer-events: none !important;
+                z-index: 0 !important;
+                width: 100px !important;
+                height: 100px !important;
+                object-fit: contain !important;
             }
             
             .sig-image {
@@ -1134,10 +1172,14 @@
                 padding: 0 !important;
                 margin: 0 !important;
                 font-size: 11px !important;
+                height: 100% !important;
+                display: flex !important;
+                flex-direction: column !important;
             }
             
             .receipt-header h2 {
                 font-size: 16px !important;
+                margin-top: 0 !important;
             }
             .receipt-header small {
                 font-size: 12px !important;
@@ -1145,7 +1187,7 @@
             .receipt-meta {
                 font-size: 10px !important;
                 padding: 4px 0 !important;
-                margin: 6px 0 4px !important;
+                margin: 4px 0 4px !important;
             }
             .receipt-member {
                 padding: 4px 0 !important;
@@ -1166,26 +1208,30 @@
                 margin: 4px 0 !important;
             }
             .signature-area {
-                margin: 10px 0 6px !important;
-                gap: 4px !important;
+                margin: 8px 0 0 !important;
+                gap: 6px !important;
+                padding-bottom: 0 !important;
             }
             .sig-image {
                 width: 70px !important;
                 height: 45px !important;
             }
             .qr-code-container #qrcode {
-                width: 60px !important;
-                height: 60px !important;
+                width: 55px !important;
+                height: 55px !important;
             }
             .qr-code-container #qrcode canvas,
             .qr-code-container #qrcode img {
-                width: 60px !important;
-                height: 60px !important;
+                width: 55px !important;
+                height: 55px !important;
             }
             .qr-code-container span {
-                font-size: 10px !important;
+                font-size: 9px !important;
             }
             .signature-block {
+                font-size: 10px !important;
+            }
+            .signature-block span {
                 font-size: 10px !important;
             }
             .status-badge {
@@ -2328,6 +2374,7 @@ overlay.addEventListener('click', function(e) {
 // Signature image URLs
 const PRESIDENT_SIGNATURE = 'https://i.ibb.co.com/q3q6bHKn/nishad.png';
 const TREASURER_SIGNATURE = 'https://i.ibb.co.com/8gPvpwSy/Azad.png';
+const WATERMARK_LOGO = 'https://blogger.googleusercontent.com/img/a/AVvXsEivqTIaHdAT5pCu40npVAhBQUB7v15cU-vog8HUrrsluvCpu3Q4kRsQ2XiX2pnPi441r1CIxxxgLe9HPVq8lVPQKg22UyoVEQZdm_JRehypwRK8WWfDQY45SCFonpHDeLrTr0u2Qhk1RnVew6cLpcWrUN9FfLdv6f_sG9KwJi1EpHbRs5DGk4ZlRIqL';
 
 // Format time to digital format (HH:MM AM/PM)
 function formatDigitalTime(timeStr) {
@@ -2368,48 +2415,56 @@ function buildReceiptHTML(data) {
     });
 
     return `
-        <div class="receipt-header">
-            <h2>নিউ ভিশন ট্রেড অ্যাসোসিয়েশন <small>রশিদ বহি</small></h2>
-        </div>
-        <div class="receipt-meta">
-            <div class="meta-left">
-                <div><span class="label">রশিদ নং:</span> <span class="value">${receiptNo || 'N/A'}</span></div>
-                <div><span class="label">সদস্য আইডি:</span> <span class="value">${memberId || 'N/A'}</span></div>
-            </div>
-            <div class="meta-right">
-                <div><span class="label">তারিখ:</span> <span class="value">${date || ''}</span></div>
-                <div><span class="label">সময়:</span> <span class="value">${formattedTime || ''}</span></div>
-            </div>
-        </div>
-        <div class="receipt-member">
-            <div class="row"><span class="label">সদস্যের নাম</span><span class="info">${name || ''}</span></div>
-            <div class="row"><span class="label">মোবাইল</span><span class="info">${mobile || ''}</span></div>
-        </div>
-        <div class="receipt-transaction">
-            <div class="line"><span class="label">লেনদেন</span><span class="amount">${transaction || ''}</span></div>
-            <div class="line"><span class="label">পরিমাণ</span><span class="amount">৳${amount || '০'}</span></div>
-            <div class="line"><span class="label">সার্ভিস চার্জ</span><span class="amount">৳${serviceCharge || '০'}</span></div>
-            <div class="receipt-total"><span>মোট পরিশোধ</span><span>৳${total || '০'}</span></div>
-            <div class="payment-status-row">
-                <span>পেমেন্ট: <strong>${method || ''}</strong></span>
-                <span class="status-badge">${status || 'সফল'}</span>
-            </div>
-        </div>
-        <div class="signature-area">
-            <div class="signature-block">
-                <span>সভাপতি স্বাক্ষর</span>
-                <div class="sig-placeholder">
-                    <img src="${PRESIDENT_SIGNATURE}" alt="সভাপতি স্বাক্ষর" class="sig-image" onerror="this.style.display='none'">
+        <div class="receipt-content-wrapper" style="position:relative;height:100%;display:flex;flex-direction:column;">
+            <!-- Watermark Logo -->
+            <img src="${WATERMARK_LOGO}" alt="Watermark" class="receipt-watermark" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.08;pointer-events:none;z-index:0;width:120px;height:120px;object-fit:contain;">
+            
+            <div style="position:relative;z-index:1;flex:1;display:flex;flex-direction:column;">
+                <div class="receipt-header">
+                    <h2>নিউ ভিশন ট্রেড অ্যাসোসিয়েশন <small>রশিদ বহি</small></h2>
                 </div>
-            </div>
-            <div class="qr-code-container">
-                <div id="qrcode_${Date.now()}"></div>
-                <span>QR Code</span>
-            </div>
-            <div class="signature-block">
-                <span>কোষাধ্যক্ষ স্বাক্ষর</span>
-                <div class="sig-placeholder">
-                    <img src="${TREASURER_SIGNATURE}" alt="কোষাধ্যক্ষ স্বাক্ষর" class="sig-image" onerror="this.style.display='none'">
+                <div class="receipt-meta">
+                    <div class="meta-left">
+                        <div><span class="label">রশিদ নং:</span> <span class="value">${receiptNo || 'N/A'}</span></div>
+                        <div><span class="label">সদস্য আইডি:</span> <span class="value">${memberId || 'N/A'}</span></div>
+                    </div>
+                    <div class="meta-right">
+                        <div><span class="label">তারিখ:</span> <span class="value">${date || ''}</span></div>
+                        <div><span class="label">সময়:</span> <span class="value">${formattedTime || ''}</span></div>
+                    </div>
+                </div>
+                <div class="receipt-member">
+                    <div class="row"><span class="label">সদস্যের নাম</span><span class="info">${name || ''}</span></div>
+                    <div class="row"><span class="label">মোবাইল</span><span class="info">${mobile || ''}</span></div>
+                </div>
+                <div class="receipt-transaction">
+                    <div class="line"><span class="label">লেনদেন</span><span class="amount">${transaction || ''}</span></div>
+                    <div class="line"><span class="label">পরিমাণ</span><span class="amount">৳${amount || '০'}</span></div>
+                    <div class="line"><span class="label">সার্ভিস চার্জ</span><span class="amount">৳${serviceCharge || '০'}</span></div>
+                    <div class="receipt-total"><span>মোট পরিশোধ</span><span>৳${total || '০'}</span></div>
+                    <div class="payment-status-row">
+                        <span>পেমেন্ট: <strong>${method || ''}</strong></span>
+                        <span class="status-badge">${status || 'সফল'}</span>
+                    </div>
+                </div>
+                <div style="flex:1;"></div>
+                <div class="signature-area" style="padding-bottom:10px;">
+                    <div class="signature-block">
+                        <span>সভাপতি স্বাক্ষর</span>
+                        <div class="sig-placeholder">
+                            <img src="${PRESIDENT_SIGNATURE}" alt="সভাপতি স্বাক্ষর" class="sig-image" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                    <div class="qr-code-container">
+                        <div id="qrcode_${Date.now()}"></div>
+                        <span>QR Code</span>
+                    </div>
+                    <div class="signature-block">
+                        <span>কোষাধ্যক্ষ স্বাক্ষর</span>
+                        <div class="sig-placeholder">
+                            <img src="${TREASURER_SIGNATURE}" alt="কোষাধ্যক্ষ স্বাক্ষর" class="sig-image" onerror="this.style.display='none'">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2477,13 +2532,26 @@ function openReceipt(data) {
             clone.style.background = '#ffffff';
             clone.style.borderRadius = '0';
             clone.style.border = '4px solid #000';
-            clone.style.padding = '6mm 5mm 5mm';
+            clone.style.padding = '5mm 5mm 5mm';
             clone.style.boxShadow = 'none';
             clone.style.width = '100mm';
             clone.style.height = '150mm';
             clone.style.overflow = 'hidden';
             clone.style.boxSizing = 'border-box';
             clone.style.margin = '0 auto';
+            clone.style.position = 'relative';
+
+            // Ensure watermark stays in PDF
+            let watermark = clone.querySelector('.receipt-watermark');
+            if (!watermark) {
+                const wrapper = clone.querySelector('.receipt-content-wrapper') || clone.querySelector('.receipt-content');
+                watermark = document.createElement('img');
+                watermark.src = WATERMARK_LOGO;
+                watermark.className = 'receipt-watermark';
+                watermark.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.08;pointer-events:none;z-index:0;width:100px;height:100px;object-fit:contain;';
+                wrapper.style.position = 'relative';
+                wrapper.insertBefore(watermark, wrapper.firstChild);
+            }
 
             // Ensure QR code images are rendered properly in PDF
             const qrDivs = clone.querySelectorAll('[id^="qrcode_"]');
@@ -2492,8 +2560,8 @@ function openReceipt(data) {
                 if (canvas) {
                     const img = document.createElement('img');
                     img.src = canvas.toDataURL('image/png');
-                    img.style.width = '60px';
-                    img.style.height = '60px';
+                    img.style.width = '55px';
+                    img.style.height = '55px';
                     div.innerHTML = '';
                     div.appendChild(img);
                 }
@@ -2502,8 +2570,8 @@ function openReceipt(data) {
             // Update signature image sizes for PDF
             const sigImgs = clone.querySelectorAll('.sig-image');
             sigImgs.forEach(img => {
-                img.style.width = '80px';
-                img.style.height = '50px';
+                img.style.width = '70px';
+                img.style.height = '45px';
             });
 
             const wrapper = document.createElement('div');
