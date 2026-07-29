@@ -845,7 +845,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            opacity: 0.08;
+            opacity: 0.06;
             pointer-events: none;
             z-index: 0;
             width: 120px;
@@ -864,16 +864,56 @@
             color: #000; 
             text-align: center; 
             letter-spacing: 0.3px; 
+            margin-bottom: 2px;
         }
         body.dark-mode .receipt-header h2 { color: #f0f0f0; }
-        .receipt-header small { 
-            display: block; 
-            font-size: 16px; 
-            font-weight: 400; 
-            color: #000; 
-            margin-top: -2px; 
+        
+        .receipt-header .org-address {
+            display: block;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 400;
+            color: #333;
+            margin-top: 0;
+            line-height: 1.4;
         }
-        body.dark-mode .receipt-header small { color: #ddd; }
+        body.dark-mode .receipt-header .org-address { color: #bbb; }
+        
+        .receipt-header .org-established {
+            display: block;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 400;
+            color: #555;
+            margin-top: 1px;
+            margin-bottom: 6px;
+        }
+        body.dark-mode .receipt-header .org-established { color: #aaa; }
+        
+        .receipt-header .receipt-title-wrapper {
+            display: inline-block;
+            border: 2px solid #000;
+            border-radius: 30px;
+            padding: 2px 20px;
+            margin: 4px auto 0;
+            text-align: center;
+            background: transparent;
+        }
+        body.dark-mode .receipt-header .receipt-title-wrapper {
+            border-color: #888;
+        }
+        .receipt-header .receipt-title-wrapper small {
+            display: block;
+            font-size: 16px;
+            font-weight: 400;
+            color: #000;
+            letter-spacing: 0.5px;
+        }
+        body.dark-mode .receipt-header .receipt-title-wrapper small { color: #ddd; }
+        
+        .receipt-header .receipt-title-wrapper {
+            margin-top: 6px;
+        }
 
         .receipt-meta {
             display: flex;
@@ -1036,6 +1076,10 @@
             .receipt-meta { font-size: 13px; }
             .sig-image { width: 70px; height: 45px; }
             .receipt-watermark { width: 100px; height: 100px; }
+            .receipt-header .receipt-title-wrapper small { font-size: 14px; }
+            .receipt-header .receipt-title-wrapper { padding: 2px 16px; }
+            .receipt-header .org-address { font-size: 11px; }
+            .receipt-header .org-established { font-size: 10px; }
         }
 
         @media (max-width: 480px) {
@@ -1052,6 +1096,8 @@
             .skeleton-financial-label { width: 90px; }
             .sig-image { width: 60px; height: 40px; }
             .receipt-watermark { width: 80px; height: 80px; }
+            .receipt-header .receipt-title-wrapper small { font-size: 13px; }
+            .receipt-header .receipt-title-wrapper { padding: 2px 12px; }
         }
 
         @media (min-width: 768px) {
@@ -1127,7 +1173,7 @@
                 top: 50% !important;
                 left: 50% !important;
                 transform: translate(-50%, -50%) !important;
-                opacity: 0.08 !important;
+                opacity: 0.06 !important;
                 pointer-events: none !important;
                 z-index: 0 !important;
                 width: 100px !important;
@@ -1148,8 +1194,8 @@
             
             .qr-code-container #qrcode canvas,
             .qr-code-container #qrcode img {
-                width: 60px !important;
-                height: 60px !important;
+                width: 55px !important;
+                height: 55px !important;
             }
             
             .receipt-meta, .receipt-member, .receipt-transaction {
@@ -1180,14 +1226,26 @@
             .receipt-header h2 {
                 font-size: 16px !important;
                 margin-top: 0 !important;
+                margin-bottom: 1px !important;
             }
-            .receipt-header small {
-                font-size: 12px !important;
+            .receipt-header .org-address {
+                font-size: 10px !important;
+            }
+            .receipt-header .org-established {
+                font-size: 9px !important;
+                margin-bottom: 4px !important;
+            }
+            .receipt-header .receipt-title-wrapper {
+                padding: 1px 14px !important;
+                margin-top: 4px !important;
+            }
+            .receipt-header .receipt-title-wrapper small {
+                font-size: 13px !important;
             }
             .receipt-meta {
                 font-size: 10px !important;
                 padding: 4px 0 !important;
-                margin: 4px 0 4px !important;
+                margin: 6px 0 4px !important;
             }
             .receipt-member {
                 padding: 4px 0 !important;
@@ -2406,23 +2464,21 @@ function buildReceiptHTML(data) {
     // Format time to digital format
     const formattedTime = formatDigitalTime(time);
 
-    // Generate QR code data (using receipt info)
-    const qrData = JSON.stringify({
-        receipt: receiptNo,
-        member: memberId,
-        amount: total,
-        date: date
-    });
-
     return `
         <div class="receipt-content-wrapper" style="position:relative;height:100%;display:flex;flex-direction:column;">
             <!-- Watermark Logo -->
-            <img src="${WATERMARK_LOGO}" alt="Watermark" class="receipt-watermark" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.08;pointer-events:none;z-index:0;width:120px;height:120px;object-fit:contain;">
+            <img src="${WATERMARK_LOGO}" alt="Watermark" class="receipt-watermark" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.06;pointer-events:none;z-index:0;width:120px;height:120px;object-fit:contain;">
             
             <div style="position:relative;z-index:1;flex:1;display:flex;flex-direction:column;">
                 <div class="receipt-header">
-                    <h2>নিউ ভিশন ট্রেড অ্যাসোসিয়েশন <small>রশিদ বহি</small></h2>
+                    <h2>নিউ ভিশন ট্রেড অ্যাসোসিয়েশন</h2>
+                    <span class="org-address">মাটিয়াকুড়া গাবতলি বাজার, শ্রীবরদী, শেরপুর।</span>
+                    <span class="org-established">স্থাপিতঃ ২০২৬ খ্রিঃ</span>
+                    <div class="receipt-title-wrapper">
+                        <small>রশিদ বহি</small>
+                    </div>
                 </div>
+                <div style="height:20px;"></div>
                 <div class="receipt-meta">
                     <div class="meta-left">
                         <div><span class="label">রশিদ নং:</span> <span class="value">${receiptNo || 'N/A'}</span></div>
@@ -2548,7 +2604,7 @@ function openReceipt(data) {
                 watermark = document.createElement('img');
                 watermark.src = WATERMARK_LOGO;
                 watermark.className = 'receipt-watermark';
-                watermark.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.08;pointer-events:none;z-index:0;width:100px;height:100px;object-fit:contain;';
+                watermark.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.06;pointer-events:none;z-index:0;width:100px;height:100px;object-fit:contain;';
                 wrapper.style.position = 'relative';
                 wrapper.insertBefore(watermark, wrapper.firstChild);
             }
