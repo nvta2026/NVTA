@@ -833,11 +833,26 @@
         body.dark-mode .popup-card .close-popup { color: #b0b8c5; }
         .popup-card .close-popup:hover { color: #ef4444; }
 
-        /* receipt inner styles */
-        .receipt-content { background: transparent; }
-        .receipt-header h2 { font-size: 22px; font-weight: 700; color: #000; text-align: center; letter-spacing: 0.3px; }
+        /* receipt inner styles - UPDATED WITH SQUARE DESIGN & BORDER */
+        .receipt-content { 
+            background: transparent; 
+        }
+        
+        .receipt-header h2 { 
+            font-size: 22px; 
+            font-weight: 700; 
+            color: #000; 
+            text-align: center; 
+            letter-spacing: 0.3px; 
+        }
         body.dark-mode .receipt-header h2 { color: #f0f0f0; }
-        .receipt-header small { display: block; font-size: 16px; font-weight: 400; color: #000; margin-top: -2px; }
+        .receipt-header small { 
+            display: block; 
+            font-size: 16px; 
+            font-weight: 400; 
+            color: #000; 
+            margin-top: -2px; 
+        }
         body.dark-mode .receipt-header small { color: #ddd; }
 
         .receipt-meta {
@@ -846,8 +861,8 @@
             flex-wrap: wrap;
             padding: 8px 0;
             margin: 12px 0 6px;
-            border-top: 1px solid #aaa;
-            border-bottom: 1px solid #aaa;
+            border-top: 2px solid #000;
+            border-bottom: 2px solid #000;
             font-size: 14px;
             background: transparent;
         }
@@ -858,14 +873,21 @@
         .receipt-meta .meta-left { display: flex; flex-direction: column; gap: 2px; }
         .receipt-meta .meta-right { display: flex; flex-direction: column; gap: 2px; text-align: right; }
 
-        .receipt-member { padding: 6px 0; border-bottom: 1px solid #aaa; margin-bottom: 8px; }
+        .receipt-member { 
+            padding: 6px 0; 
+            border-bottom: 2px solid #000; 
+            margin-bottom: 8px; 
+        }
         .receipt-member .row { display: flex; justify-content: space-between; padding: 3px 0; }
         .receipt-member .label { font-weight: 600; color: #000; }
         .receipt-member .info { font-weight: 500; color: #000; }
         body.dark-mode .receipt-member .label,
         body.dark-mode .receipt-member .info { color: #e0e0e0; }
 
-        .receipt-transaction { padding: 6px 0; border-bottom: 1px solid #aaa; }
+        .receipt-transaction { 
+            padding: 6px 0; 
+            border-bottom: 2px solid #000; 
+        }
         .receipt-transaction .line { display: flex; justify-content: space-between; padding: 4px 0; }
         .receipt-transaction .label { font-weight: 500; color: #000; }
         .receipt-transaction .amount { font-weight: 700; color: #000; }
@@ -878,8 +900,8 @@
             font-weight: 700;
             font-size: 17px;
             padding: 8px 0;
-            border-top: 1px solid #000;
-            border-bottom: 1px solid #000;
+            border-top: 2px solid #000;
+            border-bottom: 2px solid #000;
             margin: 6px 0;
         }
         body.dark-mode .receipt-total { border-color: #888; color: #f0f0f0; }
@@ -914,8 +936,8 @@
         body.dark-mode .signature-block { color: #ddd; }
         .sig-placeholder { display: flex; gap: 4px; align-items: center; }
         .sig-image {
-            width: 60px;
-            height: 40px;
+            width: 80px;
+            height: 50px;
             object-fit: contain;
             background: transparent;
             border: none;
@@ -933,7 +955,7 @@
             padding: 4px;
             background: white;
             border-radius: 4px;
-            border: 1px solid #000;
+            border: 2px solid #000;
         }
         body.dark-mode .qr-code-container #qrcode { border-color: #aaa; background: #fff; }
         .qr-code-container span { font-size: 12px; color: #000; font-weight: 500; }
@@ -991,7 +1013,7 @@
             .popup-card { padding: 16px 14px; }
             .receipt-header h2 { font-size: 19px; }
             .receipt-meta { font-size: 13px; }
-            .sig-image { width: 50px; height: 34px; }
+            .sig-image { width: 70px; height: 45px; }
         }
 
         @media (max-width: 480px) {
@@ -1006,7 +1028,7 @@
             .skeleton-financial-card { height: 85px; padding: 10px; }
             .skeleton-financial-value { width: 70px; height: 28px; }
             .skeleton-financial-label { width: 90px; }
-            .sig-image { width: 44px; height: 30px; }
+            .sig-image { width: 60px; height: 40px; }
         }
 
         @media (min-width: 768px) {
@@ -1015,7 +1037,7 @@
             .icon-btn { font-size: 20px; }
         }
 
-        /* ===== PRINT STYLES - ONLY RECEIPT SLIP VISIBLE, 100x150mm ===== */
+        /* ===== PRINT STYLES - UPDATED WITH SQUARE DESIGN & BORDER ===== */
         @media print {
             /* Hide everything except the popup overlay and its content */
             html, body {
@@ -1037,7 +1059,7 @@
                 display: none !important;
             }
             
-            /* Show only the popup overlay and its content - 100x150mm */
+            /* Show only the popup overlay and its content - 100x150mm with SQUARE DESIGN & BORDER */
             .popup-overlay {
                 position: fixed !important;
                 top: 0 !important;
@@ -1061,9 +1083,9 @@
                 height: 150mm !important;
                 max-height: 150mm !important;
                 box-shadow: none !important;
-                border: none !important;
+                border: 4px solid #000 !important;
                 border-radius: 0 !important;
-                padding: 8mm 6mm 6mm !important;
+                padding: 6mm 5mm 5mm !important;
                 background: white !important;
                 overflow: hidden !important;
                 margin: 0 auto !important;
@@ -1076,19 +1098,30 @@
             }
             
             .sig-image {
+                width: 80px !important;
+                height: 50px !important;
                 border: none !important;
             }
             
             .qr-code-container #qrcode {
-                border-color: #000 !important;
+                border: 2px solid #000 !important;
+                padding: 4px !important;
+            }
+            
+            .qr-code-container #qrcode canvas,
+            .qr-code-container #qrcode img {
+                width: 60px !important;
+                height: 60px !important;
             }
             
             .receipt-meta, .receipt-member, .receipt-transaction {
                 border-color: #000 !important;
+                border-width: 2px !important;
             }
             
             .receipt-total {
                 border-color: #000 !important;
+                border-width: 2px !important;
             }
             
             .popup-card * {
@@ -1137,17 +1170,17 @@
                 gap: 4px !important;
             }
             .sig-image {
-                width: 40px !important;
-                height: 28px !important;
+                width: 70px !important;
+                height: 45px !important;
             }
             .qr-code-container #qrcode {
-                width: 50px !important;
-                height: 50px !important;
+                width: 60px !important;
+                height: 60px !important;
             }
             .qr-code-container #qrcode canvas,
             .qr-code-container #qrcode img {
-                width: 50px !important;
-                height: 50px !important;
+                width: 60px !important;
+                height: 60px !important;
             }
             .qr-code-container span {
                 font-size: 10px !important;
@@ -2412,7 +2445,7 @@ function openReceipt(data) {
             });
         } catch(e) {
             console.warn('QR Code generation error:', e);
-            qrContainer.innerHTML = '<div style="width:80px;height:80px;border:1px solid #000;display:flex;align-items:center;justify-content:center;font-size:10px;">QR</div>';
+            qrContainer.innerHTML = '<div style="width:80px;height:80px;border:2px solid #000;display:flex;align-items:center;justify-content:center;font-size:10px;">QR</div>';
         }
     }
 
@@ -2443,7 +2476,8 @@ function openReceipt(data) {
             if (closeClone) closeClone.style.display = 'none';
             clone.style.background = '#ffffff';
             clone.style.borderRadius = '0';
-            clone.style.padding = '8mm 6mm 6mm';
+            clone.style.border = '4px solid #000';
+            clone.style.padding = '6mm 5mm 5mm';
             clone.style.boxShadow = 'none';
             clone.style.width = '100mm';
             clone.style.height = '150mm';
@@ -2458,11 +2492,18 @@ function openReceipt(data) {
                 if (canvas) {
                     const img = document.createElement('img');
                     img.src = canvas.toDataURL('image/png');
-                    img.style.width = '50px';
-                    img.style.height = '50px';
+                    img.style.width = '60px';
+                    img.style.height = '60px';
                     div.innerHTML = '';
                     div.appendChild(img);
                 }
+            });
+
+            // Update signature image sizes for PDF
+            const sigImgs = clone.querySelectorAll('.sig-image');
+            sigImgs.forEach(img => {
+                img.style.width = '80px';
+                img.style.height = '50px';
             });
 
             const wrapper = document.createElement('div');
