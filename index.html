@@ -1107,7 +1107,7 @@
         }
         
         @page {
-          size: 100mm 130mm;
+          size: 100mm 150mm;
           margin: 3mm;
         }
 
@@ -1145,27 +1145,21 @@
               }
             
             .popup-card {
-    width: 94mm !important;
-    max-width: 94mm !important;
-
-    height: 124mm !important;
-    max-height: 124mm !important;
-
-    box-shadow: none !important;
-    border: 2px solid #000 !important;
-    border-radius: 0 !important;
-
-    padding: 5mm !important;
-
-    background: white !important;
-    overflow: hidden !important;
-
-    margin: auto !important;
-
-    display: block !important;
-    box-sizing: border-box !important;
-    position: relative !important;
-}
+                width: 94mm !important;
+                max-width: 94mm !important;
+                height: 144mm !important;
+                max-height: 144mm !important;
+                box-shadow: none !important;
+                border: 2px solid #000 !important;
+                border-radius: 0 !important;
+                padding: 5mm !important;
+                background: white !important;
+                overflow: hidden !important;
+                margin: auto !important;
+                display: block !important;
+                box-sizing: border-box !important;
+                position: relative !important;
+            }
             
             .popup-card .close-popup {
                 display: none !important;
@@ -2581,35 +2575,45 @@ function openReceipt(data) {
         pdfBtn.parentNode.replaceChild(newPdf, pdfBtn);
         newPdf.addEventListener('click', function(e) {
             e.stopPropagation();
+            
+            // Get the current popup card content
             const card = document.getElementById('popupCard');
             const clone = card.cloneNode(true);
-            // remove action buttons from clone
+            
+            // Remove action buttons from clone
             const btns = clone.querySelector('#actionButtons');
             if (btns) btns.style.display = 'none';
+            
             const closeClone = clone.querySelector('.close-popup');
             if (closeClone) closeClone.style.display = 'none';
+            
+            // Style for PDF - 100x150mm
             clone.style.background = '#ffffff';
             clone.style.borderRadius = '0';
-            clone.style.border = '4px solid #000';
-            clone.style.padding = '5mm 5mm 5mm';
+            clone.style.border = '2px solid #000';
+            clone.style.padding = '5mm';
             clone.style.boxShadow = 'none';
             clone.style.width = '100mm';
-            clone.style.height = '130mm';
+            clone.style.height = '150mm';
             clone.style.overflow = 'hidden';
             clone.style.boxSizing = 'border-box';
             clone.style.margin = '0 auto';
             clone.style.position = 'relative';
+            clone.style.maxWidth = '100mm';
+            clone.style.maxHeight = '150mm';
 
             // Ensure watermark stays in PDF
             let watermark = clone.querySelector('.receipt-watermark');
             if (!watermark) {
                 const wrapper = clone.querySelector('.receipt-content-wrapper') || clone.querySelector('.receipt-content');
-                watermark = document.createElement('img');
-                watermark.src = WATERMARK_LOGO;
-                watermark.className = 'receipt-watermark';
-                watermark.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.06;pointer-events:none;z-index:0;width:100px;height:100px;object-fit:contain;';
-                wrapper.style.position = 'relative';
-                wrapper.insertBefore(watermark, wrapper.firstChild);
+                if (wrapper) {
+                    watermark = document.createElement('img');
+                    watermark.src = WATERMARK_LOGO;
+                    watermark.className = 'receipt-watermark';
+                    watermark.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.06;pointer-events:none;z-index:0;width:100px;height:100px;object-fit:contain;';
+                    wrapper.style.position = 'relative';
+                    wrapper.insertBefore(watermark, wrapper.firstChild);
+                }
             }
 
             // Ensure QR code images are rendered properly in PDF
@@ -2633,56 +2637,58 @@ function openReceipt(data) {
                 img.style.height = '45px';
             });
 
+            // Create wrapper for PDF generation
             const wrapper = document.createElement('div');
+            wrapper.style.position = 'fixed';
+            wrapper.style.left = '-9999px';
+            wrapper.style.top = '0';
+            wrapper.style.background = 'white';
+            wrapper.style.width = '100mm';
+            wrapper.style.height = '150mm';
+            wrapper.style.padding = '0';
+            wrapper.style.margin = '0';
+            wrapper.style.overflow = 'hidden';
+            wrapper.style.boxSizing = 'border-box';
+            wrapper.style.zIndex = '-1';
+            
+            wrapper.appendChild(clone);
+            document.body.appendChild(wrapper);
 
-wrapper.style.position = 'absolute';
-wrapper.style.left = '0';
-wrapper.style.top = '0';
-wrapper.style.opacity = '0';
-wrapper.style.pointerEvents = 'none';
-
-wrapper.style.background = 'white';
-wrapper.style.width = '100mm';
-wrapper.style.height = '130mm';
-wrapper.style.padding = '0';
-wrapper.style.margin = '0';
-wrapper.style.overflow = 'hidden';
-wrapper.style.boxSizing = 'border-box';
-
-wrapper.appendChild(clone);
-document.body.appendChild(wrapper);
-
-html2pdf()
-.set({
-    margin: 0,
-    filename: 'এনভিটিএ রশিদ.pdf',
-    image: {
-        type: 'jpeg',
-        quality: 1
-    },
-    html2canvas: {
-        scale: 3,
-        useCORS: true,
-        backgroundColor: '#ffffff'
-    },
-    jsPDF: {
-        unit: 'mm',
-        format: [100, 130],
-        orientation: 'portrait'
+            // Small delay to ensure DOM is ready
+            setTimeout(() => {
+                html2pdf()
+                .set({
+                    margin: 0,
+                    filename: 'এনভিটিএ রশিদ.pdf',
+                    image: {
+                        type: 'jpeg',
+                        quality: 1
+                    },
+                    html2canvas: {
+                        scale: 3,
+                        useCORS: true,
+                        backgroundColor: '#ffffff',
+                        logging: false
+                    },
+                    jsPDF: {
+                        unit: 'mm',
+                        format: [100, 150],
+                        orientation: 'portrait'
+                    }
+                })
+                .from(wrapper)
+                .save()
+                .then(() => {
+                    document.body.removeChild(wrapper);
+                })
+                .catch(err => {
+                    console.error('PDF generation error:', err);
+                    document.body.removeChild(wrapper);
+                });
+            }, 100);
+        });
     }
-})
-.from(wrapper)
-.save()
-.then(() => {
-    document.body.removeChild(wrapper);
-})
-.catch(err => {
-    console.error(err);
-    document.body.removeChild(wrapper);
-      });
-        }); // newPdf.addEventListener শেষ
-    }       // if (pdfBtn) শেষ
-}           // openReceipt শেষ
+}
 
 // Attach click listeners to history rows
 function attachHistoryClickListeners() {
