@@ -815,6 +815,8 @@
             position: relative;
             max-height: 92vh;
             overflow-y: auto;
+            transform: scale(1);
+            transition: transform 0.2s ease;
         }
         body.dark-mode .popup-card {
             background: #1e293b;
@@ -834,7 +836,7 @@
         body.dark-mode .popup-card .close-popup { color: #b0b8c5; }
         .popup-card .close-popup:hover { color: #ef4444; }
 
-        /* receipt inner styles - UPDATED WITH SQUARE DESIGN & BORDER */
+        /* receipt inner styles */
         .receipt-content { 
             background: transparent; 
             position: relative;
@@ -972,9 +974,12 @@
             justify-content: space-between;
             align-items: center;
             margin-top: 6px;
+            padding-bottom: 2px;
         }
-        .status-badge { font-weight: 600; color: #000; }
-        body.dark-mode .status-badge { color: #b0d9b0; }
+        .payment-method-label { font-weight: 600; color: #000; }
+        .payment-method-value { font-weight: 500; color: #000; }
+        body.dark-mode .payment-method-label,
+        body.dark-mode .payment-method-value { color: #e0e0e0; }
 
         .signature-area {
             display: flex;
@@ -1113,9 +1118,8 @@
           margin: 0mm;
         }
 
-        /* ===== PRINT STYLES - SQUARE BORDER ===== */
+        /* ===== PRINT STYLES ===== */
         @media print {
-            /* Hide everything except the popup overlay and its content */
             html, body {
                 margin: 0 !important;
                 padding: 0 !important;
@@ -1127,7 +1131,6 @@
                 opacity: 1 !important;
             }
             
-            /* Hide header, nav, main container, background, footer, loading overlay, skeleton */
             header, .bottom-nav, .container, #mainContainer, #skeletonScreen, 
             .bg-animation, #loadingOverlay, .loading-overlay, .marquee-section,
             .financial-grid, .committee-grid, .section-title, .history-wrapper,
@@ -1145,6 +1148,7 @@
                 padding: 0 !important;
                 margin: 0 !important;
                 box-sizing: border-box !important;
+                transform: none !important;
             }
             
             .popup-card {
@@ -1162,13 +1166,13 @@
                 display: block !important;
                 box-sizing: border-box !important;
                 position: relative !important;
+                transform: none !important;
             }
             
             .popup-card .close-popup {
                 display: none !important;
             }
             
-            /* Watermark in print */
             .receipt-watermark {
                 position: absolute !important;
                 top: 50% !important;
@@ -1270,8 +1274,13 @@
                 padding: 4px 0 !important;
                 margin: 4px 0 !important;
             }
+            .payment-status-row {
+                margin-top: 2px !important;
+                padding-bottom: 0 !important;
+                font-size: 10px !important;
+            }
             .signature-area {
-                margin: 8px 0 0 !important;
+                margin: 6px 0 0 !important;
                 gap: 6px !important;
                 padding-bottom: 0 !important;
             }
@@ -1296,12 +1305,6 @@
             }
             .signature-block span {
                 font-size: 10px !important;
-            }
-            .status-badge {
-                font-size: 11px !important;
-            }
-            .payment-status-row {
-                margin-top: 3px !important;
             }
             
             body, .popup-overlay, .popup-card, .receipt-content {
@@ -1348,13 +1351,10 @@
 <!-- SKELETON SCREEN HTML -->
 <!-- ========================================= -->
 <div id="skeletonScreen" class="container" style="display: none;">
-    <!-- Skeleton Marquee -->
     <div class="skeleton-marquee skeleton">
         <div class="skeleton-marquee-left"></div>
         <div class="skeleton-marquee-content"></div>
     </div>
-
-    <!-- Skeleton Financial -->
     <div class="skeleton-section-title skeleton"></div>
     <div class="skeleton-financial-grid">
         <div class="skeleton-financial-card skeleton">
@@ -1366,8 +1366,6 @@
             <div class="skeleton-financial-label"></div>
         </div>
     </div>
-
-    <!-- Skeleton History -->
     <div class="skeleton-section-title skeleton"></div>
     <div class="skeleton-history-wrapper skeleton">
         <table class="skeleton-history-table">
@@ -1401,8 +1399,6 @@
             </tbody>
         </table>
     </div>
-
-    <!-- Skeleton Committee -->
     <div class="skeleton-section-title skeleton"></div>
     <div class="skeleton-committee-grid">
         <div class="skeleton-committee-member skeleton">
@@ -1467,15 +1463,13 @@
 </tr>
 </thead>
 <tbody id="historyTableBody">
-    <!-- History will be populated automatically -->
 </tbody>
 </table>
 </div>
 
-<!-- Committee - Now 4 Members -->
+<!-- Committee -->
 <h2 class="section-title">কমিটি বৃন্দ</h2>
 <div class="committee-grid">
-    <!-- President -->
     <div class="committee-member">
         <img class="committee-photo"
              src="https://blogger.googleusercontent.com/img/a/AVvXsEj9OiIr3VFRvlTYNtRPHMzwWBEZNsxDHWq3f54sMWtyx8WyV64h0zN5cBt7NNvsxdeK5mwSFmB5EX6hA-41oW-lL2ubn_kjkdvSzPYeFX2C5On8GsYAOPB809sL4gWMzwVL-sQG8Sd-02CQlUzaJvR4yrufK7KOQHUMvYgXHXdlJvsKnoyCXoNVThiV"
@@ -1484,8 +1478,6 @@
         <div><b id="presidentName"></b></div>
         <div id="presidentPosition"></div>
     </div>
-
-    <!-- Vice President -->
     <div class="committee-member">
         <img class="committee-photo"
              src="https://blogger.googleusercontent.com/img/a/AVvXsEj9OiIr3VFRvlTYNtRPHMzwWBEZNsxDHWq3f54sMWtyx8WyV64h0zN5cBt7NNvsxdeK5mwSFmB5EX6hA-41oW-lL2ubn_kjkdvSzPYeFX2C5On8GsYAOPB809sL4gWMzwVL-sQG8Sd-02CQlUzaJvR4yrufK7KOQHUMvYgXHXdlJvsKnoyCXoNVThiV"
@@ -1494,8 +1486,6 @@
         <div><b id="vicePresidentName"></b></div>
         <div id="vicePresidentPosition"></div>
     </div>
-
-    <!-- General Secretary -->
     <div class="committee-member">
         <img class="committee-photo"
              src="https://blogger.googleusercontent.com/img/a/AVvXsEj9OiIr3VFRvlTYNtRPHMzwWBEZNsxDHWq3f54sMWtyx8WyV64h0zN5cBt7NNvsxdeK5mwSFmB5EX6hA-41oW-lL2ubn_kjkdvSzPYeFX2C5On8GsYAOPB809sL4gWMzwVL-sQG8Sd-02CQlUzaJvR4yrufK7KOQHUMvYgXHXdlJvsKnoyCXoNVThiV"
@@ -1504,8 +1494,6 @@
         <div><b id="secretaryName"></b></div>
         <div id="secretaryPosition"></div>
     </div>
-
-    <!-- Treasurer -->
     <div class="committee-member">
         <img class="committee-photo"
              src="https://blogger.googleusercontent.com/img/a/AVvXsEj9OiIr3VFRvlTYNtRPHMzwWBEZNsxDHWq3f54sMWtyx8WyV64h0zN5cBt7NNvsxdeK5mwSFmB5EX6hA-41oW-lL2ubn_kjkdvSzPYeFX2C5On8GsYAOPB809sL4gWMzwVL-sQG8Sd-02CQlUzaJvR4yrufK7KOQHUMvYgXHXdlJvsKnoyCXoNVThiV"
@@ -1539,7 +1527,6 @@
     <div class="popup-card" id="popupCard">
         <button class="close-popup" id="closePopupBtn"><i class="fas fa-times"></i></button>
         <div id="receiptContent" class="receipt-content">
-            <!-- dynamic receipt will be injected here -->
         </div>
     </div>
 </div>
@@ -1561,21 +1548,16 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-// ✅ STRICT AUTH GUARD - IMMEDIATE CHECK
+// STRICT AUTH GUARD
 let isAuthenticating = false;
 let authChecked = false;
 
-// Hide main content immediately
 document.addEventListener('DOMContentLoaded', function() {
-    // Hide everything immediately
     document.body.style.visibility = 'hidden';
     document.body.style.opacity = '0';
-    
-    // Strict authentication check - NO DELAY
     checkAuthImmediately();
 });
 
-// FIX 1: Immediate auth check - NO FLASH, NO DELAY
 function checkAuthImmediately() {
     isAuthenticating = true;
     
@@ -1584,17 +1566,13 @@ function checkAuthImmediately() {
         authChecked = true;
         
         if (!user) {
-            // User not logged in - IMMEDIATE REDIRECT
-            console.log('User not authenticated, redirecting immediately...');
             window.location.replace('login.html');
             return;
         }
         
-        // FIX 1: User is authenticated - show content and initialize app
         document.body.style.visibility = 'visible';
         document.body.style.opacity = '1';
         
-        // FIX 1: Apply correct theme before showing anything
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             body.classList.add('dark-mode');
@@ -1606,10 +1584,8 @@ function checkAuthImmediately() {
     });
 }
 
-// Prevent any content from showing during auth check
 window.addEventListener('load', function() {
     if (!authChecked && !isAuthenticating) {
-        // Extra safety check
         setTimeout(() => {
             auth.onAuthStateChanged((user) => {
                 if (!user) {
@@ -1620,7 +1596,6 @@ window.addEventListener('load', function() {
     }
 });
 
-// Prevent back button access after logout
 window.onpageshow = function(event) {
     if (event.persisted) {
         auth.onAuthStateChanged(user => {
@@ -1631,7 +1606,7 @@ window.onpageshow = function(event) {
     }
 };
 
-// Cache important elements
+// Cache elements
 const skeletonScreen = document.getElementById('skeletonScreen');
 const loadingOverlay = document.getElementById('loadingOverlay');
 const mainContainer = document.getElementById('mainContainer');
@@ -1652,7 +1627,6 @@ const treasurerName = document.getElementById('treasurerName');
 const treasurerPosition = document.getElementById('treasurerPosition');
 const treasurerPhoto = document.getElementById('treasurerPhoto');
 
-// Header and Navigation Elements
 const headerLogo = document.getElementById('header-logo');
 const headerTitle = document.getElementById('header-title');
 const themeToggle = document.getElementById('theme-toggle');
@@ -1661,63 +1635,48 @@ const body = document.body;
 const navBtns = document.querySelectorAll('.nav-btn');
 const bgAnimation = document.getElementById('bg-animation');
 
-// App state
 let currentUser = null;
 let currentMemberId = null;
 let currentUserData = { name: '', mobile: '' };
 
-// ✅ Show skeleton loading screen
 function showSkeleton() {
     skeletonScreen.style.display = 'block';
     mainContainer.style.display = 'none';
 }
 
-// ✅ Hide skeleton and show actual content
 function hideSkeleton() {
     skeletonScreen.style.display = 'none';
     mainContainer.style.display = 'block';
 }
 
-// ✅ Optimized number formatter
 const formatNumber = (num) => {
     if (!num && num !== 0) return '০';
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
-// Create background animation
 function createBackgroundAnimation() {
     const bubbleCount = 15;
-    
     for (let i = 0; i < bubbleCount; i++) {
         const bubble = document.createElement('div');
         bubble.classList.add('bg-bubble');
-        
-        // Random size between 20px and 100px
         const size = Math.random() * 80 + 20;
         bubble.style.width = `${size}px`;
         bubble.style.height = `${size}px`;
-        
-        // Random position
         bubble.style.left = `${Math.random() * 100}%`;
         bubble.style.top = `${Math.random() * 100}%`;
-        
-        // Random animation delay and duration
         const delay = Math.random() * 5;
         const duration = Math.random() * 10 + 10;
         bubble.style.animationDelay = `${delay}s`;
         bubble.style.animationDuration = `${duration}s`;
-        
         bgAnimation.appendChild(bubble);
     }
 }
 
-// Setup theme toggle functionality
 function setupThemeToggle() {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
         body.classList.add('dark-mode');
     }
-    
     themeToggle.addEventListener('click', () => {
         body.classList.toggle('dark-mode');
         const isDark = body.classList.contains('dark-mode');
@@ -1725,46 +1684,31 @@ function setupThemeToggle() {
     });
 }
 
-// Setup navigation buttons - FIXED VERSION
 function setupNavigation() {
-    // Get current page filename
     const currentPage = window.location.pathname.split('/').pop().toLowerCase();
-    
-    // Remove active class from all buttons first
-    navBtns.forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Set active class based on current page
+    navBtns.forEach(btn => btn.classList.remove('active'));
     switch(currentPage) {
         case 'index.html':
         case '':
         case '/':
-            // Home page
             document.getElementById('home-btn').classList.add('active');
             break;
         case 'payment.html':
-            // Payment page
             document.getElementById('deposit-btn').classList.add('active');
             break;
         case 'profile.html':
-            // Profile page
             document.getElementById('profile-btn').classList.add('active');
             break;
         default:
-            // Default to home if page not recognized
             document.getElementById('home-btn').classList.add('active');
     }
 }
 
-// Load header from Firestore
 function loadHeaderFromFirestore() {
     const headerRef = db.collection('settings').doc('general');
-    
     headerRef.get().then((doc) => {
         if (doc.exists) {
             const data = doc.data();
-            
             if (data.headerLogoUrl) {
                 headerLogo.src = data.headerLogoUrl;
                 headerLogo.style.display = 'block';
@@ -1772,7 +1716,6 @@ function loadHeaderFromFirestore() {
                     headerLogo.src = 'https://via.placeholder.com/150x50?text=Logo+Not+Found';
                 };
             }
-            
             if (data.siteTitle) {
                 headerTitle.textContent = data.siteTitle;
             }
@@ -1783,14 +1726,11 @@ function loadHeaderFromFirestore() {
     });
 }
 
-// Setup real-time notification listener - FIXED VERSION
 function setupNotificationListener(memberId) {
     if (!memberId) return;
-    
     const notificationsRef = db.collection('notifications')
         .where('memberId', '==', memberId)
         .where('read', '==', false);
-        
     notificationsRef.onSnapshot((snapshot) => {
         const unreadCount = snapshot.size;
         updateNotificationBadge(unreadCount);
@@ -1799,14 +1739,11 @@ function setupNotificationListener(memberId) {
     });
 }
 
-// Update notification badge with animation
 function updateNotificationBadge(count) {
     const num = parseInt(count) || 0;
-    
     if (num > 0) {
         notificationBadge.textContent = num;
         notificationBadge.style.display = 'flex';
-        
         if (num > parseInt(notificationBadge.dataset.prevCount || 0)) {
             notificationBadge.classList.add('pulse');
             setTimeout(() => {
@@ -1816,38 +1753,29 @@ function updateNotificationBadge(count) {
     } else {
         notificationBadge.style.display = 'none';
     }
-    
     notificationBadge.dataset.prevCount = num;
 }
 
-// ✅ Optimized: Parallel data loading
 async function loadAllDataInParallel(memberId) {
     try {
-        // Load all data simultaneously
         const [marqueeData, committeeData, userHomeData, userHistoryData] = await Promise.allSettled([
             loadMarqueeData(),
             loadCommitteeData(),
             loadUserFinancialData(memberId),
             loadUserHistoryData(memberId)
         ]);
-        
         console.log("All data loaded in parallel");
-        
-        // Setup real-time listeners after initial load
         setupMarqueeRealtimeListener();
         setupUserFinancialRealtimeListener(memberId);
         setupCommitteeRealtimeListener();
         setupUserHistoryRealtimeListener(memberId);
-        
         return { marqueeData, committeeData, userHomeData, userHistoryData };
-        
     } catch (error) {
         console.error("Error in parallel loading:", error);
         throw error;
     }
 }
 
-// ✅ Optimized: Single function to initialize all collections
 async function initializeAllCollections(memberId) {
     try {
         const results = await Promise.allSettled([
@@ -1856,7 +1784,6 @@ async function initializeAllCollections(memberId) {
             initializeManagementCollection(),
             initializeUserHistoryCollection(memberId)
         ]);
-        
         console.log("All collections initialized");
         return results;
     } catch (error) {
@@ -1865,12 +1792,10 @@ async function initializeAllCollections(memberId) {
     }
 }
 
-// ১. "Marquee" Collection তৈরি এবং ইনিশিয়ালাইজ করার ফাংশন
 async function initializeMarqueeCollection() {
     try {
         const marqueeRef = db.collection('Marquee').doc('marqueeData');
         const doc = await marqueeRef.get();
-        
         if (!doc.exists) {
             const defaultMarquee = {
                 text: "",
@@ -1878,7 +1803,6 @@ async function initializeMarqueeCollection() {
                 updatedAt: new Date().toISOString(),
                 updatedBy: "system"
             };
-            
             await marqueeRef.set(defaultMarquee);
             return defaultMarquee;
         }
@@ -1889,14 +1813,11 @@ async function initializeMarqueeCollection() {
     }
 }
 
-// ২. প্রতিটি ইউজারের জন্য "Home" ডকুমেন্ট তৈরি করার ফাংশন
 async function initializeUserHomeCollection(memberId) {
     try {
         if (!memberId) return null;
-        
         const homeRef = db.collection('Home').doc(memberId);
         const doc = await homeRef.get();
-        
         if (!doc.exists) {
             const defaultData = {
                 totalAmount: 0,
@@ -1904,7 +1825,6 @@ async function initializeUserHomeCollection(memberId) {
                 lastUpdated: new Date().toISOString(),
                 memberId: memberId
             };
-            
             await homeRef.set(defaultData);
             return defaultData;
         }
@@ -1915,37 +1835,18 @@ async function initializeUserHomeCollection(memberId) {
     }
 }
 
-// ৩. "Management" Collection তৈরি এবং ইনিশিয়ালাইজ করার ফাংশন
 async function initializeManagementCollection() {
     try {
         const managementRef = db.collection('Management').doc('committeeData');
         const doc = await managementRef.get();
-        
         if (!doc.exists) {
             const defaultCommittee = {
-                president: {
-                    name: "",
-                    position: "সভাপতি",
-                    photo: ""
-                },
-                vicePresident: {
-                    name: "",
-                    position: "সহ-সভাপতি",
-                    photo: ""
-                },
-                secretary: {
-                    name: "",
-                    position: "সাধারণ সম্পাদক",
-                    photo: ""
-                },
-                treasurer: {
-                    name: "",
-                    position: "কোষাধক্ষ্য",
-                    photo: ""
-                },
+                president: { name: "", position: "সভাপতি", photo: "" },
+                vicePresident: { name: "", position: "সহ-সভাপতি", photo: "" },
+                secretary: { name: "", position: "সাধারণ সম্পাদক", photo: "" },
+                treasurer: { name: "", position: "কোষাধক্ষ্য", photo: "" },
                 lastUpdated: new Date().toISOString()
             };
-            
             await managementRef.set(defaultCommittee);
             return defaultCommittee;
         }
@@ -1956,21 +1857,17 @@ async function initializeManagementCollection() {
     }
 }
 
-// ৪. প্রতিটি ইউজারের জন্য "History" ডকুমেন্ট তৈরি করার ফাংশন
 async function initializeUserHistoryCollection(memberId) {
     try {
         if (!memberId) return null;
-        
         const historyRef = db.collection('History').doc(memberId);
         const doc = await historyRef.get();
-        
         if (!doc.exists) {
             const defaultHistory = {
                 transactions: [],
                 lastUpdated: new Date().toISOString(),
                 memberId: memberId
             };
-            
             await historyRef.set(defaultHistory);
             return defaultHistory;
         }
@@ -1981,15 +1878,12 @@ async function initializeUserHistoryCollection(memberId) {
     }
 }
 
-// ৫. মার্কি ডেটা লোড করার ফাংশন
 async function loadMarqueeData() {
     try {
         const marqueeRef = db.collection('Marquee').doc('marqueeData');
         const doc = await marqueeRef.get();
-        
         if (doc.exists) {
             const data = doc.data();
-            
             if (data.isActive && data.text && data.text.trim() !== "") {
                 marqueeText.textContent = data.text;
                 const marqueeContent = document.getElementById('marqueeContent');
@@ -1999,7 +1893,6 @@ async function loadMarqueeData() {
                 const marqueeContent = document.getElementById('marqueeContent');
                 marqueeContent.innerHTML = '<span id="marqueeText"></span>';
             }
-            
             return data;
         } else {
             marqueeText.textContent = "";
@@ -2012,7 +1905,6 @@ async function loadMarqueeData() {
     }
 }
 
-// ৬. ইউজারের আর্থিক তথ্য লোড করার ফাংশন
 async function loadUserFinancialData(memberId) {
     try {
         if (!memberId) {
@@ -2020,32 +1912,24 @@ async function loadUserFinancialData(memberId) {
             totalAmount.textContent = "৳ ০";
             return null;
         }
-        
         const [homeDoc, historyDoc] = await Promise.all([
             db.collection('Home').doc(memberId).get(),
             db.collection('History').doc(memberId).get()
         ]);
-        
         let totalAmountValue = 0;
         let installmentCount = 0;
-        
         if (homeDoc.exists) {
             const data = homeDoc.data();
             totalAmountValue = data.totalAmount || 0;
         }
-        
         if (historyDoc.exists) {
             const historyData = historyDoc.data();
             if (historyData.transactions && Array.isArray(historyData.transactions)) {
-                installmentCount = historyData.transactions.filter(t => 
-                    t.amount && (t.amount > 0)
-                ).length;
+                installmentCount = historyData.transactions.filter(t => t.amount && (t.amount > 0)).length;
             }
         }
-        
         totalInstallments.textContent = formatNumber(installmentCount);
         totalAmount.textContent = `৳ ${formatNumber(totalAmountValue)}`;
-        
         return { totalAmountValue, installmentCount };
     } catch (error) {
         console.error("Error loading user financial data:", error);
@@ -2055,16 +1939,12 @@ async function loadUserFinancialData(memberId) {
     }
 }
 
-// ৭. কমিটি সদস্য তথ্য লোড করার ফাংশন
 async function loadCommitteeData() {
     try {
         const managementRef = db.collection('Management').doc('committeeData');
         const doc = await managementRef.get();
-        
         if (doc.exists) {
             const data = doc.data();
-            
-            // President
             if (data.president) {
                 presidentName.textContent = data.president.name || "";
                 presidentPosition.textContent = data.president.position || "সভাপতি";
@@ -2075,8 +1955,6 @@ async function loadCommitteeData() {
                     presidentPhoto.style.display = 'none';
                 }
             }
-            
-            // Vice President
             if (data.vicePresident) {
                 vicePresidentName.textContent = data.vicePresident.name || "";
                 vicePresidentPosition.textContent = data.vicePresident.position || "সহ-সভাপতি";
@@ -2087,8 +1965,6 @@ async function loadCommitteeData() {
                     vicePresidentPhoto.style.display = 'none';
                 }
             }
-            
-            // Secretary
             if (data.secretary) {
                 secretaryName.textContent = data.secretary.name || "";
                 secretaryPosition.textContent = data.secretary.position || "সাধারণ সম্পাদক";
@@ -2099,8 +1975,6 @@ async function loadCommitteeData() {
                     secretaryPhoto.style.display = 'none';
                 }
             }
-            
-            // Treasurer
             if (data.treasurer) {
                 treasurerName.textContent = data.treasurer.name || "";
                 treasurerPosition.textContent = data.treasurer.position || "কোষাধক্ষ্য";
@@ -2111,7 +1985,6 @@ async function loadCommitteeData() {
                     treasurerPhoto.style.display = 'none';
                 }
             }
-            
             return data;
         } else {
             presidentName.textContent = "";
@@ -2138,17 +2011,14 @@ async function loadCommitteeData() {
     }
 }
 
-// ৮. ইউজারের কিস্তি জমা হিস্টোরি লোড করার ফাংশন
 async function loadUserHistoryData(memberId) {
     try {
         if (!memberId) {
             showEmptyHistory();
             return null;
         }
-        
         const historyRef = db.collection('History').doc(memberId);
         const doc = await historyRef.get();
-        
         if (doc.exists) {
             const data = doc.data();
             updateHistoryTable(data.transactions || []);
@@ -2164,37 +2034,25 @@ async function loadUserHistoryData(memberId) {
     }
 }
 
-// ✅ Optimized: Separate function for updating history table
 function updateHistoryTable(transactions) {
     historyTableBody.innerHTML = '';
-    
     if (!transactions || !Array.isArray(transactions) || transactions.length === 0) {
         showEmptyHistory();
         return;
     }
-    
-    // তারিখ অনুসারে সাজান (নতুন থেকে পুরাতন)
     const sortedTransactions = [...transactions].sort((a, b) => {
         const dateA = a.date ? new Date(a.date).getTime() : 0;
         const dateB = b.date ? new Date(b.date).getTime() : 0;
         return dateB - dateA;
     });
-    
-    const hasData = sortedTransactions.some(item => 
-        item.date || item.time || item.amount || item.method
-    );
-    
+    const hasData = sortedTransactions.some(item => item.date || item.time || item.amount || item.method);
     if (!hasData) {
         showEmptyHistory();
         return;
     }
-    
-    // Has data - show all rows
     const fragment = document.createDocumentFragment();
-    
     sortedTransactions.forEach((item) => {
         const row = document.createElement('tr');
-        // attach receipt data for popup - ALL DATA FROM FIREBASE
         const receiptData = {
             receiptNo: item.receiptNo || `RCP-${Date.now().toString().slice(-6)}`,
             memberId: item.memberId || currentMemberId || '',
@@ -2210,7 +2068,6 @@ function updateHistoryTable(transactions) {
             status: item.status || 'সফল'
         };
         row.setAttribute('data-receipt', JSON.stringify(receiptData));
-        
         let displayDate = item.date || '';
         if (item.date && typeof item.date === 'string') {
             try {
@@ -2220,12 +2077,10 @@ function updateHistoryTable(transactions) {
                 }
             } catch (e) {}
         }
-        
         let displayAmount = item.amount || '';
         if (item.amount && item.amount > 0) {
             displayAmount = `৳ ${formatNumber(item.amount)}`;
         }
-        
         row.innerHTML = `
             <td>${displayDate}</td>
             <td>${item.time || ''}</td>
@@ -2234,12 +2089,10 @@ function updateHistoryTable(transactions) {
         `;
         fragment.appendChild(row);
     });
-    
     historyTableBody.appendChild(fragment);
     attachHistoryClickListeners();
 }
 
-// ৯. ফাঁকা হিস্টোরি দেখানোর ফাংশন
 function showEmptyHistory() {
     historyTableBody.innerHTML = `
         <tr>
@@ -2250,14 +2103,11 @@ function showEmptyHistory() {
     `;
 }
 
-// ১০. মার্কির জন্য রিয়েল-টাইম লিসেনার
 function setupMarqueeRealtimeListener() {
     const marqueeRef = db.collection('Marquee').doc('marqueeData');
-    
     marqueeRef.onSnapshot((doc) => {
         if (doc.exists) {
             const data = doc.data();
-            
             if (data.isActive && data.text && data.text.trim() !== "") {
                 const marqueeContent = document.getElementById('marqueeContent');
                 marqueeContent.innerHTML = '<span class="marquee-scroll" id="marqueeText">' + data.text + '</span>';
@@ -2271,31 +2121,23 @@ function setupMarqueeRealtimeListener() {
     });
 }
 
-// ১১. ইউজারের আর্থিক তথ্যের জন্য রিয়েল-টাইম লিসেনার
 function setupUserFinancialRealtimeListener(memberId) {
     if (!memberId) return;
-    
     const homeRef = db.collection('Home').doc(memberId);
-    
     homeRef.onSnapshot(async (doc) => {
         if (doc.exists) {
             const data = doc.data();
             const totalAmountValue = data.totalAmount || 0;
             totalAmount.textContent = `৳ ${formatNumber(totalAmountValue)}`;
-            
             try {
                 const historyDoc = await db.collection('History').doc(memberId).get();
                 let installmentCount = 0;
-                
                 if (historyDoc.exists) {
                     const historyData = historyDoc.data();
                     if (historyData.transactions && Array.isArray(historyData.transactions)) {
-                        installmentCount = historyData.transactions.filter(t => 
-                            t.amount && (t.amount > 0)
-                        ).length;
+                        installmentCount = historyData.transactions.filter(t => t.amount && (t.amount > 0)).length;
                     }
                 }
-                
                 totalInstallments.textContent = formatNumber(installmentCount);
             } catch (error) {
                 console.error("Error counting installments in real-time:", error);
@@ -2306,15 +2148,11 @@ function setupUserFinancialRealtimeListener(memberId) {
     });
 }
 
-// ১২. কমিটি সদস্যের জন্য রিয়েল-টাইম লিসেনার
 function setupCommitteeRealtimeListener() {
     const managementRef = db.collection('Management').doc('committeeData');
-    
     managementRef.onSnapshot((doc) => {
         if (doc.exists) {
             const data = doc.data();
-            
-            // President
             if (data.president) {
                 presidentName.textContent = data.president.name || "";
                 presidentPosition.textContent = data.president.position || "সভাপতি";
@@ -2325,8 +2163,6 @@ function setupCommitteeRealtimeListener() {
                     presidentPhoto.style.display = 'none';
                 }
             }
-            
-            // Vice President
             if (data.vicePresident) {
                 vicePresidentName.textContent = data.vicePresident.name || "";
                 vicePresidentPosition.textContent = data.vicePresident.position || "সহ-সভাপতি";
@@ -2337,8 +2173,6 @@ function setupCommitteeRealtimeListener() {
                     vicePresidentPhoto.style.display = 'none';
                 }
             }
-            
-            // Secretary
             if (data.secretary) {
                 secretaryName.textContent = data.secretary.name || "";
                 secretaryPosition.textContent = data.secretary.position || "সাধারণ সম্পাদক";
@@ -2349,8 +2183,6 @@ function setupCommitteeRealtimeListener() {
                     secretaryPhoto.style.display = 'none';
                 }
             }
-            
-            // Treasurer
             if (data.treasurer) {
                 treasurerName.textContent = data.treasurer.name || "";
                 treasurerPosition.textContent = data.treasurer.position || "কোষাধক্ষ্য";
@@ -2367,12 +2199,9 @@ function setupCommitteeRealtimeListener() {
     });
 }
 
-// ১৩. ইউজারের হিস্টোরির জন্য রিয়েল-টাইম লিসেনার
 function setupUserHistoryRealtimeListener(memberId) {
     if (!memberId) return;
-    
     const historyRef = db.collection('History').doc(memberId);
-    
     historyRef.onSnapshot((doc) => {
         if (doc.exists) {
             const data = doc.data();
@@ -2383,20 +2212,17 @@ function setupUserHistoryRealtimeListener(memberId) {
     });
 }
 
-// ১৪. ইউজারের রেজিস্ট্রেশন ডেটা থেকে memberId এবং নাম/মোবাইল পাওয়ার ফাংশন
 async function getUserData(user) {
     try {
         const snap = await db.collection('Registration')
             .where('userId', '==', user.uid)
             .limit(1)
             .get();
-            
         if (!snap.empty) {
             const data = snap.docs[0].data();
             const memberId = data.memberId || null;
             const name = data.name || data.fullName || '';
             const mobile = data.mobile || data.phone || '';
-            
             if (memberId) {
                 currentMemberId = memberId;
                 currentUserData.name = name;
@@ -2411,7 +2237,6 @@ async function getUserData(user) {
     }
 }
 
-// Initialize header components
 function initHeaderComponents() {
     createBackgroundAnimation();
     setupThemeToggle();
@@ -2425,13 +2250,12 @@ const popupCard = document.getElementById('popupCard');
 const receiptContent = document.getElementById('receiptContent');
 const closePopupBtn = document.getElementById('closePopupBtn');
 
-// FIXED: Close popup function
 function closePopup() { 
     overlay.classList.remove('active');
     document.body.classList.remove('popup-open');
+    popupCard.style.transform = 'scale(1)';
 }
 
-// FIXED: Close button event listener - using both click and touch events
 closePopupBtn.addEventListener('click', function(e) {
     e.stopPropagation();
     closePopup();
@@ -2442,14 +2266,12 @@ closePopupBtn.addEventListener('touchstart', function(e) {
     closePopup();
 });
 
-// FIXED: Overlay click to close
 overlay.addEventListener('click', function(e) { 
     if (e.target === overlay) {
         closePopup();
     }
 });
 
-// FIXED: ESC key to close
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && overlay.classList.contains('active')) {
         closePopup();
@@ -2461,14 +2283,11 @@ const PRESIDENT_SIGNATURE = 'https://i.ibb.co.com/q3q6bHKn/nishad.png';
 const TREASURER_SIGNATURE = 'https://i.ibb.co.com/8gPvpwSy/Azad.png';
 const WATERMARK_LOGO = 'https://blogger.googleusercontent.com/img/a/AVvXsEivqTIaHdAT5pCu40npVAhBQUB7v15cU-vog8HUrrsluvCpu3Q4kRsQ2XiX2pnPi441r1CIxxxgLe9HPVq8lVPQKg22UyoVEQZdm_JRehypwRK8WWfDQY45SCFonpHDeLrTr0u2Qhk1RnVew6cLpcWrUN9FfLdv6f_sG9KwJi1EpHbRs5DGk4ZlRIqL';
 
-// Format time to digital format (HH:MM AM/PM)
 function formatDigitalTime(timeStr) {
     if (!timeStr) return '';
-    // If already in digital format, return as is
     if (timeStr.match(/\d{1,2}:\d{2}\s?(AM|PM)/i)) {
         return timeStr;
     }
-    // Try to parse as date or time string
     try {
         const date = new Date(timeStr);
         if (!isNaN(date.getTime())) {
@@ -2488,12 +2307,10 @@ function buildReceiptHTML(data) {
         transaction, amount, serviceCharge, total, method, status
     } = data;
 
-    // Format time to digital format
     const formattedTime = formatDigitalTime(time);
 
     return `
         <div class="receipt-content-wrapper" style="position:relative;height:100%;display:flex;flex-direction:column;">
-            <!-- Watermark Logo -->
             <img src="${WATERMARK_LOGO}" alt="Watermark" class="receipt-watermark" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.06;pointer-events:none;z-index:0;width:120px;height:120px;object-fit:contain;">
             
             <div style="position:relative;z-index:1;flex:1;display:flex;flex-direction:column;">
@@ -2525,8 +2342,8 @@ function buildReceiptHTML(data) {
                     <div class="line"><span class="label">সার্ভিস চার্জ</span><span class="amount">৳${serviceCharge || '০'}</span></div>
                     <div class="receipt-total"><span>মোট পরিশোধ</span><span>৳${total || '০'}</span></div>
                     <div class="payment-status-row">
-                        <span>পেমেন্ট: <strong>${method || ''}</strong></span>
-                        <span class="status-badge">${status || 'সফল'}</span>
+                        <span class="payment-method-label">পেমেন্ট পদ্ধতি</span>
+                        <span class="payment-method-value">${method || ''}</span>
                     </div>
                 </div>
                 <div style="flex-grow:1;"></div>
@@ -2561,8 +2378,8 @@ function openReceipt(data) {
     receiptContent.innerHTML = buildReceiptHTML(data);
     overlay.classList.add('active');
     document.body.classList.add('popup-open');
+    popupCard.style.transform = 'scale(1)';
 
-    // Generate QR code after DOM update
     const qrContainer = receiptContent.querySelector('[id^="qrcode_"]');
     if (qrContainer) {
         const qrData = JSON.stringify({
@@ -2586,7 +2403,6 @@ function openReceipt(data) {
         }
     }
 
-    // attach print & pdf handlers
     const printBtn = document.getElementById('printReceiptBtn');
     const pdfBtn = document.getElementById('pdfReceiptBtn');
 
@@ -2605,18 +2421,15 @@ function openReceipt(data) {
         newPdf.addEventListener('click', function(e) {
             e.stopPropagation();
             
-            // Get the current popup card content
             const card = document.getElementById('popupCard');
             const clone = card.cloneNode(true);
             
-            // Remove action buttons from clone
             const btns = clone.querySelector('#actionButtons');
             if (btns) btns.style.display = 'none';
             
             const closeClone = clone.querySelector('.close-popup');
             if (closeClone) closeClone.style.display = 'none';
             
-            // Style for PDF - 100x150mm with SQUARE BORDER
             clone.style.background = '#ffffff';
             clone.style.borderRadius = '0';
             clone.style.border = '4px solid #000';
@@ -2630,8 +2443,8 @@ function openReceipt(data) {
             clone.style.position = 'relative';
             clone.style.maxWidth = '100mm';
             clone.style.maxHeight = '150mm';
+            clone.style.transform = 'none';
 
-            // Ensure watermark stays in PDF
             let watermark = clone.querySelector('.receipt-watermark');
             if (!watermark) {
                 const wrapper = clone.querySelector('.receipt-content-wrapper') || clone.querySelector('.receipt-content');
@@ -2645,7 +2458,6 @@ function openReceipt(data) {
                 }
             }
 
-            // Ensure QR code images are rendered properly in PDF
             const qrDivs = clone.querySelectorAll('[id^="qrcode_"]');
             qrDivs.forEach(div => {
                 const canvas = div.querySelector('canvas');
@@ -2659,14 +2471,12 @@ function openReceipt(data) {
                 }
             });
 
-            // Update signature image sizes for PDF
             const sigImgs = clone.querySelectorAll('.sig-image');
             sigImgs.forEach(img => {
                 img.style.width = '70px';
                 img.style.height = '45px';
             });
 
-            // Create wrapper for PDF generation
             const wrapper = document.createElement('div');
             wrapper.style.position = 'fixed';
             wrapper.style.left = '0';
@@ -2686,16 +2496,12 @@ function openReceipt(data) {
             wrapper.appendChild(clone);
             document.body.appendChild(wrapper);
 
-            // Small delay to ensure DOM is ready
             setTimeout(() => {
                 html2pdf()
                 .set({
                     margin: 0,
                     filename: 'এনভিটিএ রশিদ.pdf',
-                    image: {
-                        type: 'jpeg',
-                        quality: 1
-                    },
+                    image: { type: 'jpeg', quality: 1 },
                     html2canvas: {
                         scale: 3,
                         useCORS: true,
@@ -2724,7 +2530,6 @@ function openReceipt(data) {
     }
 }
 
-// Attach click listeners to history rows
 function attachHistoryClickListeners() {
     const rows = document.querySelectorAll('#historyTableBody tr[data-receipt]');
     rows.forEach(row => {
@@ -2745,23 +2550,17 @@ function attachHistoryClickListeners() {
     });
 }
 
-// ✅ Main app initialization (ONLY called after successful auth)
 async function initializeApp(user) {
-    // Show skeleton screen immediately
     showSkeleton();
     initHeaderComponents();
     
     try {
         currentUser = user;
-        
-        // Get user data from Registration collection
         const userData = await getUserData(user);
         const memberId = userData.memberId;
         
         if (!memberId) {
-            setTimeout(() => {
-                hideSkeleton();
-            }, 300);
+            setTimeout(() => { hideSkeleton(); }, 300);
             return;
         }
         
@@ -2769,13 +2568,10 @@ async function initializeApp(user) {
         currentUserData.name = userData.name;
         currentUserData.mobile = userData.mobile;
         
-        // Setup notification listener with memberId
         setupNotificationListener(memberId);
-        
         await initializeAllCollections(memberId);
         await loadAllDataInParallel(memberId);
         
-        // Smooth transition from skeleton to content
         setTimeout(() => {
             hideSkeleton();
             attachHistoryClickListeners();
@@ -2783,9 +2579,7 @@ async function initializeApp(user) {
         
     } catch (error) {
         console.error("Error in app initialization:", error);
-        setTimeout(() => {
-            hideSkeleton();
-        }, 300);
+        setTimeout(() => { hideSkeleton(); }, 300);
     }
 }
 </script>
