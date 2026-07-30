@@ -983,6 +983,7 @@
             flex-wrap: wrap;
             gap: 10px;
             padding-bottom: 10px;
+            border-bottom: 2px solid #000;
         }
         .signature-block {
             display: flex;
@@ -1204,6 +1205,10 @@
             .receipt-total {
                 border-color: #000 !important;
                 border-width: 2px !important;
+            }
+            
+            .signature-area {
+                border-bottom: 2px solid #000 !important;
             }
             
             .popup-card * {
@@ -2501,7 +2506,7 @@ function buildReceiptHTML(data) {
                     </div>
                 </div>
                 <div style="flex-grow:1;"></div>
-                <div class="signature-area" style="padding-bottom:10px;">
+                <div class="signature-area">
                     <div class="signature-block">
                         <span>সভাপতি স্বাক্ষর</span>
                         <div class="sig-placeholder">
@@ -2640,16 +2645,19 @@ function openReceipt(data) {
             // Create wrapper for PDF generation
             const wrapper = document.createElement('div');
             wrapper.style.position = 'fixed';
-            wrapper.style.left = '-9999px';
+            wrapper.style.left = '0';
             wrapper.style.top = '0';
-            wrapper.style.background = 'white';
             wrapper.style.width = '100mm';
             wrapper.style.height = '150mm';
             wrapper.style.padding = '0';
             wrapper.style.margin = '0';
             wrapper.style.overflow = 'hidden';
             wrapper.style.boxSizing = 'border-box';
-            wrapper.style.zIndex = '-1';
+            wrapper.style.zIndex = '999999';
+            wrapper.style.backgroundColor = '#ffffff';
+            wrapper.style.display = 'flex';
+            wrapper.style.alignItems = 'center';
+            wrapper.style.justifyContent = 'center';
             
             wrapper.appendChild(clone);
             document.body.appendChild(wrapper);
@@ -2668,7 +2676,9 @@ function openReceipt(data) {
                         scale: 3,
                         useCORS: true,
                         backgroundColor: '#ffffff',
-                        logging: false
+                        logging: false,
+                        width: 100,
+                        height: 150
                     },
                     jsPDF: {
                         unit: 'mm',
@@ -2685,7 +2695,7 @@ function openReceipt(data) {
                     console.error('PDF generation error:', err);
                     document.body.removeChild(wrapper);
                 });
-            }, 100);
+            }, 200);
         });
     }
 }
