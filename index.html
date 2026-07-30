@@ -607,7 +607,7 @@
 
         /* Skeleton History Table */
         .skeleton-history-wrapper {
-            overflow-x:auto;
+            overflow-x: auto;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 0;
@@ -845,7 +845,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            opacity: 0.06;
+            opacity: 0.08;
             pointer-events: none;
             z-index: 0;
             width: 120px;
@@ -858,62 +858,22 @@
             z-index: 1;
         }
         
-        .receipt-header {
-            text-align: center;
-        }
-        
         .receipt-header h2 { 
             font-size: 22px; 
             font-weight: 700; 
             color: #000; 
             text-align: center; 
             letter-spacing: 0.3px; 
-            margin-bottom: 2px;
         }
         body.dark-mode .receipt-header h2 { color: #f0f0f0; }
-        
-        .receipt-header .org-address {
-            display: block;
-            text-align: center;
-            font-size: 12px;
-            font-weight: 400;
-            color: #333;
-            margin-top: 0;
-            line-height: 1.4;
+        .receipt-header small { 
+            display: block; 
+            font-size: 16px; 
+            font-weight: 400; 
+            color: #000; 
+            margin-top: -2px; 
         }
-        body.dark-mode .receipt-header .org-address { color: #bbb; }
-        
-        .receipt-header .org-established {
-            display: block;
-            text-align: center;
-            font-size: 11px;
-            font-weight: 400;
-            color: #555;
-            margin-top: 1px;
-            margin-bottom: 0;
-        }
-        body.dark-mode .receipt-header .org-established { color: #aaa; }
-        
-        .receipt-header .receipt-title-wrapper {
-            display: inline-block;
-            border: 2px solid #000;
-            border-radius: 20px;
-            padding: 2px 20px;
-            margin: 15px auto 20px;
-            text-align: center;
-            background: transparent;
-        }
-        body.dark-mode .receipt-header .receipt-title-wrapper {
-            border-color: #888;
-        }
-        .receipt-header .receipt-title-wrapper small {
-            display: block;
-            font-size: 16px;
-            font-weight: 400;
-            color: #000;
-            letter-spacing: 0.5px;
-        }
-        body.dark-mode .receipt-header .receipt-title-wrapper small { color: #ddd; }
+        body.dark-mode .receipt-header small { color: #ddd; }
 
         .receipt-meta {
             display: flex;
@@ -983,7 +943,6 @@
             flex-wrap: wrap;
             gap: 10px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #000;
         }
         .signature-block {
             display: flex;
@@ -1077,10 +1036,6 @@
             .receipt-meta { font-size: 13px; }
             .sig-image { width: 70px; height: 45px; }
             .receipt-watermark { width: 100px; height: 100px; }
-            .receipt-header .receipt-title-wrapper small { font-size: 14px; }
-            .receipt-header .receipt-title-wrapper { padding: 2px 16px; }
-            .receipt-header .org-address { font-size: 11px; }
-            .receipt-header .org-established { font-size: 10px; }
         }
 
         @media (max-width: 480px) {
@@ -1097,19 +1052,12 @@
             .skeleton-financial-label { width: 90px; }
             .sig-image { width: 60px; height: 40px; }
             .receipt-watermark { width: 80px; height: 80px; }
-            .receipt-header .receipt-title-wrapper small { font-size: 13px; }
-            .receipt-header .receipt-title-wrapper { padding: 2px 12px; }
         }
 
         @media (min-width: 768px) {
             .logo { height: 35px; }
             .app-title { font-size: 18px; }
             .icon-btn { font-size: 20px; }
-        }
-        
-        @page {
-          size: 100mm 150mm;
-          margin: 3mm;
         }
 
         /* ===== PRINT STYLES - UPDATED WITH SQUARE DESIGN & BORDER ===== */
@@ -1134,29 +1082,36 @@
                 display: none !important;
             }
             
+            /* Show only the popup overlay and its content - 100x150mm with SQUARE DESIGN & BORDER */
             .popup-overlay {
-              position: fixed !important;
-              inset: 0 !important;
-              background: white !important;
-              display: flex !important;
-              justify-content: center !important;
-              align-items: center !important;
-              padding: 5mm !important;
-              box-sizing: border-box !important;
-              }
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: white !important;
+                backdrop-filter: none !important;
+                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                z-index: 9999 !important;
+                margin: 0 !important;
+                border: none !important;
+            }
             
             .popup-card {
-                width: 94mm !important;
-                max-width: 94mm !important;
-                height: 144mm !important;
-                max-height: 144mm !important;
+                width: 100mm !important;
+                max-width: 100mm !important;
+                height: 150mm !important;
+                max-height: 150mm !important;
                 box-shadow: none !important;
-                border: 2px solid #000 !important;
+                border: 4px solid #000 !important;
                 border-radius: 0 !important;
-                padding: 5mm !important;
+                padding: 5mm 5mm 5mm !important;
                 background: white !important;
                 overflow: hidden !important;
-                margin: auto !important;
+                margin: 0 auto !important;
                 display: block !important;
                 box-sizing: border-box !important;
                 position: relative !important;
@@ -1172,7 +1127,7 @@
                 top: 50% !important;
                 left: 50% !important;
                 transform: translate(-50%, -50%) !important;
-                opacity: 0.06 !important;
+                opacity: 0.08 !important;
                 pointer-events: none !important;
                 z-index: 0 !important;
                 width: 100px !important;
@@ -1193,8 +1148,8 @@
             
             .qr-code-container #qrcode canvas,
             .qr-code-container #qrcode img {
-                width: 55px !important;
-                height: 55px !important;
+                width: 60px !important;
+                height: 60px !important;
             }
             
             .receipt-meta, .receipt-member, .receipt-transaction {
@@ -1205,10 +1160,6 @@
             .receipt-total {
                 border-color: #000 !important;
                 border-width: 2px !important;
-            }
-            
-            .signature-area {
-                border-bottom: 2px solid #000 !important;
             }
             
             .popup-card * {
@@ -1229,26 +1180,14 @@
             .receipt-header h2 {
                 font-size: 16px !important;
                 margin-top: 0 !important;
-                margin-bottom: 1px !important;
             }
-            .receipt-header .org-address {
-                font-size: 10px !important;
-            }
-            .receipt-header .org-established {
-                font-size: 9px !important;
-                margin-bottom: 0 !important;
-            }
-            .receipt-header .receipt-title-wrapper {
-                padding: 1px 14px !important;
-                margin-top: 16px !important;
-            }
-            .receipt-header .receipt-title-wrapper small {
-                font-size: 13px !important;
+            .receipt-header small {
+                font-size: 12px !important;
             }
             .receipt-meta {
                 font-size: 10px !important;
                 padding: 4px 0 !important;
-                margin: 6px 0 4px !important;
+                margin: 4px 0 4px !important;
             }
             .receipt-member {
                 padding: 4px 0 !important;
@@ -2467,19 +2406,22 @@ function buildReceiptHTML(data) {
     // Format time to digital format
     const formattedTime = formatDigitalTime(time);
 
+    // Generate QR code data (using receipt info)
+    const qrData = JSON.stringify({
+        receipt: receiptNo,
+        member: memberId,
+        amount: total,
+        date: date
+    });
+
     return `
         <div class="receipt-content-wrapper" style="position:relative;height:100%;display:flex;flex-direction:column;">
             <!-- Watermark Logo -->
-            <img src="${WATERMARK_LOGO}" alt="Watermark" class="receipt-watermark" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.06;pointer-events:none;z-index:0;width:120px;height:120px;object-fit:contain;">
+            <img src="${WATERMARK_LOGO}" alt="Watermark" class="receipt-watermark" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.08;pointer-events:none;z-index:0;width:120px;height:120px;object-fit:contain;">
             
             <div style="position:relative;z-index:1;flex:1;display:flex;flex-direction:column;">
                 <div class="receipt-header">
-                    <h2>নিউ ভিশন ট্রেড অ্যাসোসিয়েশন</h2>
-                    <span class="org-address">মাটিয়াকুড়া গাবতলি বাজার, শ্রীবরদী, শেরপুর।</span>
-                    <span class="org-established">স্থাপিতঃ ২০২৬ খ্রিঃ</span>
-                    <div class="receipt-title-wrapper">
-                        <small>রশিদ বহি</small>
-                    </div>
+                    <h2>নিউ ভিশন ট্রেড অ্যাসোসিয়েশন <small>রশিদ বহি</small></h2>
                 </div>
                 <div class="receipt-meta">
                     <div class="meta-left">
@@ -2505,8 +2447,8 @@ function buildReceiptHTML(data) {
                         <span class="status-badge">${status || 'সফল'}</span>
                     </div>
                 </div>
-                <div style="flex-grow:1;"></div>
-                <div class="signature-area">
+                <div style="flex:1;"></div>
+                <div class="signature-area" style="padding-bottom:10px;">
                     <div class="signature-block">
                         <span>সভাপতি স্বাক্ষর</span>
                         <div class="sig-placeholder">
@@ -2580,23 +2522,17 @@ function openReceipt(data) {
         pdfBtn.parentNode.replaceChild(newPdf, pdfBtn);
         newPdf.addEventListener('click', function(e) {
             e.stopPropagation();
-            
-            // Get the current popup card content
             const card = document.getElementById('popupCard');
             const clone = card.cloneNode(true);
-            
-            // Remove action buttons from clone
+            // remove action buttons from clone
             const btns = clone.querySelector('#actionButtons');
             if (btns) btns.style.display = 'none';
-            
             const closeClone = clone.querySelector('.close-popup');
             if (closeClone) closeClone.style.display = 'none';
-            
-            // Style for PDF - 100x150mm
             clone.style.background = '#ffffff';
             clone.style.borderRadius = '0';
-            clone.style.border = '2px solid #000';
-            clone.style.padding = '5mm';
+            clone.style.border = '4px solid #000';
+            clone.style.padding = '5mm 5mm 5mm';
             clone.style.boxShadow = 'none';
             clone.style.width = '100mm';
             clone.style.height = '150mm';
@@ -2604,21 +2540,17 @@ function openReceipt(data) {
             clone.style.boxSizing = 'border-box';
             clone.style.margin = '0 auto';
             clone.style.position = 'relative';
-            clone.style.maxWidth = '100mm';
-            clone.style.maxHeight = '150mm';
 
             // Ensure watermark stays in PDF
             let watermark = clone.querySelector('.receipt-watermark');
             if (!watermark) {
                 const wrapper = clone.querySelector('.receipt-content-wrapper') || clone.querySelector('.receipt-content');
-                if (wrapper) {
-                    watermark = document.createElement('img');
-                    watermark.src = WATERMARK_LOGO;
-                    watermark.className = 'receipt-watermark';
-                    watermark.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.06;pointer-events:none;z-index:0;width:100px;height:100px;object-fit:contain;';
-                    wrapper.style.position = 'relative';
-                    wrapper.insertBefore(watermark, wrapper.firstChild);
-                }
+                watermark = document.createElement('img');
+                watermark.src = WATERMARK_LOGO;
+                watermark.className = 'receipt-watermark';
+                watermark.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.08;pointer-events:none;z-index:0;width:100px;height:100px;object-fit:contain;';
+                wrapper.style.position = 'relative';
+                wrapper.insertBefore(watermark, wrapper.firstChild);
             }
 
             // Ensure QR code images are rendered properly in PDF
@@ -2642,60 +2574,32 @@ function openReceipt(data) {
                 img.style.height = '45px';
             });
 
-            // Create wrapper for PDF generation
             const wrapper = document.createElement('div');
             wrapper.style.position = 'fixed';
-            wrapper.style.left = '0';
+            wrapper.style.left = '-9999px';
             wrapper.style.top = '0';
+            wrapper.style.background = 'white';
             wrapper.style.width = '100mm';
             wrapper.style.height = '150mm';
             wrapper.style.padding = '0';
             wrapper.style.margin = '0';
             wrapper.style.overflow = 'hidden';
             wrapper.style.boxSizing = 'border-box';
-            wrapper.style.zIndex = '999999';
-            wrapper.style.backgroundColor = '#ffffff';
-            wrapper.style.display = 'flex';
-            wrapper.style.alignItems = 'center';
-            wrapper.style.justifyContent = 'center';
-            
             wrapper.appendChild(clone);
             document.body.appendChild(wrapper);
 
-            // Small delay to ensure DOM is ready
-            setTimeout(() => {
-                html2pdf()
+            html2pdf()
                 .set({
-                    margin: 0,
-                    filename: 'এনভিটিএ রশিদ.pdf',
-                    image: {
-                        type: 'jpeg',
-                        quality: 1
-                    },
-                    html2canvas: {
-                        scale: 3,
-                        useCORS: true,
-                        backgroundColor: '#ffffff',
-                        logging: false,
-                        width: 100,
-                        height: 150
-                    },
-                    jsPDF: {
-                        unit: 'mm',
-                        format: [100, 150],
-                        orientation: 'portrait'
-                    }
+                    margin:        [0, 0, 0, 0],
+                    filename:      'এনভিটিএ রশিদ.pdf',
+                    image:         { type: 'jpeg', quality: 0.98 },
+                    html2canvas:   { scale: 2, letterRendering: true, useCORS: true, background: '#ffffff', width: 100 * 2, height: 150 * 2 },
+                    jsPDF:         { unit: 'mm', format: [100, 150], orientation: 'portrait' }
                 })
                 .from(wrapper)
                 .save()
-                .then(() => {
-                    document.body.removeChild(wrapper);
-                })
-                .catch(err => {
-                    console.error('PDF generation error:', err);
-                    document.body.removeChild(wrapper);
-                });
-            }, 200);
+                .then(() => { document.body.removeChild(wrapper); })
+                .catch((err) => { console.warn('PDF error:', err); document.body.removeChild(wrapper); });
         });
     }
 }
