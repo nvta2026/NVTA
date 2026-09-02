@@ -502,6 +502,32 @@
         }
 
         /* ========================================= */
+        /* PREVENT SCROLL PROPAGATION - FIX */
+        /* ========================================= */
+        .history-wrapper.scrollable {
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+        }
+
+        .history-wrapper.scrollable table {
+            overscroll-behavior: contain;
+        }
+
+        .history-wrapper.scrollable::-webkit-scrollbar {
+            width: 4px;
+            background: transparent;
+        }
+
+        .history-wrapper.scrollable::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        body.dark-mode .history-wrapper.scrollable::-webkit-scrollbar-thumb {
+            background: #08A33F;
+        }
+
+        /* ========================================= */
         /* SKELETON SCREEN STYLES */
         /* ========================================= */
 
@@ -2163,7 +2189,31 @@ function updateHistoryTable(transactions) {
         historyWrapper.classList.remove('scrollable');
     }
     
+    // ===== FIX: Prevent scroll propagation =====
+    // Remove existing listeners to avoid duplicates
+    historyWrapper.removeEventListener('scroll', stopScrollPropagation);
+    historyWrapper.removeEventListener('touchmove', stopTouchPropagation);
+    historyWrapper.removeEventListener('wheel', stopWheelPropagation);
+    
+    // Add listeners with stopPropagation
+    historyWrapper.addEventListener('scroll', stopScrollPropagation);
+    historyWrapper.addEventListener('touchmove', stopTouchPropagation, { passive: true });
+    historyWrapper.addEventListener('wheel', stopWheelPropagation, { passive: true });
+    
     attachHistoryClickListeners();
+}
+
+// ===== FIX: Scroll propagation stoppers =====
+function stopScrollPropagation(e) {
+    e.stopPropagation();
+}
+
+function stopTouchPropagation(e) {
+    e.stopPropagation();
+}
+
+function stopWheelPropagation(e) {
+    e.stopPropagation();
 }
 
 function showEmptyHistory() {
@@ -2458,9 +2508,9 @@ function buildReceiptHTML(data) {
                         <span>QR Code</span>
                     </div>
                     <div class="signature-block">
-                        <span>কোষাধ্যক্ষ স্বাক্ষর</span>
+                        <span>কোষাধক্ষ্য স্বাক্ষর</span>
                         <div class="sig-placeholder">
-                            <img src="${TREASURER_SIGNATURE}" alt="কোষাধ্যক্ষ স্বাক্ষর" class="sig-image" onerror="this.style.display='none'">
+                            <img src="${TREASURER_SIGNATURE}" alt="কোষাধক্ষ্য স্বাক্ষর" class="sig-image" onerror="this.style.display='none'">
                         </div>
                     </div>
                 </div>
