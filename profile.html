@@ -506,14 +506,16 @@ body.dark-mode .member-name {
     color: var(--dark-text);
 }
 
+/* ========== MEMBER ID - FONT SIZE INCREASED ========== */
 .member-id {
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 20px;
+    font-weight: 600;
     color: #666;
     background: transparent;
     padding: 0;
     display: inline-block;
     max-width: fit-content;
+    letter-spacing: 0.5px; /* কিছু স্পেসিং যোগ করা হয়েছে */
 }
 
 body.dark-mode .member-id {
@@ -1249,6 +1251,7 @@ body.dark-mode .skeleton-logout-btn {
     .skeleton-address-label { width: 100%; }
 }
 
+/* ========== MEMBER ID - MOBILE RESPONSIVE FONT SIZE ========== */
 @media (max-width: 768px) {
     body{
         font-size:13px;
@@ -1287,8 +1290,9 @@ body.dark-mode .skeleton-logout-btn {
         font-size: 22px;
     }
     
+    /* Member ID - Tablet size */
     .member-id {
-        font-size: 11px;
+        font-size: 14px;
     }
     
     .info-section, .address-section, .nominee-section {
@@ -1355,8 +1359,9 @@ body.dark-mode .skeleton-logout-btn {
         font-size: 20px;
     }
     
+    /* Member ID - Mobile size */
     .member-id {
-        font-size: 10px;
+        font-size: 12px;
     }
     
     .avatar-upload-btn {
@@ -1397,8 +1402,9 @@ body.dark-mode .skeleton-logout-btn {
         font-size: 18px;
     }
 
+    /* Member ID - Very small screen */
     .member-id {
-        font-size: 9px;
+        font-size: 11px;
     }
 
     .avatar-upload-btn {
