@@ -1369,7 +1369,7 @@
             loadingSpinner.style.display = 'block';
             submitBtn.disabled = true;
             
-            const memberId = 'NVTA-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+            const memberId = Math.floor(100000 + Math.random() * 900000).toString();
             
             const userCredential = await auth.createUserWithEmailAndPassword(
                 formData.email, 
