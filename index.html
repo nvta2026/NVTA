@@ -58,6 +58,18 @@
             opacity: 0;
         }
 
+        /* ===== CRITICAL FIX: Prevent pull-to-refresh ===== */
+        body {
+            overscroll-behavior: none !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Prevent any child from causing pull-to-refresh */
+        * {
+            overscroll-behavior: none !important;
+        }
+
         body:not(.dark-mode) {
             background-color: white;
         }
@@ -438,7 +450,9 @@
             border-color: #08A33F;
         }
 
-        /* History */
+        /* ========================================= */
+        /* HISTORY TABLE - SCROLL FIXED */
+        /* ========================================= */
         .history-wrapper{
             overflow-x:auto;
             border:1px solid #ddd;
@@ -447,22 +461,34 @@
             max-height: none;
             overflow-y: visible;
             transition: max-height 0.3s ease;
+            position: relative;
         }
 
         .history-wrapper.scrollable {
             max-height: 352px !important;
             overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain !important;
+            touch-action: pan-y !important;
         }
 
-        /* Hide scrollbar but keep functionality */
+        /* Hide scrollbar completely */
         .history-wrapper.scrollable::-webkit-scrollbar {
-            width: 0px;
-            background: transparent;
+            width: 0px !important;
+            height: 0px !important;
+            background: transparent !important;
+            display: none !important;
         }
 
         .history-wrapper.scrollable {
-            scrollbar-width: none;
-            -ms-overflow-style: none;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+
+        /* Prevent scroll from bubbling up */
+        .history-wrapper.scrollable * {
+            overscroll-behavior: contain !important;
+            touch-action: pan-y !important;
         }
 
         .history-table{
@@ -499,32 +525,6 @@
 
         body.dark-mode .history-table tbody tr:hover {
             background-color: #2005CC;
-        }
-
-        /* ========================================= */
-        /* PREVENT SCROLL PROPAGATION - FIX */
-        /* ========================================= */
-        .history-wrapper.scrollable {
-            overscroll-behavior: contain;
-            touch-action: pan-y;
-        }
-
-        .history-wrapper.scrollable table {
-            overscroll-behavior: contain;
-        }
-
-        .history-wrapper.scrollable::-webkit-scrollbar {
-            width: 4px;
-            background: transparent;
-        }
-
-        .history-wrapper.scrollable::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
-            border-radius: 4px;
-        }
-
-        body.dark-mode .history-wrapper.scrollable::-webkit-scrollbar-thumb {
-            background: #08A33F;
         }
 
         /* ========================================= */
@@ -1709,6 +1709,37 @@ window.onpageshow = function(event) {
     }
 };
 
+// ===== CRITICAL FIX: Prevent pull-to-refresh on history scroll =====
+document.addEventListener('touchmove', function(e) {
+    // Check if the touch is inside history wrapper
+    const historyWrapper = document.getElementById('historyWrapper');
+    if (historyWrapper && historyWrapper.classList.contains('scrollable')) {
+        const target = e.target;
+        if (historyWrapper.contains(target)) {
+            // Allow scroll inside history wrapper
+            return;
+        }
+    }
+    // Prevent pull-to-refresh on body
+    if (e.target === document.body || e.target === document.documentElement) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
+// Also prevent default on wheel events that might cause refresh
+document.addEventListener('wheel', function(e) {
+    const historyWrapper = document.getElementById('historyWrapper');
+    if (historyWrapper && historyWrapper.classList.contains('scrollable')) {
+        const target = e.target;
+        if (historyWrapper.contains(target)) {
+            return;
+        }
+    }
+    if (e.target === document.body || e.target === document.documentElement) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
 // Cache elements
 const skeletonScreen = document.getElementById('skeletonScreen');
 const loadingOverlay = document.getElementById('loadingOverlay');
@@ -2189,31 +2220,7 @@ function updateHistoryTable(transactions) {
         historyWrapper.classList.remove('scrollable');
     }
     
-    // ===== FIX: Prevent scroll propagation =====
-    // Remove existing listeners to avoid duplicates
-    historyWrapper.removeEventListener('scroll', stopScrollPropagation);
-    historyWrapper.removeEventListener('touchmove', stopTouchPropagation);
-    historyWrapper.removeEventListener('wheel', stopWheelPropagation);
-    
-    // Add listeners with stopPropagation
-    historyWrapper.addEventListener('scroll', stopScrollPropagation);
-    historyWrapper.addEventListener('touchmove', stopTouchPropagation, { passive: true });
-    historyWrapper.addEventListener('wheel', stopWheelPropagation, { passive: true });
-    
     attachHistoryClickListeners();
-}
-
-// ===== FIX: Scroll propagation stoppers =====
-function stopScrollPropagation(e) {
-    e.stopPropagation();
-}
-
-function stopTouchPropagation(e) {
-    e.stopPropagation();
-}
-
-function stopWheelPropagation(e) {
-    e.stopPropagation();
 }
 
 function showEmptyHistory() {
