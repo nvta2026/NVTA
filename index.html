@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>হোম</title>
 
     <!-- Firebase SDK -->
@@ -45,6 +45,7 @@
             box-sizing:border-box;
             font-family:'Segoe UI','Kalpurush','Siyam Rupali',sans-serif;
         }
+        
         body{
             color:#333;
             font-size:14px; 
@@ -56,15 +57,21 @@
             overflow-x: hidden;
             visibility: hidden;
             opacity: 0;
-            /* CRITICAL: Prevent pull-to-refresh on body */
+            /* সমস্যার মূল সমাধান: Pull-to-refresh বন্ধ করা */
             overscroll-behavior: none !important;
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch;
             touch-action: pan-y !important;
+            height: 100vh;
+            width: 100vw;
         }
 
-        /* Prevent any child from causing pull-to-refresh */
+        /* সব এলিমেন্টে pull-to-refresh বন্ধ */
         * {
+            overscroll-behavior: none !important;
+        }
+
+        html {
             overscroll-behavior: none !important;
         }
 
@@ -330,7 +337,6 @@
             opacity: 1;
             padding: 15px;
             transition: opacity 0.3s;
-            /* Prevent scroll issues on container */
             overscroll-behavior: none !important;
         }
 
@@ -451,7 +457,7 @@
         }
 
         /* ========================================= */
-        /* HISTORY TABLE - SMOOTH SCROLL FIXED */
+        /* HISTORY TABLE - সম্পূর্ণ সমাধান */
         /* ========================================= */
         .history-wrapper{
             overflow-x:auto;
@@ -462,8 +468,9 @@
             overflow-y: visible;
             transition: max-height 0.3s ease;
             position: relative;
-            /* Prevent scroll from affecting parent */
+            /* গুরুত্বপূর্ণ: স্ক্রল কন্টেইনমেন্ট */
             overscroll-behavior: contain !important;
+            touch-action: pan-y !important;
         }
 
         .history-wrapper.scrollable {
@@ -472,11 +479,13 @@
             -webkit-overflow-scrolling: touch !important;
             overscroll-behavior: contain !important;
             touch-action: pan-y !important;
-            /* Smooth scrolling */
             scroll-behavior: smooth !important;
+            /* স্ক্রলবার সম্পূর্ণ লুকানো */
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
         }
 
-        /* Hide scrollbar completely */
+        /* স্ক্রলবার লুকানো */
         .history-wrapper.scrollable::-webkit-scrollbar {
             width: 0px !important;
             height: 0px !important;
@@ -484,12 +493,7 @@
             display: none !important;
         }
 
-        .history-wrapper.scrollable {
-            scrollbar-width: none !important;
-            -ms-overflow-style: none !important;
-        }
-
-        /* Prevent scroll from bubbling up - CRITICAL */
+        /* স্ক্রল বাবল আপ রোধ */
         .history-wrapper.scrollable * {
             overscroll-behavior: contain !important;
             touch-action: pan-y !important;
@@ -1401,11 +1405,8 @@
     </div>
 </header>
 
-<!-- Loading Overlay with Spinner - HIDDEN FOR SPEED -->
-<div id="loadingOverlay" class="loading-overlay" style="display: none !important;">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">অপেক্ষা করুন</div>
-</div>
+<!-- Loading Overlay - HIDDEN -->
+<div id="loadingOverlay" class="loading-overlay" style="display: none !important;"></div>
 
 <!-- SKELETON SCREEN -->
 <div id="skeletonScreen" class="container" style="display: block;">
@@ -1660,25 +1661,25 @@ window.onpageshow = function(event) {
     }
 };
 
-// ===== CRITICAL FIX: Prevent pull-to-refresh and page refresh =====
-// Method 1: Prevent default on touchmove for body
+// ===== সমস্যার মূল সমাধান: Pull-to-Refresh সম্পূর্ণ বন্ধ =====
+// ১. টাচমুভ ইভেন্টে ডিফল্ট প্রিভেন্ট
 document.addEventListener('touchmove', function(e) {
     const historyWrapper = document.getElementById('historyWrapper');
-    // If touch is inside history wrapper, allow it
+    
+    // যদি টাচ হিস্টোরি র‍্যাপারের ভেতরে হয়, তাহলে স্ক্রল করতে দিন
     if (historyWrapper && historyWrapper.classList.contains('scrollable')) {
         const target = e.target;
         if (historyWrapper.contains(target)) {
-            return; // Allow scroll inside history
+            // হিস্টোরি টেবিলের ভেতরে স্ক্রল করতে দিন
+            return;
         }
     }
-    // Prevent pull-to-refresh on body
-    if (e.target === document.body || e.target === document.documentElement || 
-        e.target.closest('.container') === document.querySelector('.container')) {
-        e.preventDefault();
-    }
+    
+    // বাকি সব জায়গায় pull-to-refresh বন্ধ
+    e.preventDefault();
 }, { passive: false });
 
-// Method 2: Prevent wheel events from causing refresh
+// ২. হুইল ইভেন্টে ডিফল্ট প্রিভেন্ট
 document.addEventListener('wheel', function(e) {
     const historyWrapper = document.getElementById('historyWrapper');
     if (historyWrapper && historyWrapper.classList.contains('scrollable')) {
@@ -1687,17 +1688,15 @@ document.addEventListener('wheel', function(e) {
             return;
         }
     }
-    if (e.target === document.body || e.target === document.documentElement) {
-        e.preventDefault();
-    }
+    e.preventDefault();
 }, { passive: false });
 
-// Method 3: Prevent scroll events from bubbling on history wrapper
+// ৩. হিস্টোরি র‍্যাপারের স্ক্রল ইভেন্ট প্রপাগেশন বন্ধ
 function setupHistoryScrollProtection() {
     const historyWrapper = document.getElementById('historyWrapper');
     if (!historyWrapper) return;
     
-    // Prevent scroll from bubbling up
+    // স্ক্রল ইভেন্ট বাবল আপ রোধ
     historyWrapper.addEventListener('scroll', function(e) {
         e.stopPropagation();
     });
@@ -1709,11 +1708,6 @@ function setupHistoryScrollProtection() {
     historyWrapper.addEventListener('wheel', function(e) {
         e.stopPropagation();
     }, { passive: true });
-}
-
-// Call this after history is rendered
-function protectHistoryScroll() {
-    setTimeout(setupHistoryScrollProtection, 100);
 }
 
 // Cache elements
@@ -1760,7 +1754,7 @@ function showSkeleton() {
 function hideSkeleton() {
     skeletonScreen.style.display = 'none';
     mainContainer.style.display = 'block';
-    // Setup scroll protection after content is shown
+    // কন্টেন্ট শো হওয়ার পর স্ক্রল প্রটেকশন সেটআপ
     setTimeout(setupHistoryScrollProtection, 200);
 }
 
@@ -2093,7 +2087,7 @@ function updateHistoryTable(transactions) {
     }
     
     attachHistoryClickListeners();
-    // Setup scroll protection after table update
+    // টেবিল আপডেট হওয়ার পর স্ক্রল প্রটেকশন সেটআপ
     setTimeout(setupHistoryScrollProtection, 100);
 }
 
