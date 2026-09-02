@@ -528,7 +528,7 @@
         }
 
         /* ========================================= */
-        /* SKELETON SCREEN STYLES */
+        /* SKELETON SCREEN STYLES - REDUCED */
         /* ========================================= */
 
         .skeleton {
@@ -549,7 +549,7 @@
                 var(--skeleton-highlight) 50%,
                 transparent 100%
             );
-            animation: shimmer 1.5s infinite ease-in-out;
+            animation: shimmer 1.2s infinite ease-in-out;
             z-index: 1;
         }
 
@@ -669,7 +669,7 @@
             background-color: var(--skeleton-highlight-dark);
         }
 
-        /* Skeleton History Table */
+        /* Skeleton History Table - Reduced rows */
         .skeleton-history-wrapper {
             overflow-x:auto;
             border: 1px solid #e0e0e0;
@@ -714,11 +714,11 @@
         }
 
         .skeleton-history-row {
-            height: 60px;
+            height: 50px;
         }
 
         .skeleton-history-cell {
-            height: 16px;
+            height: 14px;
             border-radius: 4px;
             background-color: var(--skeleton-highlight);
             margin: 0 5px;
@@ -742,7 +742,7 @@
             padding: 15px;
             text-align: center;
             background-color: var(--skeleton-bg);
-            height: 180px;
+            height: 160px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -755,11 +755,11 @@
         }
 
         .skeleton-committee-photo {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             background-color: var(--skeleton-highlight);
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         body.dark-mode .skeleton-committee-photo {
@@ -768,10 +768,10 @@
 
         .skeleton-committee-name {
             width: 100px;
-            height: 18px;
+            height: 16px;
             border-radius: 4px;
             background-color: var(--skeleton-highlight);
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
 
         body.dark-mode .skeleton-committee-name {
@@ -780,7 +780,7 @@
 
         .skeleton-committee-position {
             width: 80px;
-            height: 14px;
+            height: 12px;
             border-radius: 4px;
             background-color: var(--skeleton-highlight);
         }
@@ -789,55 +789,9 @@
             background-color: var(--skeleton-highlight-dark);
         }
 
-        /* Loading State */
+        /* Loading State - Hidden by default for speed */
         .loading-overlay {
-            position: fixed;
-            top: 50px;
-            left: 0;
-            width: 100%;
-            height: calc(100% - 110px);
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 90;
-            transition: background-color 0.3s;
-        }
-
-        body.dark-mode .loading-overlay {
-            background: rgba(26, 26, 26, 0.9);
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #27ae60;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        body.dark-mode .loading-spinner {
-            border: 4px solid #2d2d2d;
-            border-top: 4px solid #2ecc71;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: #333;
-            font-size: 18px;
-            font-family: 'Kalpurush', 'Siyam Rupali', sans-serif;
-            transition: color 0.3s;
-        }
-
-        body.dark-mode .loading-text {
-            color: #f0f0f0;
+            display: none !important;
         }
 
         /* Content Loading State */
@@ -1167,11 +1121,9 @@
             .marquee-left { font-size:12px; padding:2px 6px; }
             .committee-grid { grid-template-columns:repeat(2, 1fr); gap:12px; }
             .committee-member { padding:12px 8px; }
-            .loading-spinner { width: 40px; height: 40px; }
-            .loading-text { font-size: 16px; }
             .skeleton-committee-photo { width: 70px; height: 70px; }
             .skeleton-financial-card { height: 90px; }
-            .skeleton-committee-member { height: 160px; }
+            .skeleton-committee-member { height: 140px; }
             .skeleton-section-title { height: 20px; width: 150px; }
             .logo { height: 40px; }
             .app-title { font-size: 14px; }
@@ -1196,10 +1148,8 @@
             .committee-grid { grid-template-columns:repeat(2, 1fr); gap:10px; }
             .committee-member { padding:10px 6px; }
             .committee-photo { width:60px; height:60px; }
-            .loading-spinner { width: 35px; height: 35px; border-width: 3px; }
-            .loading-text { font-size: 14px; }
             .skeleton-committee-photo { width: 60px; height: 60px; }
-            .skeleton-committee-member { height: 150px; padding: 10px 6px; }
+            .skeleton-committee-member { height: 120px; padding: 10px 6px; }
             .skeleton-committee-grid { gap: 10px; }
             .skeleton-financial-card { height: 85px; padding: 10px; }
             .skeleton-financial-value { width: 70px; height: 28px; }
@@ -1453,14 +1403,14 @@
     </div>
 </header>
 
-<!-- Loading Overlay with Spinner -->
-<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+<!-- Loading Overlay with Spinner - HIDDEN FOR SPEED -->
+<div id="loadingOverlay" class="loading-overlay" style="display: none !important;">
     <div class="loading-spinner"></div>
     <div class="loading-text">অপেক্ষা করুন</div>
 </div>
 
-<!-- SKELETON SCREEN -->
-<div id="skeletonScreen" class="container" style="display: none;">
+<!-- SKELETON SCREEN - Always shown first, then hidden -->
+<div id="skeletonScreen" class="container" style="display: block;">
     <div class="skeleton-marquee skeleton">
         <div class="skeleton-marquee-left"></div>
         <div class="skeleton-marquee-content"></div>
@@ -1534,7 +1484,7 @@
     </div>
 </div>
 
-<!-- ACTUAL CONTENT -->
+<!-- ACTUAL CONTENT - Hidden initially, shown after data loads -->
 <div class="container" id="mainContainer" style="display: none;">
 
 <!-- Marquee -->
@@ -1643,6 +1593,9 @@
 <div id="pdf-generation-container"></div>
 
 <script>
+// ===== FAST LOADING OPTIMIZATION =====
+// Show skeleton immediately, load data as fast as possible
+
 // Firebase config
 const firebaseConfig = {
     apiKey: "AIzaSyBnUqarL-c8oEA52EPBCUdoz67kzvsDnM0",
@@ -1711,22 +1664,18 @@ window.onpageshow = function(event) {
 
 // ===== CRITICAL FIX: Prevent pull-to-refresh on history scroll =====
 document.addEventListener('touchmove', function(e) {
-    // Check if the touch is inside history wrapper
     const historyWrapper = document.getElementById('historyWrapper');
     if (historyWrapper && historyWrapper.classList.contains('scrollable')) {
         const target = e.target;
         if (historyWrapper.contains(target)) {
-            // Allow scroll inside history wrapper
             return;
         }
     }
-    // Prevent pull-to-refresh on body
     if (e.target === document.body || e.target === document.documentElement) {
         e.preventDefault();
     }
 }, { passive: false });
 
-// Also prevent default on wheel events that might cause refresh
 document.addEventListener('wheel', function(e) {
     const historyWrapper = document.getElementById('historyWrapper');
     if (historyWrapper && historyWrapper.classList.contains('scrollable')) {
@@ -1742,7 +1691,6 @@ document.addEventListener('wheel', function(e) {
 
 // Cache elements
 const skeletonScreen = document.getElementById('skeletonScreen');
-const loadingOverlay = document.getElementById('loadingOverlay');
 const mainContainer = document.getElementById('mainContainer');
 const marqueeText = document.getElementById('marqueeText');
 const totalInstallments = document.getElementById('totalInstallments');
@@ -1773,12 +1721,15 @@ const bgAnimation = document.getElementById('bg-animation');
 let currentUser = null;
 let currentMemberId = null;
 let currentUserData = { name: '', mobile: '' };
+let dataLoaded = false;
 
+// Show skeleton immediately
 function showSkeleton() {
     skeletonScreen.style.display = 'block';
     mainContainer.style.display = 'none';
 }
 
+// Hide skeleton and show content
 function hideSkeleton() {
     skeletonScreen.style.display = 'none';
     mainContainer.style.display = 'block';
@@ -1891,114 +1842,36 @@ function updateNotificationBadge(count) {
     notificationBadge.dataset.prevCount = num;
 }
 
-async function loadAllDataInParallel(memberId) {
+// ===== FAST LOAD: Load all data in parallel with minimal delay =====
+async function loadAllDataFast(memberId) {
     try {
-        const [marqueeData, committeeData, userHomeData, userHistoryData] = await Promise.allSettled([
+        // Load all data in parallel
+        const [marqueeData, committeeData, userHomeData, userHistoryData] = await Promise.all([
             loadMarqueeData(),
             loadCommitteeData(),
             loadUserFinancialData(memberId),
             loadUserHistoryData(memberId)
         ]);
-        console.log("All data loaded in parallel");
+        
+        // Hide skeleton and show content immediately
+        hideSkeleton();
+        dataLoaded = true;
+        
+        // Setup real-time listeners after content is shown
         setupMarqueeRealtimeListener();
         setupUserFinancialRealtimeListener(memberId);
         setupCommitteeRealtimeListener();
         setupUserHistoryRealtimeListener(memberId);
+        
         return { marqueeData, committeeData, userHomeData, userHistoryData };
     } catch (error) {
-        console.error("Error in parallel loading:", error);
-        throw error;
-    }
-}
-
-async function initializeAllCollections(memberId) {
-    try {
-        const results = await Promise.allSettled([
-            initializeMarqueeCollection(),
-            initializeUserHomeCollection(memberId),
-            initializeManagementCollection(),
-            initializeUserHistoryCollection(memberId)
-        ]);
-        console.log("All collections initialized");
-        return results;
-    } catch (error) {
-        console.error("Error initializing collections:", error);
-        throw error;
-    }
-}
-
-async function initializeMarqueeCollection() {
-    try {
-        const marqueeRef = db.collection('Marquee').doc('marqueeData');
-        const doc = await marqueeRef.get();
-        if (!doc.exists) {
-            const defaultMarquee = { text: "", isActive: true, updatedAt: new Date().toISOString(), updatedBy: "system" };
-            await marqueeRef.set(defaultMarquee);
-            return defaultMarquee;
-        }
-        return doc.exists ? doc.data() : null;
-    } catch (error) {
-        console.error("Error initializing Marquee collection:", error);
+        console.error("Error loading data:", error);
+        hideSkeleton(); // Still hide skeleton even on error
         return null;
     }
 }
 
-async function initializeUserHomeCollection(memberId) {
-    try {
-        if (!memberId) return null;
-        const homeRef = db.collection('Home').doc(memberId);
-        const doc = await homeRef.get();
-        if (!doc.exists) {
-            const defaultData = { totalAmount: 0, totalInstallments: 0, lastUpdated: new Date().toISOString(), memberId: memberId };
-            await homeRef.set(defaultData);
-            return defaultData;
-        }
-        return doc.exists ? doc.data() : null;
-    } catch (error) {
-        console.error("Error initializing user home document:", error);
-        return null;
-    }
-}
-
-async function initializeManagementCollection() {
-    try {
-        const managementRef = db.collection('Management').doc('committeeData');
-        const doc = await managementRef.get();
-        if (!doc.exists) {
-            const defaultCommittee = {
-                president: { name: "", position: "সভাপতি", photo: "" },
-                vicePresident: { name: "", position: "সহ-সভাপতি", photo: "" },
-                secretary: { name: "", position: "সাধারণ সম্পাদক", photo: "" },
-                treasurer: { name: "", position: "কোষাধক্ষ্য", photo: "" },
-                lastUpdated: new Date().toISOString()
-            };
-            await managementRef.set(defaultCommittee);
-            return defaultCommittee;
-        }
-        return doc.exists ? doc.data() : null;
-    } catch (error) {
-        console.error("Error initializing Management collection:", error);
-        return null;
-    }
-}
-
-async function initializeUserHistoryCollection(memberId) {
-    try {
-        if (!memberId) return null;
-        const historyRef = db.collection('History').doc(memberId);
-        const doc = await historyRef.get();
-        if (!doc.exists) {
-            const defaultHistory = { transactions: [], lastUpdated: new Date().toISOString(), memberId: memberId };
-            await historyRef.set(defaultHistory);
-            return defaultHistory;
-        }
-        return doc.exists ? doc.data() : null;
-    } catch (error) {
-        console.error("Error initializing user history document:", error);
-        return null;
-    }
-}
-
+// ===== SIMPLIFIED DATA LOADERS (no initialization checks for speed) =====
 async function loadMarqueeData() {
     try {
         const marqueeRef = db.collection('Marquee').doc('marqueeData');
@@ -2009,19 +1882,12 @@ async function loadMarqueeData() {
                 marqueeText.textContent = data.text;
                 const marqueeContent = document.getElementById('marqueeContent');
                 marqueeContent.innerHTML = '<span class="marquee-scroll" id="marqueeText">' + data.text + '</span>';
-            } else {
-                marqueeText.textContent = "";
-                const marqueeContent = document.getElementById('marqueeContent');
-                marqueeContent.innerHTML = '<span id="marqueeText"></span>';
             }
             return data;
-        } else {
-            marqueeText.textContent = "";
-            return null;
         }
+        return null;
     } catch (error) {
-        console.error("Error loading marquee data:", error);
-        marqueeText.textContent = "";
+        console.error("Error loading marquee:", error);
         return null;
     }
 }
@@ -2040,8 +1906,7 @@ async function loadUserFinancialData(memberId) {
         let totalAmountValue = 0;
         let installmentCount = 0;
         if (homeDoc.exists) {
-            const data = homeDoc.data();
-            totalAmountValue = data.totalAmount || 0;
+            totalAmountValue = homeDoc.data().totalAmount || 0;
         }
         if (historyDoc.exists) {
             const historyData = historyDoc.data();
@@ -2053,7 +1918,7 @@ async function loadUserFinancialData(memberId) {
         totalAmount.textContent = `৳ ${formatNumber(totalAmountValue)}`;
         return { totalAmountValue, installmentCount };
     } catch (error) {
-        console.error("Error loading user financial data:", error);
+        console.error("Error loading financial data:", error);
         totalInstallments.textContent = "০";
         totalAmount.textContent = "৳ ০";
         return null;
@@ -2107,27 +1972,10 @@ async function loadCommitteeData() {
                 }
             }
             return data;
-        } else {
-            presidentName.textContent = "";
-            vicePresidentName.textContent = "";
-            secretaryName.textContent = "";
-            treasurerName.textContent = "";
-            presidentPhoto.style.display = 'none';
-            vicePresidentPhoto.style.display = 'none';
-            secretaryPhoto.style.display = 'none';
-            treasurerPhoto.style.display = 'none';
-            return null;
         }
+        return null;
     } catch (error) {
-        console.error("Error loading committee data:", error);
-        presidentName.textContent = "";
-        vicePresidentName.textContent = "";
-        secretaryName.textContent = "";
-        treasurerName.textContent = "";
-        presidentPhoto.style.display = 'none';
-        vicePresidentPhoto.style.display = 'none';
-        secretaryPhoto.style.display = 'none';
-        treasurerPhoto.style.display = 'none';
+        console.error("Error loading committee:", error);
         return null;
     }
 }
@@ -2149,7 +1997,7 @@ async function loadUserHistoryData(memberId) {
             return null;
         }
     } catch (error) {
-        console.error("Error loading user history data:", error);
+        console.error("Error loading history:", error);
         showEmptyHistory();
         return null;
     }
@@ -2212,7 +2060,6 @@ function updateHistoryTable(transactions) {
     });
     historyTableBody.appendChild(fragment);
     
-    // Check if more than 5 rows and add scroll
     const rowCount = sortedTransactions.length;
     if (rowCount > 5) {
         historyWrapper.classList.add('scrollable');
@@ -2248,7 +2095,7 @@ function setupMarqueeRealtimeListener() {
             }
         }
     }, (error) => {
-        console.error("Error in marquee real-time listener:", error);
+        console.error("Marquee listener error:", error);
     });
 }
 
@@ -2271,11 +2118,11 @@ function setupUserFinancialRealtimeListener(memberId) {
                 }
                 totalInstallments.textContent = formatNumber(installmentCount);
             } catch (error) {
-                console.error("Error counting installments in real-time:", error);
+                console.error("Error counting installments:", error);
             }
         }
     }, (error) => {
-        console.error("Error in user financial real-time listener:", error);
+        console.error("Financial listener error:", error);
     });
 }
 
@@ -2326,7 +2173,7 @@ function setupCommitteeRealtimeListener() {
             }
         }
     }, (error) => {
-        console.error("Error in committee real-time listener:", error);
+        console.error("Committee listener error:", error);
     });
 }
 
@@ -2339,7 +2186,7 @@ function setupUserHistoryRealtimeListener(memberId) {
             updateHistoryTable(data.transactions || []);
         }
     }, (error) => {
-        console.error("Error in user history real-time listener:", error);
+        console.error("History listener error:", error);
     });
 }
 
@@ -2559,7 +2406,6 @@ function openReceipt(data) {
     }
 
     const printBtn = document.getElementById('printReceiptBtn');
-    // const pdfBtn = document.getElementById('pdfReceiptBtn'); // PDF button removed
 
     if (printBtn) {
         const newPrint = printBtn.cloneNode(true);
@@ -2569,8 +2415,6 @@ function openReceipt(data) {
             window.print();
         });
     }
-
-    // PDF button functionality removed
 }
 
 function attachHistoryClickListeners() {
@@ -2593,7 +2437,9 @@ function attachHistoryClickListeners() {
     });
 }
 
+// ===== MAIN INITIALIZATION - FAST =====
 async function initializeApp(user) {
+    // Show skeleton immediately
     showSkeleton();
     initHeaderComponents();
     
@@ -2602,27 +2448,25 @@ async function initializeApp(user) {
         const userData = await getUserData(user);
         const memberId = userData.memberId;
         
-        if (!memberId) {
-            setTimeout(() => { hideSkeleton(); }, 300);
-            return;
+        if (memberId) {
+            currentMemberId = memberId;
+            currentUserData.name = userData.name;
+            currentUserData.mobile = userData.mobile;
+            
+            setupNotificationListener(memberId);
+            
+            // Load all data in parallel - this will hide skeleton when done
+            await loadAllDataFast(memberId);
+        } else {
+            // No member ID, just show content
+            hideSkeleton();
         }
         
-        currentMemberId = memberId;
-        currentUserData.name = userData.name;
-        currentUserData.mobile = userData.mobile;
-        
-        setupNotificationListener(memberId);
-        await initializeAllCollections(memberId);
-        await loadAllDataInParallel(memberId);
-        
-        setTimeout(() => {
-            hideSkeleton();
-            attachHistoryClickListeners();
-        }, 300);
+        attachHistoryClickListeners();
         
     } catch (error) {
         console.error("Error in app initialization:", error);
-        setTimeout(() => { hideSkeleton(); }, 300);
+        hideSkeleton();
     }
 }
 </script>
