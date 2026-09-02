@@ -444,7 +444,27 @@
             border:1px solid #ddd;
             border-radius:8px;
             padding:0;
+            max-height: none;
+            overflow-y: visible;
+            transition: max-height 0.3s ease;
         }
+
+        .history-wrapper.scrollable {
+            max-height: 352px !important;
+            overflow-y: auto !important;
+        }
+
+        /* Hide scrollbar but keep functionality */
+        .history-wrapper.scrollable::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        .history-wrapper.scrollable {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
         .history-table{
             width:100%;
             min-width:300px;
@@ -462,10 +482,23 @@
             color:#2c3e9e;
             font-size:14px; 
             font-weight:600;
+            position: sticky;
+            top: 0;
+            z-index: 2;
         }
+
+        body.dark-mode .history-table th {
+            background: #2d2d2d;
+            color: #08A33F;
+        }
+
         .history-table tbody tr:hover{
             background-color:#F54927;
             cursor:pointer;
+        }
+
+        body.dark-mode .history-table tbody tr:hover {
+            background-color: #F54927;
         }
 
         /* ========================================= */
@@ -1128,6 +1161,9 @@
             .receipt-header .receipt-title-wrapper { padding: 2px 16px; }
             .receipt-header .org-address { font-size: 11px; }
             .receipt-header .org-established { font-size: 10px; }
+            .history-wrapper.scrollable {
+                max-height: 282px !important;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1146,6 +1182,9 @@
             .receipt-watermark { width: 80px; height: 80px; }
             .receipt-header .receipt-title-wrapper small { font-size: 13px; }
             .receipt-header .receipt-title-wrapper { padding: 2px 12px; }
+            .history-wrapper.scrollable {
+                max-height: 222px !important;
+            }
         }
 
         @media (min-width: 768px) {
@@ -1495,7 +1534,7 @@
 
 <!-- History -->
 <h2 class="section-title">কিস্তি জমা হিস্টোরি</h2>
-<div class="history-wrapper">
+<div class="history-wrapper" id="historyWrapper">
 <table class="history-table">
 <thead>
 <tr>
@@ -1652,6 +1691,7 @@ const marqueeText = document.getElementById('marqueeText');
 const totalInstallments = document.getElementById('totalInstallments');
 const totalAmount = document.getElementById('totalAmount');
 const historyTableBody = document.getElementById('historyTableBody');
+const historyWrapper = document.getElementById('historyWrapper');
 const presidentName = document.getElementById('presidentName');
 const presidentPosition = document.getElementById('presidentPosition');
 const presidentPhoto = document.getElementById('presidentPhoto');
@@ -2114,6 +2154,15 @@ function updateHistoryTable(transactions) {
         fragment.appendChild(row);
     });
     historyTableBody.appendChild(fragment);
+    
+    // Check if more than 5 rows and add scroll
+    const rowCount = sortedTransactions.length;
+    if (rowCount > 5) {
+        historyWrapper.classList.add('scrollable');
+    } else {
+        historyWrapper.classList.remove('scrollable');
+    }
+    
     attachHistoryClickListeners();
 }
 
@@ -2125,6 +2174,7 @@ function showEmptyHistory() {
             </td>
         </tr>
     `;
+    historyWrapper.classList.remove('scrollable');
 }
 
 function setupMarqueeRealtimeListener() {
