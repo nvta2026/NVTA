@@ -56,13 +56,11 @@
             overflow-x: hidden;
             visibility: hidden;
             opacity: 0;
-        }
-
-        /* ===== CRITICAL FIX: Prevent pull-to-refresh ===== */
-        body {
+            /* CRITICAL: Prevent pull-to-refresh on body */
             overscroll-behavior: none !important;
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch;
+            touch-action: pan-y !important;
         }
 
         /* Prevent any child from causing pull-to-refresh */
@@ -97,6 +95,7 @@
             height: 100%;
             z-index: -1;
             overflow: hidden;
+            pointer-events: none;
         }
 
         .bg-bubble {
@@ -331,6 +330,8 @@
             opacity: 1;
             padding: 15px;
             transition: opacity 0.3s;
+            /* Prevent scroll issues on container */
+            overscroll-behavior: none !important;
         }
 
         .container.loading {
@@ -406,18 +407,17 @@
             margin-bottom:25px;
         }
         .financial-card{
-    flex:1;
-    border:1px solid #ddd;
-    border-radius:8px;
-    padding:15px;
-    text-align:center;
-    font-size:14px;
-
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-}
+            flex:1;
+            border:1px solid #ddd;
+            border-radius:8px;
+            padding:15px;
+            text-align:center;
+            font-size:14px;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+        }
         .committee-member{
             border:1px solid #ddd;
             border-radius:8px;
@@ -451,7 +451,7 @@
         }
 
         /* ========================================= */
-        /* HISTORY TABLE - SCROLL FIXED */
+        /* HISTORY TABLE - SMOOTH SCROLL FIXED */
         /* ========================================= */
         .history-wrapper{
             overflow-x:auto;
@@ -462,14 +462,18 @@
             overflow-y: visible;
             transition: max-height 0.3s ease;
             position: relative;
+            /* Prevent scroll from affecting parent */
+            overscroll-behavior: contain !important;
         }
 
         .history-wrapper.scrollable {
             max-height: 352px !important;
             overflow-y: auto !important;
-            -webkit-overflow-scrolling: touch;
+            -webkit-overflow-scrolling: touch !important;
             overscroll-behavior: contain !important;
             touch-action: pan-y !important;
+            /* Smooth scrolling */
+            scroll-behavior: smooth !important;
         }
 
         /* Hide scrollbar completely */
@@ -485,7 +489,7 @@
             -ms-overflow-style: none !important;
         }
 
-        /* Prevent scroll from bubbling up */
+        /* Prevent scroll from bubbling up - CRITICAL */
         .history-wrapper.scrollable * {
             overscroll-behavior: contain !important;
             touch-action: pan-y !important;
@@ -528,7 +532,7 @@
         }
 
         /* ========================================= */
-        /* SKELETON SCREEN STYLES - REDUCED */
+        /* SKELETON SCREEN STYLES */
         /* ========================================= */
 
         .skeleton {
@@ -669,7 +673,7 @@
             background-color: var(--skeleton-highlight-dark);
         }
 
-        /* Skeleton History Table - Reduced rows */
+        /* Skeleton History Table */
         .skeleton-history-wrapper {
             overflow-x:auto;
             border: 1px solid #e0e0e0;
@@ -789,15 +793,9 @@
             background-color: var(--skeleton-highlight-dark);
         }
 
-        /* Loading State - Hidden by default for speed */
+        /* Loading State - Hidden for speed */
         .loading-overlay {
             display: none !important;
-        }
-
-        /* Content Loading State */
-        .content-loading {
-            opacity: 0.5;
-            pointer-events: none;
         }
 
         /* ===== POPUP / RECEIPT MODAL ===== */
@@ -1409,7 +1407,7 @@
     <div class="loading-text">অপেক্ষা করুন</div>
 </div>
 
-<!-- SKELETON SCREEN - Always shown first, then hidden -->
+<!-- SKELETON SCREEN -->
 <div id="skeletonScreen" class="container" style="display: block;">
     <div class="skeleton-marquee skeleton">
         <div class="skeleton-marquee-left"></div>
@@ -1484,7 +1482,7 @@
     </div>
 </div>
 
-<!-- ACTUAL CONTENT - Hidden initially, shown after data loads -->
+<!-- ACTUAL CONTENT -->
 <div class="container" id="mainContainer" style="display: none;">
 
 <!-- Marquee -->
@@ -1662,20 +1660,25 @@ window.onpageshow = function(event) {
     }
 };
 
-// ===== CRITICAL FIX: Prevent pull-to-refresh on history scroll =====
+// ===== CRITICAL FIX: Prevent pull-to-refresh and page refresh =====
+// Method 1: Prevent default on touchmove for body
 document.addEventListener('touchmove', function(e) {
     const historyWrapper = document.getElementById('historyWrapper');
+    // If touch is inside history wrapper, allow it
     if (historyWrapper && historyWrapper.classList.contains('scrollable')) {
         const target = e.target;
         if (historyWrapper.contains(target)) {
-            return;
+            return; // Allow scroll inside history
         }
     }
-    if (e.target === document.body || e.target === document.documentElement) {
+    // Prevent pull-to-refresh on body
+    if (e.target === document.body || e.target === document.documentElement || 
+        e.target.closest('.container') === document.querySelector('.container')) {
         e.preventDefault();
     }
 }, { passive: false });
 
+// Method 2: Prevent wheel events from causing refresh
 document.addEventListener('wheel', function(e) {
     const historyWrapper = document.getElementById('historyWrapper');
     if (historyWrapper && historyWrapper.classList.contains('scrollable')) {
@@ -1688,6 +1691,30 @@ document.addEventListener('wheel', function(e) {
         e.preventDefault();
     }
 }, { passive: false });
+
+// Method 3: Prevent scroll events from bubbling on history wrapper
+function setupHistoryScrollProtection() {
+    const historyWrapper = document.getElementById('historyWrapper');
+    if (!historyWrapper) return;
+    
+    // Prevent scroll from bubbling up
+    historyWrapper.addEventListener('scroll', function(e) {
+        e.stopPropagation();
+    });
+    
+    historyWrapper.addEventListener('touchmove', function(e) {
+        e.stopPropagation();
+    }, { passive: true });
+    
+    historyWrapper.addEventListener('wheel', function(e) {
+        e.stopPropagation();
+    }, { passive: true });
+}
+
+// Call this after history is rendered
+function protectHistoryScroll() {
+    setTimeout(setupHistoryScrollProtection, 100);
+}
 
 // Cache elements
 const skeletonScreen = document.getElementById('skeletonScreen');
@@ -1733,6 +1760,8 @@ function showSkeleton() {
 function hideSkeleton() {
     skeletonScreen.style.display = 'none';
     mainContainer.style.display = 'block';
+    // Setup scroll protection after content is shown
+    setTimeout(setupHistoryScrollProtection, 200);
 }
 
 const formatNumber = (num) => {
@@ -1842,10 +1871,9 @@ function updateNotificationBadge(count) {
     notificationBadge.dataset.prevCount = num;
 }
 
-// ===== FAST LOAD: Load all data in parallel with minimal delay =====
+// ===== FAST LOAD: Load all data in parallel =====
 async function loadAllDataFast(memberId) {
     try {
-        // Load all data in parallel
         const [marqueeData, committeeData, userHomeData, userHistoryData] = await Promise.all([
             loadMarqueeData(),
             loadCommitteeData(),
@@ -1853,11 +1881,9 @@ async function loadAllDataFast(memberId) {
             loadUserHistoryData(memberId)
         ]);
         
-        // Hide skeleton and show content immediately
         hideSkeleton();
         dataLoaded = true;
         
-        // Setup real-time listeners after content is shown
         setupMarqueeRealtimeListener();
         setupUserFinancialRealtimeListener(memberId);
         setupCommitteeRealtimeListener();
@@ -1866,12 +1892,11 @@ async function loadAllDataFast(memberId) {
         return { marqueeData, committeeData, userHomeData, userHistoryData };
     } catch (error) {
         console.error("Error loading data:", error);
-        hideSkeleton(); // Still hide skeleton even on error
+        hideSkeleton();
         return null;
     }
 }
 
-// ===== SIMPLIFIED DATA LOADERS (no initialization checks for speed) =====
 async function loadMarqueeData() {
     try {
         const marqueeRef = db.collection('Marquee').doc('marqueeData');
@@ -2068,6 +2093,8 @@ function updateHistoryTable(transactions) {
     }
     
     attachHistoryClickListeners();
+    // Setup scroll protection after table update
+    setTimeout(setupHistoryScrollProtection, 100);
 }
 
 function showEmptyHistory() {
@@ -2437,9 +2464,8 @@ function attachHistoryClickListeners() {
     });
 }
 
-// ===== MAIN INITIALIZATION - FAST =====
+// ===== MAIN INITIALIZATION =====
 async function initializeApp(user) {
-    // Show skeleton immediately
     showSkeleton();
     initHeaderComponents();
     
@@ -2454,11 +2480,8 @@ async function initializeApp(user) {
             currentUserData.mobile = userData.mobile;
             
             setupNotificationListener(memberId);
-            
-            // Load all data in parallel - this will hide skeleton when done
             await loadAllDataFast(memberId);
         } else {
-            // No member ID, just show content
             hideSkeleton();
         }
         
